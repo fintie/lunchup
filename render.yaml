@@ -1,0 +1,55 @@
+services:
+  # Backend API Service
+  - type: web
+    name: lunchup-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: MONGODB_URI
+        fromDatabase:
+          name: lunchup-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        fromService:
+          name: lunchup-web
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+    healthCheckPath: /
+
+  # Frontend Web Service
+  - type: web
+    name: lunchup-web
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: lunchup-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+
+databases:
+  - name: lunchup-db
+    databaseName: lunchup
+    user: lunchup_user
+    plan: free
+    region: oregon
