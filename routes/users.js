@@ -26,6 +26,11 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password, professionalBackground, skills, preferredTopics, preferredLocation, preferredMeetingPoint, bio } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required' });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -58,6 +63,8 @@ router.post('/register', async (req, res) => {
       { expiresIn: '1d' }
     );
 
+    console.log(`✅ User registered: ${email} (${newUser._id})`);
+    
     res.status(201).json({
       token,
       user: {
@@ -67,7 +74,18 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('❌ Register error:', error.message);
+    console.error('Error details:', error);
+    
+    // More specific error messages
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+    
+    if (error.name === 'MongoServerError') {
+      return res.status(503).json({ message: 'Database unavailable. Please try again later.' });
+    }
+    
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

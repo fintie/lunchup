@@ -29,12 +29,25 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/lunchup';
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected successfully'))
+let mongoConnected = false;
+
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
+  socketTimeoutMS: 45000,
+})
+  .then(() => {
+    mongoConnected = true;
+    console.log('✅ MongoDB connected successfully');
+  })
   .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
-    // Don't exit - app can run in demo mode
+    console.error('❌ MongoDB connection error:', err.message);
+    console.log('⚠️  Running without database - some features may not work');
   });
+
+// MongoDB connection error handler
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB error:', err);
+});
 
 // Graceful shutdown handling
 process.on('SIGINT', async () => {
