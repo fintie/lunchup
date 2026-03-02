@@ -31,8 +31,9 @@ services:
     env: static
     region: oregon
     plan: free
-    buildCommand: cd client && npm install && npm run build
-    staticPublishPath: ./client/build
+    rootDirectory: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
     envVars:
       - key: REACT_APP_API_URL
         fromService:
