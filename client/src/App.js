@@ -24,8 +24,8 @@ const getApiUrl = () => {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       if (hostname.includes('onrender.com')) {
-        // Replace -web with -api in the hostname
-        return `https://${hostname.replace('lunchup-web', 'lunchup-api')}`;
+        // lunchup-web.onrender.com -> lunchup.onrender.com
+        return `https://${hostname.replace('-web', '')}`;
       }
     }
   }
