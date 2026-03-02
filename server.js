@@ -2,14 +2,22 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
+
+// Load environment variables
 require('dotenv').config();
+
+console.log('🔧 Environment check:');
+console.log('  NODE_ENV:', process.env.NODE_ENV || 'undefined');
+console.log('  PORT:', process.env.PORT || 'undefined');
+console.log('  MONGODB_URI:', process.env.MONGODB_URI ? '***' : 'undefined');
+console.log('  CORS_ORIGIN:', process.env.CORS_ORIGIN || 'undefined');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'http://localhost:3001'],
+  origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
   optionsSuccessStatus: 200
 };
