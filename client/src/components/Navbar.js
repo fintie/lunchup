@@ -27,22 +27,29 @@ const Navbar = ({ user, logout }) => {
             </Link>
             {user ? (
               <>
-                <Link 
-                  to="/matches" 
+                <Link
+                  to="/matches"
                   className={`nav-link ${isActive('/matches') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Find Matches
                 </Link>
-                <Link 
-                  to="/meetings" 
+                <Link
+                  to="/live"
+                  className={`nav-link ${isActive('/live') ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  🔴 Live
+                </Link>
+                <Link
+                  to="/meetings"
                   className={`nav-link ${isActive('/meetings') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   My Meetings
                 </Link>
-                <Link 
-                  to="/profile" 
+                <Link
+                  to="/profile"
                   className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -51,8 +58,22 @@ const Navbar = ({ user, logout }) => {
               </>
             ) : (
               <>
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/matches"
+                  className={`nav-link ${isActive('/matches') ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Find Matches
+                </Link>
+                <Link
+                  to="/live"
+                  className={`nav-link ${isActive('/live') ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  🔴 Live
+                </Link>
+                <Link
+                  to="/login"
                   className={`nav-link ${isActive('/login') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
                 >

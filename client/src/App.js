@@ -11,6 +11,7 @@ import Profile from './components/Profile';
 import Matches from './components/Matches';
 import Meetings from './components/Meetings';
 import Navbar from './components/Navbar';
+import Live from './components/Live';
 
 // Determine API URL based on environment
 const getApiUrl = () => {
@@ -112,6 +113,10 @@ function AppContent() {
           <Route
             path="/matches"
             element={<Matches user={user} />}
+          />
+          <Route
+            path="/live"
+            element={<Live user={user} />}
           />
           <Route
             path="/meetings"
