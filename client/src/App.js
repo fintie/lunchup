@@ -111,7 +111,7 @@ function AppContent() {
           />
           <Route
             path="/matches"
-            element={user ? <Matches user={user} /> : <Navigate to="/login" />}
+            element={<Matches user={user} />}
           />
           <Route
             path="/meetings"
