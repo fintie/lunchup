@@ -20,7 +20,7 @@ function Matches({ user }) {
     try {
       const token = localStorage.getItem('token');
       
-      // Try to fetch from API (works for both authenticated and guest)
+      // Try to fetch all users from API
       try {
         const allUsersRes = await axios.get('/users', {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
@@ -33,7 +33,8 @@ function Matches({ user }) {
           allUsers = getSampleMatches();
         }
         
-        setMatches(allUsers.slice(0, 12));
+        // Show ALL users (not just 12)
+        setMatches(allUsers);
       } catch (apiError) {
         // If API fails, show sample matches
         setMatches(getSampleMatches());
@@ -46,7 +47,7 @@ function Matches({ user }) {
     }
   };
 
-  // Sample matches for guests
+  // Sample matches for guests (expanded list)
   const getSampleMatches = () => [
     {
       _id: 'sample1',
@@ -113,6 +114,72 @@ function Matches({ user }) {
       preferredMeetingPoint: 'Acland Street',
       profilePicture: 'https://i.pravatar.cc/300?img=3',
       matchScore: 72
+    },
+    {
+      _id: 'sample7',
+      name: 'Charlotte Kim',
+      professionalBackground: 'HR Partner at Telstra',
+      skills: ['Leadership', 'Team Building', 'Coaching'],
+      preferredTopics: ['Career Growth', 'Leadership'],
+      preferredLocation: 'Sydney - Parramatta',
+      preferredMeetingPoint: 'Westfield Parramatta',
+      profilePicture: 'https://i.pravatar.cc/300?img=24',
+      matchScore: 70
+    },
+    {
+      _id: 'sample8',
+      name: 'Oliver Brown',
+      professionalBackground: 'DevOps Engineer at AWS',
+      skills: ['AWS', 'Kubernetes', 'Docker'],
+      preferredTopics: ['Cloud Computing', 'DevOps'],
+      preferredLocation: 'Brisbane - CBD',
+      preferredMeetingPoint: 'Queen Street Mall',
+      profilePicture: 'https://i.pravatar.cc/300?img=56',
+      matchScore: 68
+    },
+    {
+      _id: 'sample9',
+      name: 'Sophie Taylor',
+      professionalBackground: 'Financial Analyst at Macquarie',
+      skills: ['Financial Modeling', 'Excel', 'Analysis'],
+      preferredTopics: ['Finance', 'Investment'],
+      preferredLocation: 'Sydney - CBD',
+      preferredMeetingPoint: 'Martin Place',
+      profilePicture: 'https://i.pravatar.cc/300?img=28',
+      matchScore: 65
+    },
+    {
+      _id: 'sample10',
+      name: 'William Davis',
+      professionalBackground: 'Product Manager at Atlassian',
+      skills: ['Product Strategy', 'Agile', 'Roadmapping'],
+      preferredTopics: ['Product Development', 'Agile'],
+      preferredLocation: 'Melbourne - CBD',
+      preferredMeetingPoint: 'Southern Cross Station',
+      profilePicture: 'https://i.pravatar.cc/300?img=52',
+      matchScore: 63
+    },
+    {
+      _id: 'sample11',
+      name: 'Mia Johnson',
+      professionalBackground: 'Growth Manager at Airwallex',
+      skills: ['Growth Hacking', 'Analytics', 'Marketing'],
+      preferredTopics: ['Growth', 'Startups'],
+      preferredLocation: 'Melbourne - CBD',
+      preferredMeetingPoint: 'Collins Street',
+      profilePicture: 'https://i.pravatar.cc/300?img=35',
+      matchScore: 60
+    },
+    {
+      _id: 'sample12',
+      name: 'James Wilson',
+      professionalBackground: 'Solutions Architect at Google',
+      skills: ['Cloud Architecture', 'Python', 'Leadership'],
+      preferredTopics: ['Cloud', 'Architecture'],
+      preferredLocation: 'Sydney - Pyrmont',
+      preferredMeetingPoint: 'The Star Casino',
+      profilePicture: 'https://i.pravatar.cc/300?img=15',
+      matchScore: 58
     }
   ];
 
@@ -254,27 +321,29 @@ function Matches({ user }) {
             <h1>Find Matches</h1>
             <p>
               {user 
-                ? 'Discover professionals who share your interests' 
-                : 'Browse professionals in your area. Sign up to connect!'}
+                ? `${matches.length} professionals available to connect` 
+                : `${matches.length} professionals in your area. Sign up to connect!`}
             </p>
           </div>
-          <button
-            onClick={handleFindMatches}
-            className="btn btn-primary btn-lg"
-            disabled={findingMatches}
-          >
-            {findingMatches ? (
-              <>
-                <span className="spinner-small"></span>
-                Finding...
-              </>
-            ) : (
-              <>
-                <span>🎯</span>
-                {user ? 'Find Matches' : 'Browse Matches'}
-              </>
-            )}
-          </button>
+          {user && (
+            <button
+              onClick={handleFindMatches}
+              className="btn btn-primary btn-lg"
+              disabled={findingMatches}
+            >
+              {findingMatches ? (
+                <>
+                  <span className="spinner-small"></span>
+                  Finding...
+                </>
+              ) : (
+                <>
+                  <span>🎯</span>
+                  Refresh Matches
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {message.text && (
