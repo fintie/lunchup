@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './Live.css';
 
 function Live({ user }) {
   const [scenes, setScenes] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showConnectModal, setShowConnectModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  // Sample Australian users for live visualization
+  // Sample Australian users for live visualization (names hidden from display)
   const users = [
     { id: 1, name: 'Emma W.', role: 'Product Designer at Canva', avatar: 'https://i.pravatar.cc/300?img=5' },
     { id: 2, name: 'Liam C.', role: 'Software Engineer at Atlassian', avatar: 'https://i.pravatar.cc/300?img=11' },
@@ -17,13 +20,11 @@ function Live({ user }) {
     { id: 8, name: 'Oliver K.', role: 'DevOps Engineer at AWS', avatar: 'https://i.pravatar.cc/300?img=56' },
   ];
 
-  // Scene types
-  const sceneTypes = {
-    RESTAURANT: 'restaurant',
-    CAFE: 'cafe',
-    WALKING: 'walking',
+  // Status types
+  const statusTypes = {
+    MEETING: 'meeting',
     WAITING: 'waiting',
-    MEETING: 'meeting'
+    AVAILABLE: 'available'
   };
 
   // Generate initial scenes
@@ -35,78 +36,72 @@ function Live({ user }) {
       setCurrentTime(new Date());
     }, 1000);
 
-    // Refresh scenes every 10 seconds for "live" feel
-    const sceneRefresh = setInterval(() => {
+    // Randomly change user status every 15 minutes (900000ms)
+    const statusRefresh = setInterval(() => {
       generateScenes();
-    }, 10000);
+      console.log('🔄 Auto-updating user statuses...');
+    }, 900000); // 15 minutes
 
     return () => {
       clearInterval(timer);
-      clearInterval(sceneRefresh);
+      clearInterval(statusRefresh);
     };
   }, []);
 
   const generateScenes = () => {
+    // Randomly assign statuses to users
+    const shuffledUsers = [...users].sort(() => 0.5 - Math.random());
+    
     const newScenes = [
       // Restaurant scene - 2 users meeting
       {
         id: 'scene1',
-        type: sceneTypes.RESTAURANT,
+        type: 'restaurant',
         location: 'The Grounds, Alexandria',
-        users: [users[0], users[1]],
-        status: 'meeting',
+        users: [shuffledUsers[0], shuffledUsers[1]],
+        status: statusTypes.MEETING,
         topic: 'Product & Engineering Sync',
         animation: 'seated'
       },
-      // Cafe scene - 2 users having coffee
+      // Cafe scene - 2 users meeting
       {
         id: 'scene2',
-        type: sceneTypes.CAFE,
+        type: 'cafe',
         location: 'Patricia Coffee, CBD',
-        users: [users[2], users[3]],
-        status: 'meeting',
+        users: [shuffledUsers[2], shuffledUsers[3]],
+        status: statusTypes.MEETING,
         topic: 'Marketing Strategy Discussion',
         animation: 'seated'
       },
-      // Walking scene - user walking to meeting
+      // Waiting scene - user waiting for connection
       {
         id: 'scene3',
-        type: sceneTypes.WALKING,
-        location: 'George Street',
-        users: [users[4]],
-        status: 'walking',
-        destination: 'Meeting at Circular Quay',
-        animation: 'walking-right'
-      },
-      // Waiting scene - user waiting for match
-      {
-        id: 'scene4',
-        type: sceneTypes.WAITING,
-        location: 'Barangaroo Reserve',
-        users: [users[5]],
-        status: 'waiting',
-        waitingFor: 'Emma W.',
+        type: 'waiting',
+        location: 'Circular Quay',
+        users: [shuffledUsers[4]],
+        status: statusTypes.WAITING,
+        waitingFor: 'Someone to connect',
         animation: 'waiting'
       },
       // Another restaurant scene
       {
-        id: 'scene5',
-        type: sceneTypes.RESTAURANT,
+        id: 'scene4',
+        type: 'restaurant',
         location: 'Quay Restaurant',
-        users: [users[6], users[7]],
-        status: 'meeting',
+        users: [shuffledUsers[5], shuffledUsers[6]],
+        status: statusTypes.MEETING,
         topic: 'HR & Tech Collaboration',
         animation: 'seated'
       },
-      // Walking scene 2
+      // Available user looking for connection
       {
-        id: 'scene6',
-        type: sceneTypes.WALKING,
-        location: 'Collins Street, Melbourne',
-        users: [users[1]],
-        status: 'walking',
-        destination: 'Lunch at Chin Chin',
-        animation: 'walking-left'
+        id: 'scene5',
+        type: 'cafe',
+        location: 'Single O, Surry Hills',
+        users: [shuffledUsers[7]],
+        status: statusTypes.AVAILABLE,
+        waitingFor: 'Open to connect',
+        animation: 'available'
       }
     ];
 
@@ -123,10 +118,52 @@ function Live({ user }) {
 
   const getStatusIcon = (status) => {
     switch(status) {
-      case 'meeting': return '💬';
-      case 'walking': return '🚶';
-      case 'waiting': return '⏳';
+      case statusTypes.MEETING: return '💬';
+      case statusTypes.WAITING: return '⏳';
+      case statusTypes.AVAILABLE: return '👋';
       default: return '📍';
+    }
+  };
+
+  const handleUserClick = (user, scene) => {
+    if (scene.status === statusTypes.MEETING) {
+      // Users in meeting can't be connected
+      return;
+    }
+    
+    if (!user) {
+      // Guest user - redirect to register
+      window.location.href = '/#/register';
+      return;
+    }
+    
+    // Show connect modal
+    setSelectedUser({ user, scene });
+    setShowConnectModal(true);
+  };
+
+  const handleConnect = () => {
+    if (selectedUser && user) {
+      // Save connection
+      const connection = {
+        id: selectedUser.user.id,
+        name: selectedUser.user.name,
+        role: selectedUser.user.role,
+        connectedAt: new Date().toISOString(),
+        status: 'pending'
+      };
+      
+      const existingConnections = JSON.parse(localStorage.getItem('connections') || '[]');
+      const updatedConnections = [...existingConnections, connection];
+      localStorage.setItem('connections', JSON.stringify(updatedConnections));
+      localStorage.setItem('connectionsUpdated', Date.now().toString());
+      
+      setShowConnectModal(false);
+      
+      // Refresh scenes to update status
+      setTimeout(() => {
+        generateScenes();
+      }, 2000);
     }
   };
 
@@ -157,20 +194,69 @@ function Live({ user }) {
         </div>
         <div className="stat-divider"></div>
         <div className="stat-item">
-          <span className="stat-value">{scenes.filter(s => s.status === 'meeting').length}</span>
-          <span className="stat-label">Meetings Now</span>
+          <span className="stat-value">{scenes.filter(s => s.status === statusTypes.MEETING).length}</span>
+          <span className="stat-label">In Meetings</span>
         </div>
         <div className="stat-divider"></div>
         <div className="stat-item">
-          <span className="stat-value">{scenes.filter(s => s.status === 'walking').length}</span>
-          <span className="stat-label">En Route</span>
-        </div>
-        <div className="stat-divider"></div>
-        <div className="stat-item">
-          <span className="stat-value">{scenes.filter(s => s.status === 'waiting').length}</span>
+          <span className="stat-value">{scenes.filter(s => s.status === statusTypes.WAITING).length}</span>
           <span className="stat-label">Waiting</span>
         </div>
+        <div className="stat-divider"></div>
+        <div className="stat-item">
+          <span className="stat-value">{scenes.filter(s => s.status === statusTypes.AVAILABLE).length}</span>
+          <span className="stat-label">Available</span>
+        </div>
       </div>
+
+      {/* Connect Modal */}
+      {showConnectModal && selectedUser && (
+        <div className="connect-modal-overlay" onClick={() => setShowConnectModal(false)}>
+          <div className="connect-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowConnectModal(false)}>×</button>
+            
+            {!user ? (
+              // Guest modal
+              <>
+                <div className="modal-icon">🔒</div>
+                <h2>Connect with {selectedUser.user.name}</h2>
+                <p className="modal-role">{selectedUser.user.role}</p>
+                <p>Create an account to start connecting with professionals like {selectedUser.user.name.split(' ')[0]}.</p>
+                <div className="modal-benefits">
+                  <div className="benefit">✅ Connect with professionals</div>
+                  <div className="benefit">✅ Schedule lunch meetings</div>
+                  <div className="benefit">✅ Grow your network</div>
+                </div>
+                <div className="modal-actions">
+                  <Link to="/register" className="btn btn-primary btn-block btn-lg">
+                    Create Account
+                  </Link>
+                  <Link to="/login" className="btn btn-secondary btn-block">
+                    Sign In
+                  </Link>
+                </div>
+              </>
+            ) : (
+              // Authenticated user modal
+              <>
+                <div className="modal-icon">🤝</div>
+                <h2>Connect with {selectedUser.user.name}</h2>
+                <p className="modal-role">{selectedUser.user.role}</p>
+                <p className="modal-location">📍 {selectedUser.scene.location}</p>
+                <p>Send a connection request to {selectedUser.user.name.split(' ')[0]} and start networking!</p>
+                <div className="modal-actions">
+                  <button onClick={handleConnect} className="btn btn-primary btn-block btn-lg">
+                    Send Connection Request
+                  </button>
+                  <button onClick={() => setShowConnectModal(false)} className="btn btn-secondary btn-block">
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Live Scenes Grid */}
       <div className="scenes-grid">
@@ -185,9 +271,9 @@ function Live({ user }) {
               <span className="scene-type-badge">{scene.type}</span>
               <span className="scene-status">
                 {getStatusIcon(scene.status)}
-                {scene.status === 'meeting' ? ' In Meeting' : 
-                 scene.status === 'walking' ? ' Walking' : 
-                 scene.status === 'waiting' ? ' Waiting' : 'Active'}
+                {scene.status === statusTypes.MEETING ? ' In Meeting' : 
+                 scene.status === statusTypes.WAITING ? ' Waiting for Connect' : 
+                 scene.status === statusTypes.AVAILABLE ? ' Available to Connect' : 'Active'}
               </span>
             </div>
 
@@ -204,51 +290,50 @@ function Live({ user }) {
               
               {/* Users in scene */}
               <div className={`scene-users scene-users-${scene.animation}`}>
-                {scene.users.map((user, idx) => (
+                {scene.users.map((userData, idx) => (
                   <div 
-                    key={user.id} 
-                    className="scene-user"
+                    key={userData.id} 
+                    className={`scene-user ${scene.status !== statusTypes.MEETING ? 'clickable' : ''}`}
+                    onClick={() => handleUserClick(userData, scene)}
                     style={{ 
                       animationDelay: `${idx * 0.2}s`,
-                      left: scene.users.length === 2 ? `${idx * 50 + 10}%` : '40%'
+                      left: scene.users.length === 2 ? `${idx * 50 + 10}%` : '40%',
+                      cursor: scene.status !== statusTypes.MEETING ? 'pointer' : 'default'
                     }}
+                    title={scene.status !== statusTypes.MEETING ? 'Click to connect' : 'In meeting'}
                   >
                     <div className="user-avatar-container">
-                      <img src={user.avatar} alt={user.name} className="user-avatar" />
-                      {scene.status === 'meeting' && (
+                      <img src={userData.avatar} alt={userData.name} className="user-avatar" />
+                      {scene.status === statusTypes.MEETING && (
                         <span className="user-status-indicator meeting"></span>
                       )}
-                      {scene.status === 'walking' && (
-                        <span className="user-status-indicator walking"></span>
-                      )}
-                      {scene.status === 'waiting' && (
+                      {scene.status === statusTypes.WAITING && (
                         <span className="user-status-indicator waiting"></span>
+                      )}
+                      {scene.status === statusTypes.AVAILABLE && (
+                        <span className="user-status-indicator available"></span>
                       )}
                     </div>
                     <div className="user-info-bubble">
-                      <span className="user-name">{user.name}</span>
-                      <span className="user-role">{user.role}</span>
+                      {/* Only show role/company, NOT name */}
+                      <span className="user-role">{userData.role}</span>
+                      {scene.status !== statusTypes.MEETING && (
+                        <span className="connect-hint">👆 Click to connect</span>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Connection line for meetings */}
-              {scene.status === 'meeting' && scene.users.length === 2 && (
+              {scene.status === statusTypes.MEETING && scene.users.length === 2 && (
                 <div className="connection-line"></div>
               )}
 
-              {/* Walking path animation */}
-              {scene.status === 'walking' && (
-                <div className="walking-path">
-                  <div className="path-dots"></div>
-                </div>
-              )}
-
               {/* Waiting indicator */}
-              {scene.status === 'waiting' && (
+              {(scene.status === statusTypes.WAITING || scene.status === statusTypes.AVAILABLE) && (
                 <div className="waiting-bubble">
-                  <span className="waiting-text">Waiting for {scene.waitingFor}...</span>
+                  <span className="waiting-text">{scene.waitingFor}</span>
                 </div>
               )}
             </div>
@@ -261,15 +346,9 @@ function Live({ user }) {
                   {scene.topic}
                 </div>
               )}
-              {scene.destination && (
-                <div className="scene-destination">
-                  <span className="destination-icon">🎯</span>
-                  {scene.destination}
-                </div>
-              )}
               <div className="scene-time-ago">
                 <span className="time-dot"></span>
-                Just now
+                Status updates in {Math.floor(Math.random() * 10) + 5} min
               </div>
             </div>
           </div>
@@ -284,25 +363,25 @@ function Live({ user }) {
             <span className="feed-icon meeting">💬</span>
             <div className="feed-content">
               <span className="feed-text">
-                <strong>Emma W.</strong> and <strong>Liam C.</strong> started a meeting
+                <strong>Product Designer</strong> and <strong>Software Engineer</strong> started a meeting
               </span>
               <span className="feed-time">2 min ago</span>
-            </div>
-          </div>
-          <div className="feed-item">
-            <span className="feed-icon walking">🚶</span>
-            <div className="feed-content">
-              <span className="feed-text">
-                <strong>Ava A.</strong> is heading to Circular Quay
-              </span>
-              <span className="feed-time">5 min ago</span>
             </div>
           </div>
           <div className="feed-item">
             <span className="feed-icon waiting">⏳</span>
             <div className="feed-content">
               <span className="feed-text">
-                <strong>Jack R.</strong> is waiting for a match
+                <strong>UX Designer</strong> is waiting for a connection
+              </span>
+              <span className="feed-time">5 min ago</span>
+            </div>
+          </div>
+          <div className="feed-item">
+            <span className="feed-icon available">👋</span>
+            <div className="feed-content">
+              <span className="feed-text">
+                <strong>DevOps Engineer</strong> is available to connect
               </span>
               <span className="feed-time">8 min ago</span>
             </div>
@@ -311,13 +390,29 @@ function Live({ user }) {
             <span className="feed-icon success">✅</span>
             <div className="feed-content">
               <span className="feed-text">
-                <strong>Olivia M.</strong> connected with <strong>Noah T.</strong>
+                <strong>Marketing Manager</strong> connected with <strong>Data Scientist</strong>
               </span>
               <span className="feed-time">12 min ago</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* CTA for Guests */}
+      {!user && (
+        <div className="guest-cta">
+          <h2>Want to join these professionals?</h2>
+          <p>Sign up now to start connecting and meeting for lunch!</p>
+          <div className="cta-buttons">
+            <Link to="/register" className="btn btn-primary btn-lg">
+              Create Account
+            </Link>
+            <Link to="/login" className="btn btn-secondary btn-lg">
+              Sign In
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
