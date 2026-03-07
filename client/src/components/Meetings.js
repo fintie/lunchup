@@ -4,6 +4,7 @@ import './Meetings.css';
 
 function Meetings({ user }) {
   const [meetings, setMeetings] = useState([]);
+  const [connections, setConnections] = useState([]);
   const [showSchedule, setShowSchedule] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -18,34 +19,32 @@ function Meetings({ user }) {
 
   useEffect(() => {
     fetchMeetings();
+    fetchConnections();
+    
+    // Listen for connection updates
+    const handleStorageChange = () => {
+      fetchConnections();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const fetchMeetings = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      // For demo, we'll show sample meetings
-      // In production, you'd fetch from the API
+      // For demo, show sample meetings
       setMeetings([
         {
           _id: '1',
-          with: { name: 'Sarah Chen' },
+          with: { name: 'Sarah Chen', photo: 'https://i.pravatar.cc/300?img=5' },
           date: '2025-03-01',
           time: '12:30',
           location: 'The Modern Restaurant',
-          meetingPoint: 'Union Square',
+          meetingPoint: 'Circular Quay',
           topic: 'Product Strategy Discussion',
           status: 'confirmed'
-        },
-        {
-          _id: '2',
-          with: { name: 'Michael Rodriguez' },
-          date: '2025-03-05',
-          time: '13:00',
-          location: 'Google Cafe',
-          meetingPoint: 'Bryant Park',
-          topic: 'Tech Trends & Open Source',
-          status: 'scheduled'
         }
       ]);
     } catch (error) {
@@ -53,6 +52,11 @@ function Meetings({ user }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchConnections = () => {
+    const storedConnections = JSON.parse(localStorage.getItem('connections') || '[]');
+    setConnections(storedConnections);
   };
 
   const handleSubmit = async (e) => {
@@ -63,15 +67,6 @@ function Meetings({ user }) {
     try {
       const token = localStorage.getItem('token');
       
-      // In production, you'd send this to the API
-      // await axios.post('/meetings', {
-      //   ...newMeeting,
-      //   hostId: user.id,
-      //   attendees: [selectedPersonId]
-      // }, {
-      //   headers: { Authorization: `Bearer ${token}` }
-      // });
-
       // For demo, simulate success
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -97,17 +92,37 @@ function Meetings({ user }) {
     setNewMeeting({ ...newMeeting, [e.target.name]: e.target.value });
   };
 
+  const handleAcceptConnection = (connectionId) => {
+    const updated = connections.map(c => 
+      c.id === connectionId ? { ...c, status: 'accepted' } : c
+    );
+    setConnections(updated);
+    localStorage.setItem('connections', JSON.stringify(updated));
+    setMessage({ type: 'success', text: 'Connection accepted! You can now schedule a meeting.' });
+    setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+  };
+
+  const handleScheduleWithConnection = (connection) => {
+    setNewMeeting({
+      ...newMeeting,
+      topic: `Meeting with ${connection.name}`
+    });
+    setShowSchedule(true);
+  };
+
   const getStatusBadge = (status) => {
     const badges = {
       scheduled: { label: 'Scheduled', class: 'badge-scheduled' },
       confirmed: { label: 'Confirmed', class: 'badge-confirmed' },
       completed: { label: 'Completed', class: 'badge-completed' },
-      cancelled: { label: 'Cancelled', class: 'badge-cancelled' }
+      cancelled: { label: 'Cancelled', class: 'badge-cancelled' },
+      pending: { label: 'Pending', class: 'badge-pending' },
+      accepted: { label: 'Accepted', class: 'badge-accepted' }
     };
     return badges[status] || badges.scheduled;
   };
 
-  if (loading && meetings.length === 0) {
+  if (loading && meetings.length === 0 && connections.length === 0) {
     return (
       <div className="meetings-page">
         <div className="container">
@@ -126,7 +141,7 @@ function Meetings({ user }) {
         <div className="meetings-header">
           <div>
             <h1>My Meetings</h1>
-            <p>Manage your upcoming lunch meetings</p>
+            <p>Manage your connections and upcoming lunch meetings</p>
           </div>
           <button 
             onClick={() => setShowSchedule(!showSchedule)}
@@ -202,7 +217,7 @@ function Meetings({ user }) {
                   value={newMeeting.meetingPoint}
                   onChange={handleChange}
                   className="form-input"
-                  placeholder="e.g., Union Square, Lobby entrance"
+                  placeholder="e.g., Circular Quay, Lobby entrance"
                   required
                 />
               </div>
@@ -252,35 +267,95 @@ function Meetings({ user }) {
           </div>
         )}
 
-        {meetings.length === 0 ? (
+        {/* Connections Section */}
+        {connections.length > 0 && (
+          <div className="connections-section">
+            <h2 className="section-title">My Connections</h2>
+            <div className="connections-grid">
+              {connections.map((connection, index) => {
+                const statusBadge = getStatusBadge(connection.status);
+                return (
+                  <div 
+                    key={connection.id} 
+                    className="connection-card animate-scaleIn"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="connection-avatar">
+                      {connection.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="connection-info">
+                      <h3>{connection.name}</h3>
+                      <span className={`connection-status ${statusBadge.class}`}>
+                        {statusBadge.label}
+                      </span>
+                      <p className="connection-date">
+                        Connected {new Date(connection.connectedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="connection-actions">
+                      {connection.status === 'pending' && (
+                        <>
+                          <button 
+                            onClick={() => handleAcceptConnection(connection.id)}
+                            className="btn btn-primary btn-sm"
+                          >
+                            Accept
+                          </button>
+                          <button 
+                            onClick={() => handleScheduleWithConnection(connection)}
+                            className="btn btn-secondary btn-sm"
+                          >
+                            Schedule
+                          </button>
+                        </>
+                      )}
+                      {connection.status === 'accepted' && (
+                        <button 
+                          onClick={() => handleScheduleWithConnection(connection)}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Schedule Meeting
+                        </button>
+                      )}
+                      {connection.status === 'scheduled' && (
+                        <span className="connection-scheduled">✓ Meeting Scheduled</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Meetings Section */}
+        {meetings.length === 0 && connections.length === 0 ? (
           <div className="empty-state animate-scaleIn">
             <div className="empty-icon">📅</div>
-            <h2>No meetings scheduled</h2>
-            <p>Connect with someone to schedule your first lunch meeting!</p>
-            <button 
-              onClick={() => setShowSchedule(true)}
-              className="btn btn-primary btn-lg"
-            >
-              Book Your First Meeting
-            </button>
+            <h2>No meetings yet</h2>
+            <p>Connect with someone from the Matches page to start building your network!</p>
+            <a href="#/matches" className="btn btn-primary btn-lg">
+              Find Matches
+            </a>
           </div>
         ) : (
-          <div className="meetings-list">
-            {meetings.map((meeting, index) => {
-              const statusBadge = getStatusBadge(meeting.status);
-              return (
-                <div 
-                  key={meeting._id} 
-                  className="meeting-card animate-scaleIn"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="meeting-date-badge">
-                    <span className="day">{new Date(meeting.date).getDate()}</span>
-                    <span className="month">{new Date(meeting.date).toLocaleDateString('en-US', { month: 'short' })}</span>
-                  </div>
-                  
-                  <div className="meeting-body">
-                    <div className="meeting-header-row">
+          meetings.length > 0 && (
+            <div className="meetings-list">
+              <h2 className="section-title">Upcoming Meetings</h2>
+              {meetings.map((meeting, index) => {
+                const statusBadge = getStatusBadge(meeting.status);
+                return (
+                  <div 
+                    key={meeting._id} 
+                    className="meeting-card animate-scaleIn"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="meeting-date-badge">
+                      <span className="day">{new Date(meeting.date).getDate()}</span>
+                      <span className="month">{new Date(meeting.date).toLocaleDateString('en-US', { month: 'short' })}</span>
+                    </div>
+                    
+                    <div className="meeting-body">
                       <div className="meeting-person">
                         {meeting.with.photo ? (
                           <img src={meeting.with.photo} alt={meeting.with.name} className="meeting-avatar" />
@@ -301,32 +376,32 @@ function Meetings({ user }) {
                           hour12: true 
                         })}
                       </span>
+                      
+                      <div className="meeting-details">
+                        <div className="detail-item">
+                          <span className="detail-icon">🍽️</span>
+                          <span>{meeting.location}</span>
+                        </div>
+                        <div className="detail-item">
+                          <span className="detail-icon">📍</span>
+                          <span>Meet at: {meeting.meetingPoint}</span>
+                        </div>
+                        <div className="detail-item">
+                          <span className="detail-icon">💬</span>
+                          <span>{meeting.topic}</span>
+                        </div>
+                      </div>
                     </div>
                     
-                    <div className="meeting-details">
-                      <div className="detail-item">
-                        <span className="detail-icon">🍽️</span>
-                        <span>{meeting.location}</span>
-                      </div>
-                      <div className="detail-item">
-                        <span className="detail-icon">📍</span>
-                        <span>Meet at: {meeting.meetingPoint}</span>
-                      </div>
-                      <div className="detail-item">
-                        <span className="detail-icon">💬</span>
-                        <span>{meeting.topic}</span>
-                      </div>
+                    <div className="meeting-actions">
+                      <button className="btn btn-secondary btn-sm">Message</button>
+                      <button className="btn btn-outline btn-sm">Reschedule</button>
                     </div>
                   </div>
-                  
-                  <div className="meeting-actions">
-                    <button className="btn btn-secondary btn-sm">Message</button>
-                    <button className="btn btn-outline btn-sm">Reschedule</button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )
         )}
       </div>
     </div>

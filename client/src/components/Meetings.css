@@ -315,3 +315,116 @@
     width: 100%;
   }
 }
+
+/* Connections Section */
+.connections-section {
+  margin-bottom: var(--space-8);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-5);
+  color: var(--gray-800);
+}
+
+.connections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.connection-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
+  transition: all var(--transition-slow);
+}
+
+.connection-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.connection-avatar {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.connection-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.connection-info h3 {
+  font-size: 1.125rem;
+  margin-bottom: var(--space-1);
+}
+
+.connection-status {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-2);
+}
+
+.badge-pending {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+.badge-accepted {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.badge-scheduled {
+  background: var(--primary-100);
+  color: var(--primary-700);
+}
+
+.connection-date {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+}
+
+.connection-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.connection-scheduled {
+  font-size: 0.875rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .connection-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .connection-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}

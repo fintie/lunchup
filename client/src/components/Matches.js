@@ -12,7 +12,7 @@ function Matches({ user }) {
   const [selectedMatch, setSelectedMatch] = useState(null);
 
   useEffect(() => {
-    fetchMatches();
+    fetchMatches(); // Auto-load matches on page visit
   }, []);
 
   const fetchMatches = async () => {
@@ -206,10 +206,30 @@ function Matches({ user }) {
       setSelectedMatch({ id: matchId, name: matchName });
       setShowAuthModal(true);
     } else {
-      // User is authenticated - proceed with connection
-      setMessage({ type: 'success', text: `Connection request sent to ${matchName}!` });
+      // User is authenticated - save the connection
+      const connection = {
+        id: matchId,
+        name: matchName,
+        connectedAt: new Date().toISOString(),
+        status: 'pending'
+      };
+      
+      // Get existing connections from localStorage
+      const existingConnections = JSON.parse(localStorage.getItem('connections') || '[]');
+      
+      // Add new connection
+      const updatedConnections = [...existingConnections, connection];
+      localStorage.setItem('connections', JSON.stringify(updatedConnections));
+      
+      // Also save to axios for Meetings component to access
+      localStorage.setItem('connectionsUpdated', Date.now().toString());
+      
+      setMessage({ type: 'success', text: `Connection request sent to ${matchName}! They'll appear in your meetings once accepted.` });
+      
+      // Remove from matches list
       setMatches(matches.filter(m => m._id !== matchId));
-      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+      
+      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
     }
   };
 
