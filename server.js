@@ -34,6 +34,10 @@ let mongoConnected = false;
 mongoose.connect(MONGODB_URI, {
   serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
   socketTimeoutMS: 45000,
+  connectTimeoutMS: 10000,
+  maxPoolSize: 10,
+  retryWrites: true,
+  retryReads: true
 })
   .then(() => {
     mongoConnected = true;
@@ -47,6 +51,11 @@ mongoose.connect(MONGODB_URI, {
 // MongoDB connection error handler
 mongoose.connection.on('error', (err) => {
   console.error('MongoDB error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠️  MongoDB disconnected');
+  mongoConnected = false;
 });
 
 // Graceful shutdown handling
