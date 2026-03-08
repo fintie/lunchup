@@ -133,12 +133,42 @@ router.post('/register', async (req, res) => {
 // Get all users (for matching)
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    // Get all users except the current user
-    const users = await User.find({ _id: { $ne: req.userId } })
-      .select('-password')
-      .limit(50);
+    let users = [];
+    
+    // Try MongoDB first
+    try {
+      users = await User.find({ _id: { $ne: req.userId } })
+        .select('-password')
+        .limit(50);
+    } catch (mongoError) {
+      console.log('MongoDB unavailable, returning demo users');
+    }
+    
+    // If no MongoDB users, return demo users (excluding current user)
+    if (users.length === 0) {
+      const demoUsersArray = Array.from(demoUsers.values())
+        .filter(u => u._id !== req.userId)
+        .map(u => ({
+          _id: u._id,
+          name: u.name,
+          email: u.email,
+          professionalBackground: u.professionalBackground,
+          skills: u.skills,
+          preferredTopics: u.preferredTopics,
+          preferredLocation: u.preferredLocation,
+          preferredMeetingPoint: u.preferredMeetingPoint,
+          profilePicture: u.profilePicture,
+          bio: u.bio,
+          isOnline: u.isOnline,
+          lastActive: u.lastActive
+        }));
+      
+      users = demoUsersArray.slice(0, 50); // Limit to 50
+    }
+    
     res.json(users);
   } catch (error) {
+    console.error('Get users error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
