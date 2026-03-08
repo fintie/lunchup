@@ -4,6 +4,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// In-memory demo users storage (same as auth.js)
+const demoUsers = new Map();
+let demoUserId = 1;
+
 // Middleware to verify JWT token
 const authMiddleware = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -31,46 +35,82 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+    let user;
+    let isNewUser = false;
+
+    // Try MongoDB first
+    try {
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      // Create new user in MongoDB
+      const newUser = new User({
+        name,
+        email,
+        password: hashedPassword,
+        professionalBackground,
+        skills,
+        preferredTopics,
+        preferredLocation,
+        preferredMeetingPoint,
+        bio
+      });
+
+      await newUser.save();
+      user = newUser;
+      isNewUser = true;
+      
+      console.log(`✅ User registered in MongoDB: ${email}`);
+    } catch (mongoError) {
+      console.log('MongoDB unavailable, using demo mode for registration');
+      
+      // Fall back to demo mode
+      if (demoUsers.has(email)) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      user = {
+        _id: `demo_${demoUserId++}`,
+        name,
+        email,
+        password: hashedPassword,
+        professionalBackground,
+        skills,
+        preferredTopics,
+        preferredLocation,
+        preferredMeetingPoint,
+        bio
+      };
+
+      demoUsers.set(email, user);
+      isNewUser = true;
+      
+      console.log(`✅ User registered in demo mode: ${email}`);
     }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      professionalBackground,
-      skills,
-      preferredTopics,
-      preferredLocation,
-      preferredMeetingPoint,
-      bio
-    });
-
-    await newUser.save();
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: newUser._id },
+      { userId: user._id },
       process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '1d' }
     );
 
-    console.log(`✅ User registered: ${email} (${newUser._id})`);
-    
     res.status(201).json({
       token,
       user: {
-        id: newUser._id,
-        name: newUser.name,
-        email: newUser.email
+        id: user._id,
+        name: user.name,
+        email: user.email
       }
     });
   } catch (error) {
