@@ -135,17 +135,11 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     let users = [];
     
-    // Try MongoDB first
-    try {
-      users = await User.find({ _id: { $ne: req.userId } })
-        .select('-password')
-        .limit(50);
-    } catch (mongoError) {
-      console.log('MongoDB unavailable, returning demo users');
-    }
+    // Check if current user is a demo user
+    const isDemoUser = req.userId && req.userId.startsWith('demo_');
     
-    // If no MongoDB users, return demo users (excluding current user)
-    if (users.length === 0) {
+    if (isDemoUser) {
+      // Return demo users directly without MongoDB query
       const demoUsersArray = Array.from(demoUsers.values())
         .filter(u => u._id !== req.userId)
         .map(u => ({
@@ -163,7 +157,35 @@ router.get('/', authMiddleware, async (req, res) => {
           lastActive: u.lastActive
         }));
       
-      users = demoUsersArray.slice(0, 50); // Limit to 50
+      users = demoUsersArray.slice(0, 70); // Return all 70
+    } else {
+      // Try MongoDB for real users
+      try {
+        users = await User.find({ _id: { $ne: req.userId } })
+          .select('-password')
+          .limit(50);
+      } catch (mongoError) {
+        console.log('MongoDB unavailable, returning demo users');
+        
+        const demoUsersArray = Array.from(demoUsers.values())
+          .filter(u => u._id !== req.userId)
+          .map(u => ({
+            _id: u._id,
+            name: u.name,
+            email: u.email,
+            professionalBackground: u.professionalBackground,
+            skills: u.skills,
+            preferredTopics: u.preferredTopics,
+            preferredLocation: u.preferredLocation,
+            preferredMeetingPoint: u.preferredMeetingPoint,
+            profilePicture: u.profilePicture,
+            bio: u.bio,
+            isOnline: u.isOnline,
+            lastActive: u.lastActive
+          }));
+        
+        users = demoUsersArray.slice(0, 70);
+      }
     }
     
     res.json(users);
