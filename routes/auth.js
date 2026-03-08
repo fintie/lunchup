@@ -7,7 +7,6 @@ const User = require('../models/User');
 
 // In-memory demo users (fallback when MongoDB is unavailable)
 const demoUsers = new Map();
-let demoUserId = 1;
 
 // Australian first names
 const firstNames = [
@@ -121,8 +120,8 @@ const getRandomItems = (arr, count) => {
   return shuffled.slice(0, Math.min(count, arr.length));
 };
 
-// Initialize with 70 demo users
-const initializeDemoUsers = async () => {
+// Generate 70 demo users synchronously (without hashing for speed)
+const generateDemoUsers = () => {
   console.log('🌱 Generating 70 demo users...');
   
   for (let i = 0; i < 70; i++) {
@@ -132,19 +131,16 @@ const initializeDemoUsers = async () => {
     const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@lunchup.com`;
     const password = 'password123'; // Same password for all demo users
     
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
     const locationData = locations[Math.floor(Math.random() * locations.length)];
     
     demoUsers.set(email, {
-      _id: `demo_${demoUserId++}`,
+      _id: `demo_${i + 1}`,
       name,
       email,
-      password: hashedPassword,
+      password: '$2a$10$demoHashedPasswordForAllDemoUsers123456789', // Pre-hashed for demo
       professionalBackground: backgrounds[Math.floor(Math.random() * backgrounds.length)],
-      skills: getRandomItems(allSkills, Math.floor(Math.random() * 3) + 3), // 3-5 skills
-      preferredTopics: getRandomItems(allTopics, Math.floor(Math.random() * 2) + 2), // 2-3 topics
+      skills: getRandomItems(allSkills, Math.floor(Math.random() * 3) + 3),
+      preferredTopics: getRandomItems(allTopics, Math.floor(Math.random() * 2) + 2),
       preferredLocation: locationData.location,
       preferredMeetingPoint: locationData.meetingPoint,
       profilePicture: `https://i.pravatar.cc/300?img=${(i % 70) + 1}`,
@@ -154,11 +150,29 @@ const initializeDemoUsers = async () => {
     });
   }
   
+  // Add main demo user
+  demoUsers.set('demo@lunchup.com', {
+    _id: 'demo_0',
+    name: 'Demo User',
+    email: 'demo@lunchup.com',
+    password: '$2a$10$demoHashedPasswordForAllDemoUsers123456789',
+    professionalBackground: 'Developer',
+    skills: ['JavaScript', 'React', 'Node.js'],
+    preferredTopics: ['Tech Trends', 'Startups'],
+    preferredLocation: 'Sydney - CBD',
+    preferredMeetingPoint: 'Circular Quay',
+    profilePicture: 'https://i.pravatar.cc/300?img=1',
+    bio: 'Demo user for testing',
+    isOnline: true,
+    lastActive: new Date()
+  });
+  
   console.log(`✅ ${demoUsers.size} demo users initialized`);
   console.log('📧 Demo login: demo@lunchup.com / password123');
 };
 
-initializeDemoUsers();
+// Initialize demo users immediately
+generateDemoUsers();
 
 // Helper to check MongoDB health
 const checkMongoHealth = async () => {
@@ -175,23 +189,45 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check demo users FIRST (faster)
+    // Check demo users FIRST (faster, no MongoDB needed)
     let user = demoUsers.get(email);
     
-    if (!user) {
-      // Not in demo users, try MongoDB
-      try {
-        user = await User.findOne({ email });
-      } catch (mongoError) {
-        console.log('⚠️  MongoDB unavailable');
+    if (user) {
+      // Demo user found - accept password123 for all demo users
+      if (password === 'password123') {
+        // Generate JWT token
+        const token = jwt.sign(
+          { userId: user._id },
+          process.env.JWT_SECRET || 'fallback_secret',
+          { expiresIn: '1d' }
+        );
+
+        res.json({
+          token,
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email
+          }
+        });
+        return;
+      } else {
+        return res.status(400).json({ message: 'Invalid credentials. Password is password123 for demo users.' });
       }
+    }
+    
+    // Not a demo user, try MongoDB
+    try {
+      user = await User.findOne({ email });
+    } catch (mongoError) {
+      console.log('⚠️  MongoDB unavailable');
     }
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials. Try demo@lunchup.com / password123' });
     }
 
-    // Check password
+    // Check password for MongoDB user
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
