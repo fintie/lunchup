@@ -134,61 +134,58 @@ router.post('/register', async (req, res) => {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     let users = [];
+    let mongoUsers = [];
+    let demoUsersArray = [];
     
     // Check if current user is a demo user
     const isDemoUser = req.userId && req.userId.startsWith('demo_');
     
-    if (isDemoUser) {
-      // Return demo users directly without MongoDB query
-      const demoUsersArray = Array.from(demoUsers.values())
-        .filter(u => u._id !== req.userId)
-        .map(u => ({
-          _id: u._id,
-          name: u.name,
-          email: u.email,
-          professionalBackground: u.professionalBackground,
-          skills: u.skills,
-          preferredTopics: u.preferredTopics,
-          preferredLocation: u.preferredLocation,
-          preferredMeetingPoint: u.preferredMeetingPoint,
-          profilePicture: u.profilePicture,
-          bio: u.bio,
-          isOnline: u.isOnline,
-          lastActive: u.lastActive
-        }));
-      
-      users = demoUsersArray.slice(0, 70); // Return all 70
-    } else {
-      // Try MongoDB for real users
-      try {
-        users = await User.find({ _id: { $ne: req.userId } })
-          .select('-password')
-          .limit(50);
-      } catch (mongoError) {
-        console.log('MongoDB unavailable, returning demo users');
-        
-        const demoUsersArray = Array.from(demoUsers.values())
-          .filter(u => u._id !== req.userId)
-          .map(u => ({
-            _id: u._id,
-            name: u.name,
-            email: u.email,
-            professionalBackground: u.professionalBackground,
-            skills: u.skills,
-            preferredTopics: u.preferredTopics,
-            preferredLocation: u.preferredLocation,
-            preferredMeetingPoint: u.preferredMeetingPoint,
-            profilePicture: u.profilePicture,
-            bio: u.bio,
-            isOnline: u.isOnline,
-            lastActive: u.lastActive
-          }));
-        
-        users = demoUsersArray.slice(0, 70);
-      }
+    // Try to get MongoDB users
+    try {
+      mongoUsers = await User.find({ _id: { $ne: req.userId } })
+        .select('-password')
+        .limit(50);
+      console.log(`📊 Loaded ${mongoUsers.length} users from MongoDB`);
+    } catch (mongoError) {
+      console.log('MongoDB unavailable');
     }
     
-    res.json(users);
+    // Always load demo users
+    demoUsersArray = Array.from(demoUsers.values())
+      .filter(u => u._id !== req.userId)
+      .map(u => ({
+        _id: u._id,
+        name: u.name,
+        email: u.email,
+        professionalBackground: u.professionalBackground,
+        skills: u.skills,
+        preferredTopics: u.preferredTopics,
+        preferredLocation: u.preferredLocation,
+        preferredMeetingPoint: u.preferredMeetingPoint,
+        profilePicture: u.profilePicture,
+        bio: u.bio,
+        isOnline: u.isOnline,
+        lastActive: u.lastActive
+      }));
+    
+    console.log(`📊 Loaded ${demoUsersArray.length} demo users`);
+    
+    // Combine MongoDB users + demo users
+    if (isDemoUser) {
+      // Demo user sees all demo users + MongoDB users
+      users = [...demoUsersArray, ...mongoUsers];
+    } else {
+      // MongoDB user sees all MongoDB users + demo users
+      users = [...mongoUsers, ...demoUsersArray];
+    }
+    
+    // Remove duplicates (by email) and limit
+    const uniqueUsers = users.filter((user, index, self) =>
+      index === self.findIndex(u => u.email === user.email)
+    ).slice(0, 100); // Limit to 100 total
+    
+    console.log(`📊 Returning ${uniqueUsers.length} total users`);
+    res.json(uniqueUsers);
   } catch (error) {
     console.error('Get users error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
