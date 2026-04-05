@@ -28,13 +28,15 @@ const Login = ({ onAuth }) => {
       const res = await axios.post('/auth/login', formData);
       const { token, user } = res.data;
 
-      // Store auth data directly
-      localStorage.setItem('token', token);
-      localStorage.setItem('userName', user.name);
-      localStorage.setItem('userEmail', user.email);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      if (onAuth) {
+        onAuth(user, token);
+      } else {
+        localStorage.setItem('token', token);
+        localStorage.setItem('userName', user.name);
+        localStorage.setItem('userEmail', user.email);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
 
-      // Navigate to matches
       navigate('/matches', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password');
