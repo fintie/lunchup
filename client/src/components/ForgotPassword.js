@@ -8,16 +8,21 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [resetLink, setResetLink] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
+    setResetLink('');
 
     try {
       const res = await axios.post('/auth/forgot-password', { email });
       setSuccess(res.data?.message || 'If that email exists, we will send reset instructions.');
+      if (res.data?.resetLink) {
+        setResetLink(res.data.resetLink);
+      }
       setEmail('');
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to start password reset right now.');
@@ -35,7 +40,7 @@ const ForgotPassword = () => {
         <div className="auth-card animate-scaleIn">
           <div className="auth-header">
             <h1>Forgot your password?</h1>
-            <p>Enter your email and we’ll help you reset access to your account.</p>
+            <p>Enter your email and we’ll send you a link to reset your password.</p>
           </div>
 
           {error && (
@@ -49,6 +54,16 @@ const ForgotPassword = () => {
             <div className="alert alert-success">
               <span className="alert-icon">✅</span>
               {success}
+            </div>
+          )}
+
+          {resetLink && (
+            <div className="alert alert-info">
+              <span className="alert-icon">🔗</span>
+              <div>
+                <div className="alert-title">Reset link</div>
+                <a href={resetLink} className="alert-link">{resetLink}</a>
+              </div>
             </div>
           )}
 

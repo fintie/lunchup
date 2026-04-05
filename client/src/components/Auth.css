@@ -169,6 +169,23 @@
   border: 1px solid #6ce9a6;
 }
 
+.alert-info {
+  background: #eff8ff;
+  color: #175cd3;
+  border: 1px solid #84caff;
+}
+
+.alert-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.alert-link {
+  color: inherit;
+  word-break: break-all;
+  text-decoration: underline;
+}
+
 .alert-icon {
   font-size: 1rem;
 }

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 const User = require('../models/User');
 
@@ -184,6 +186,55 @@ const checkMongoHealth = async () => {
   }
 };
 
+
+const createResetToken = () => crypto.randomBytes(32).toString('hex');
+
+const getBaseUrl = (req) => {
+  if (process.env.APP_URL) {
+    return process.env.APP_URL.replace(/\/$/, '');
+  }
+
+  const host = req.get('host');
+  const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
+  return `${protocol}://${host}`;
+};
+
+const createTransporter = () => {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: Number(process.env.SMTP_PORT) === 465,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+};
+
+const sendResetEmail = async ({ to, resetLink }) => {
+  const transporter = createTransporter();
+
+  if (!transporter) {
+    return false;
+  }
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    subject: 'Reset your LunchUp password',
+    text: `Reset your LunchUp password by visiting this link: ${resetLink}
+
+This link expires in 1 hour.`,
+    html: `<p>Reset your LunchUp password by clicking the link below:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link expires in 1 hour.</p>`
+  });
+
+  return true;
+};
+
 // Forgot password
 router.post('/forgot-password', async (req, res) => {
   try {
@@ -193,12 +244,18 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(400).json({ message: 'Email is required' });
     }
 
-    const normalizedEmail = email.toLowerCase();
+    const normalizedEmail = email.toLowerCase().trim();
     const demoUser = demoUsers.get(normalizedEmail);
 
     if (demoUser) {
+      const resetToken = createResetToken();
+      demoUser.resetPasswordToken = resetToken;
+      demoUser.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
+      demoUsers.set(normalizedEmail, demoUser);
+
       return res.json({
-        message: 'Demo accounts use password123. Please sign in with demo@lunchup.com / password123.'
+        message: 'Reset instructions are ready for this demo account.',
+        resetLink: `${getBaseUrl(req)}/#/reset-password/${resetToken}`
       });
     }
 
@@ -213,11 +270,77 @@ router.post('/forgot-password', async (req, res) => {
       return res.json({ message: 'If that email exists, we will send reset instructions.' });
     }
 
+    const resetToken = createResetToken();
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    const resetLink = `${getBaseUrl(req)}/#/reset-password/${resetToken}`;
+    const emailSent = await sendResetEmail({ to: user.email, resetLink }).catch((error) => {
+      console.error('Reset email send error:', error);
+      return false;
+    });
+
     return res.json({
-      message: 'Password reset email is not wired up yet, but we found your account. Please contact support/admin for a manual reset.'
+      message: emailSent
+        ? 'If that email exists, we have sent reset instructions.'
+        : 'Reset link generated. Email is not configured on the server yet, so use the link below.',
+      ...(emailSent ? {} : { resetLink })
     });
   } catch (error) {
     console.error('Forgot password error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Reset password
+router.post('/reset-password/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
+    const now = new Date();
+    const demoUser = Array.from(demoUsers.values()).find(
+      (candidate) => candidate.resetPasswordToken === token && candidate.resetPasswordExpires && candidate.resetPasswordExpires > now
+    );
+
+    if (demoUser) {
+      const salt = await bcrypt.genSalt(10);
+      demoUser.password = await bcrypt.hash(password, salt);
+      delete demoUser.resetPasswordToken;
+      delete demoUser.resetPasswordExpires;
+      demoUsers.set(demoUser.email, demoUser);
+
+      return res.json({ message: 'Password reset successful. You can now sign in.' });
+    }
+
+    let user = null;
+    try {
+      user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: now }
+      });
+    } catch (mongoError) {
+      console.log('⚠️  MongoDB unavailable during reset password');
+    }
+
+    if (!user) {
+      return res.status(400).json({ message: 'This reset link is invalid or has expired.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    return res.json({ message: 'Password reset successful. You can now sign in.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
     return res.status(500).json({ message: 'Server error' });
   }
 });
@@ -231,8 +354,16 @@ router.post('/login', async (req, res) => {
     let user = demoUsers.get(email);
     
     if (user) {
-      // Demo user found - accept password123 for all demo users
-      if (password === 'password123') {
+      // Demo user found
+      let isMatch = false;
+
+      if (user.password === '$2a$10$demoHashedPasswordForAllDemoUsers123456789') {
+        isMatch = password === 'password123';
+      } else {
+        isMatch = await bcrypt.compare(password, user.password);
+      }
+
+      if (isMatch) {
         // Generate JWT token
         const token = jwt.sign(
           { userId: user._id },
@@ -249,9 +380,9 @@ router.post('/login', async (req, res) => {
           }
         });
         return;
-      } else {
-        return res.status(400).json({ message: 'Invalid credentials. Password is password123 for demo users.' });
       }
+
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
     
     // Not a demo user, try MongoDB

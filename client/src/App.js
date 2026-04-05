@@ -8,6 +8,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import Profile from './components/Profile';
 import Matches from './components/Matches';
 import Meetings from './components/Meetings';
@@ -110,6 +111,10 @@ function AppContent() {
           <Route
             path="/forgot-password"
             element={!user ? <ForgotPassword /> : <Navigate to="/matches" />}
+          />
+          <Route
+            path="/reset-password/:token"
+            element={!user ? <ResetPassword /> : <Navigate to="/matches" />}
           />
           <Route
             path="/profile"
