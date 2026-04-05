@@ -91,6 +91,7 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/match', require('./routes/match'));
 app.use('/api/meetings', require('./routes/meetings'));
+app.use('/api/news', require('./routes/news'));
 app.use('/api/seed', require('./routes/seed'));
 
 // Serve static files in production
