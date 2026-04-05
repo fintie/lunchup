@@ -7,6 +7,7 @@ import './App.css';
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
+import ForgotPassword from './components/ForgotPassword';
 import Profile from './components/Profile';
 import Matches from './components/Matches';
 import Meetings from './components/Meetings';
@@ -105,6 +106,10 @@ function AppContent() {
           <Route
             path="/register"
             element={!user ? <Register onAuth={login} /> : <Navigate to="/matches" />}
+          />
+          <Route
+            path="/forgot-password"
+            element={!user ? <ForgotPassword /> : <Navigate to="/matches" />}
           />
           <Route
             path="/profile"

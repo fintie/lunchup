@@ -93,6 +93,10 @@ const Login = ({ onAuth }) => {
               />
             </div>
 
+            <div className="auth-inline-link-row">
+              <Link to="/forgot-password" className="auth-inline-link">Forgot password?</Link>
+            </div>
+
             <button 
               type="submit" 
               className="btn btn-primary btn-block btn-lg"

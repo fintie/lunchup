@@ -184,6 +184,44 @@ const checkMongoHealth = async () => {
   }
 };
 
+// Forgot password
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    const demoUser = demoUsers.get(normalizedEmail);
+
+    if (demoUser) {
+      return res.json({
+        message: 'Demo accounts use password123. Please sign in with demo@lunchup.com / password123.'
+      });
+    }
+
+    let user = null;
+    try {
+      user = await User.findOne({ email: normalizedEmail });
+    } catch (mongoError) {
+      console.log('⚠️  MongoDB unavailable during forgot password');
+    }
+
+    if (!user) {
+      return res.json({ message: 'If that email exists, we will send reset instructions.' });
+    }
+
+    return res.json({
+      message: 'Password reset email is not wired up yet, but we found your account. Please contact support/admin for a manual reset.'
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Login route - tries demo mode FIRST for speed
 router.post('/login', async (req, res) => {
   try {

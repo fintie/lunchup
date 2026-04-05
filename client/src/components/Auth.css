@@ -163,8 +163,30 @@
   border: 1px solid var(--error);
 }
 
+.alert-success {
+  background: #ecfdf3;
+  color: #027a48;
+  border: 1px solid #6ce9a6;
+}
+
 .alert-icon {
   font-size: 1rem;
+}
+
+.auth-inline-link-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(var(--space-5) * -1 + var(--space-1));
+}
+
+.auth-inline-link {
+  font-size: 0.875rem;
+  color: var(--primary-600);
+  font-weight: 500;
+}
+
+.auth-inline-link:hover {
+  color: var(--primary-700);
 }
 
 .auth-footer {
