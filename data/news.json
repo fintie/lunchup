@@ -1,5 +1,93 @@
 [
   {
+    "id": "coindesk-1775444784350-0",
+    "title": "A simple explainer on what quantum computing actually is, and why it is terrifying for bitcoin",
+    "source": "CoinDesk",
+    "summary": "Most simplifies the complex process of quantum computing as \"it can be 0 and 1 at the same time.\" That is not an explanation for why it threatens Bitcoin. This is.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/tech/2026/04/05/a-simple-explainer-on-what-quantum-computing-actually-is-and-why-it-is-terrifying-for-bitcoin",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-05T20:03:22.000Z"
+  },
+  {
+    "id": "techcrunch-1775444783494-0",
+    "title": "Polymarket took down wagers tied to rescue of downed Air Force officer",
+    "source": "TechCrunch",
+    "summary": "A Democratic congressman had harsh criticism for Polymarket for allowing users to bet on the date the U.S. would confirm the rescue of Air Force service members shot down over Iran.",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://techcrunch.com/2026/04/05/polymarket-took-down-wagers-tied-to-rescue-of-downed-air-force-officer/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-05T19:36:03.000Z"
+  },
+  {
+    "id": "techcrunch-1775444783495-1",
+    "title": "Copilot is ‘for entertainment purposes only,’ according to Microsoft’s terms of use",
+    "source": "TechCrunch",
+    "summary": "AI skeptics aren’t the only ones warning users not to unthinkingly trust models’ outputs — that’s what the AI companies say themselves in their terms of service.",
+    "whyItMatters": "This is useful signal for founders comparing model quality, speed, and where the next product edge may come from.",
+    "url": "https://techcrunch.com/2026/04/05/copilot-is-for-entertainment-purposes-only-according-to-microsofts-terms-of-service/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-05T18:51:37.000Z"
+  },
+  {
+    "id": "coindesk-1775444784350-1",
+    "title": "AI is making crypto's security problem even worse, Ledger CTO warns",
+    "source": "CoinDesk",
+    "summary": "Ledger’s Charles Guillemet says artificial intelligence is making hacks cheaper and faster, forcing a rethink of how crypto systems stay secure.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/tech/2026/04/05/ai-is-making-crypto-s-security-problem-even-worse-ledger-cto-warns",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-05T14:00:00.000Z"
+  },
+  {
+    "id": "coindesk-1775444784350-2",
+    "title": "Drift says $270 million exploit was a six-month North Korean intelligence operation",
+    "source": "CoinDesk",
+    "summary": "Attackers posed as a trading firm, met Drift contributors in person across multiple countries, deposited $1 million of their own capital, and waited half a year before executing the drain CoinDesk detailed earlier this week.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/05/drift-says-usd270-million-exploit-was-a-six-month-north-korean-intelligence-operation",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-05T12:17:58.000Z"
+  },
+  {
+    "id": "coindesk-1775444784351-3",
+    "title": "Ant Group’s blockchain arm unveils platform for AI agents to transact on crypto rails",
+    "source": "CoinDesk",
+    "summary": "Anvita includes tokenization services and a platform for agents to coordinate tasks and settle payments in real time using stablecoins.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/business/2026/04/02/ant-group-s-blockchain-arm-unveils-platform-for-ai-agents-to-transact-on-crypto-rails",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-05T12:00:00.000Z"
+  },
+  {
+    "id": "coindesk-1775444784351-4",
+    "title": "Bitcoin holds steady as sentiment hits worst levels since Iran war began",
+    "source": "CoinDesk",
+    "summary": "Social sentiment, on-chain data, and positioning metrics all hit extremes not seen since late February, even as institutional buying remains elevated.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/05/bitcoin-enters-april-at-its-most-hated-level-since-the-war-began",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-05T11:54:21.000Z"
+  },
+  {
+    "id": "techcrunch-1775444783495-2",
+    "title": "Peter Thiel&#8217;s big bet on solar-powered cow collars",
+    "source": "TechCrunch",
+    "summary": "Why did Founders Fund invest $220 million in cattle management startup Halter?",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://techcrunch.com/2026/04/04/unpacking-peter-thiels-big-bet-on-solar-powered-cow-collars/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-04T21:30:00.000Z"
+  },
+  {
     "id": "au-web3-1-1775436328609",
     "title": "Australian Web3 builders continue focusing on infrastructure, utility, and real-world applications",
     "source": "Lunchup Web3 Brief",
