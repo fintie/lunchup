@@ -23,12 +23,12 @@ const News = () => {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get('/api/news');
+        const { data } = await axios.get('/news');
         setNews(data.items || []);
         setUpdatedAt(data.updatedAt || '');
         setError('');
       } catch (err) {
-        console.error('Failed to load news:', err);
+        console.error('Failed to load news:', err?.response?.status, err?.response?.data || err.message || err);
         setError('Unable to load today\'s news right now. Please try again shortly.');
       } finally {
         setLoading(false);
