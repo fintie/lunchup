@@ -17,18 +17,23 @@ const News = () => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
   const [updatedAt, setUpdatedAt] = useState('');
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
         setLoading(true);
+        setDebugInfo(`Requesting: ${axios.defaults.baseURL}/news`);
         const { data } = await axios.get('/news');
         setNews(data.items || []);
         setUpdatedAt(data.updatedAt || '');
         setError('');
+        setDebugInfo((prev) => `${prev}\nLoaded ${Array.isArray(data.items) ? data.items.length : 0} items`);
       } catch (err) {
+        const details = `Requesting: ${axios.defaults.baseURL}/news | Status: ${err?.response?.status || 'no-status'} | Message: ${typeof err?.response?.data === 'string' ? err.response.data : (err?.message || 'unknown error')}`;
         console.error('Failed to load news:', err?.response?.status, err?.response?.data || err.message || err);
+        setDebugInfo(details);
         setError('Unable to load today\'s news right now. Please try again shortly.');
       } finally {
         setLoading(false);
@@ -48,6 +53,11 @@ const News = () => {
             A daily snapshot of stories across Sydney and the broader Australian tech ecosystem,
             with a lightweight Lunchup angle on why stronger conversations and connections matter.
           </p>
+          {debugInfo && !error && (
+            <div className="news-updated" style={{ marginTop: '8px', fontSize: '12px', opacity: 0.75 }}>
+              {debugInfo}
+            </div>
+          )}
           {updatedAt && (
             <div className="news-updated">Last updated: {formatDate(updatedAt)}</div>
           )}
@@ -58,7 +68,10 @@ const News = () => {
         {loading ? (
           <div className="news-state-card">Loading today&apos;s stories…</div>
         ) : error ? (
-          <div className="news-state-card error">{error}</div>
+          <div className="news-state-card error">
+            <div>{error}</div>
+            {debugInfo && <div style={{ marginTop: '10px', fontSize: '12px', opacity: 0.85, wordBreak: 'break-word' }}>{debugInfo}</div>}
+          </div>
         ) : (
           <div className="news-grid">
             {news.map((item) => (
