@@ -103,6 +103,26 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+const newsUpdateScript = path.join(__dirname, 'scripts', 'updateNews.js');
+
+function scheduleNewsRefresh() {
+  const runUpdate = () => {
+    const { execFile } = require('child_process');
+    execFile('node', [newsUpdateScript], (error, stdout, stderr) => {
+      if (error) {
+        console.error('❌ News refresh failed:', stderr || error.message);
+        return;
+      }
+      console.log(`📰 ${stdout.trim()}`);
+    });
+  };
+
+  runUpdate();
+  setInterval(runUpdate, 3 * 60 * 60 * 1000);
+}
+
+scheduleNewsRefresh();
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
