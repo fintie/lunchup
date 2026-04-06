@@ -18,22 +18,14 @@ import News from './components/News';
 
 // Determine API URL based on environment
 const getApiUrl = () => {
-  // Production: use environment variable or derive from window location
-  if (process.env.NODE_ENV === 'production') {
-    // If REACT_APP_API_URL is set, use it
-    if (process.env.REACT_APP_API_URL) {
-      return process.env.REACT_APP_API_URL;
-    }
-    // If running on Render web service, use the API service URL
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      if (hostname.includes('onrender.com')) {
-        // lunchup-web.onrender.com -> lunchup.onrender.com
-        return `https://${hostname.replace('-web', '')}`;
-      }
-    }
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
   }
-  // Development: use localhost
+
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lunchup.onrender.com';
+  }
+
   return 'http://localhost:3001';
 };
 
