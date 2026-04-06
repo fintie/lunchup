@@ -31,6 +31,7 @@
   margin: 0 0 16px;
   font-size: clamp(2rem, 4vw, 3.35rem);
   line-height: 1.08;
+  color: #ffffff;
 }
 
 .news-hero p {

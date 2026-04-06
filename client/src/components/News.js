@@ -23,7 +23,7 @@ const News = () => {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get('/news');
+        const { data } = await axios.get('/api/news');
         setNews(data.items || []);
         setUpdatedAt(data.updatedAt || '');
         setError('');
