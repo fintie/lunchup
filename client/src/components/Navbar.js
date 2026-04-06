@@ -49,13 +49,6 @@ const Navbar = ({ user, logout }) => {
                   News
                 </Link>
                 <Link
-                  to="/news"
-                  className={`nav-link ${isActive('/news') ? 'active' : ''}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  News
-                </Link>
-                <Link
                   to="/meetings"
                   className={`nav-link ${isActive('/meetings') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
@@ -122,8 +115,10 @@ const Navbar = ({ user, logout }) => {
           </div>
 
           <button 
-            className="mobile-menu-toggle"
+            className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
           >
             <span className="hamburger"></span>
           </button>
