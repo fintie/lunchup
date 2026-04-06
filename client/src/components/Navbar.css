@@ -46,6 +46,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .nav-link {
@@ -72,6 +73,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  flex-shrink: 0;
 }
 
 .user-greeting {
@@ -129,12 +131,16 @@
   display: none;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   width: 40px;
   height: 40px;
   background: transparent;
   border: none;
   cursor: pointer;
   padding: var(--space-2);
+  margin-left: auto;
+  position: relative;
+  z-index: 1300;
 }
 
 .hamburger {

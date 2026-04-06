@@ -80,6 +80,13 @@ const Navbar = ({ user, logout }) => {
                   🔴 Live
                 </Link>
                 <Link
+                  to="/news"
+                  className={`nav-link ${isActive('/news') ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  News
+                </Link>
+                <Link
                   to="/login"
                   className={`nav-link ${isActive('/login') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}
