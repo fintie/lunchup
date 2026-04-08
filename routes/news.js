@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
   res.json({
     success: true,
     updatedAt: items[0]?.publishedAt || new Date().toISOString(),
+    itemCount: items.length,
     region: 'Australia / Global',
     items
   });

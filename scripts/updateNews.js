@@ -3,7 +3,8 @@ const path = require('path');
 const axios = require('axios');
 
 const DATA_PATH = path.join(__dirname, '..', 'data', 'news.json');
-const MAX_ITEMS = 20;
+const MAX_ITEMS = 100;
+const FRESH_ITEMS_PER_RUN = 12;
 const FETCH_TIMEOUT = 12000;
 
 const FEEDS = [
@@ -201,10 +202,11 @@ async function fetchFeed(feed) {
     .map((item, index) => normaliseItem(item, feed, index));
 }
 
-function dedupeByTitle(items) {
+function dedupeNewsItems(items) {
   const seen = new Set();
   return items.filter(item => {
-    const key = item.title.toLowerCase();
+    const key = (item.url || item.title || '').trim().toLowerCase();
+    if (!key) return false;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -237,14 +239,21 @@ async function main() {
     }
   }
 
-  const freshItems = dedupeByTitle(collected)
+  const freshItems = dedupeNewsItems(collected)
+    .filter(item => !existing.some(existingItem => {
+      const existingKey = (existingItem.url || existingItem.title || '').trim().toLowerCase();
+      const incomingKey = (item.url || item.title || '').trim().toLowerCase();
+      return existingKey && existingKey === incomingKey;
+    }))
     .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-    .slice(0, 8);
+    .slice(0, FRESH_ITEMS_PER_RUN);
 
   const nextItems = freshItems.length ? freshItems : fallbackItems(existing);
-  const merged = dedupeByTitle([...nextItems, ...existing]).slice(0, MAX_ITEMS);
+  const merged = dedupeNewsItems([...nextItems, ...existing])
+    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+    .slice(0, MAX_ITEMS);
   writeItems(merged);
-  console.log(`Updated news feed with ${nextItems.length} item(s)`);
+  console.log(`Updated news feed with ${nextItems.length} new item(s), total stored: ${merged.length}`);
 }
 
 main().catch(error => {

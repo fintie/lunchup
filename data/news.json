@@ -1,5 +1,71 @@
 [
   {
+    "id": "coindesk-1775656184493-0",
+    "title": "Saylor’s solo act: JPMorgan says Strategy is practically the only thing keeping crypto flows alive",
+    "source": "CoinDesk",
+    "summary": "Digital asset inflows totaled $11 billion in Q1, as institutional demand and ETF outflows left corporate buyers and venture capital as the primary sources of funding.",
+    "whyItMatters": "Funding updates help show which product categories and teams are attracting conviction, talent, and room to move faster.",
+    "url": "https://www.coindesk.com/business/2026/04/08/crypto-inflows-slowed-sharply-in-first-quarter-as-investor-demand-weakened-says-jpmorgan",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T13:44:05.000Z"
+  },
+  {
+    "id": "coindesk-1775656184493-1",
+    "title": "Iran eyes crypto toll for oil tanker transits through Strait of Hormuz, according to FT",
+    "source": "CoinDesk",
+    "summary": "Iran plans to collect cryptocurrency and other digital payments as transit fees from fully loaded oil tankers passing through the Strait of Hormuz, said the report.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/08/iran-eyes-crypto-toll-for-oil-tanker-transit-through-strait-of-hormuz",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T13:14:44.000Z"
+  },
+  {
+    "id": "coindesk-1775656184493-2",
+    "title": "Bitcoin’s quantum threat is distant, but migration clock is ticking, says Adam Back",
+    "source": "CoinDesk",
+    "summary": "Researchers are advancing post-quantum protections even as current hardware remains far from breaking crypto systems",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/tech/2026/04/08/bitcoin-s-quantum-threat-is-distant-but-migration-clock-is-ticking-says-adam-back-says",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T13:08:46.000Z"
+  },
+  {
+    "id": "techcrunch-1775656182822-0",
+    "title": "Atlassian launches visual AI tools and third-party agents in Confluence",
+    "source": "TechCrunch",
+    "summary": "Confluence users can now create visual assets within the software in addition to new third-party agents working with Lovable, Replit, and Gamma.",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://techcrunch.com/2026/04/08/atlassian-confluence-visual-ai-tools-agents/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-08T13:00:00.000Z"
+  },
+  {
+    "id": "coindesk-1775656184493-3",
+    "title": "Morgan Stanley's bitcoin ETF opens today, giving BlackRock’s $55 billion IBIT fund its toughest rival yet",
+    "source": "CoinDesk",
+    "summary": "While BlackRock’s spot bitcoin ETF currently reigns as the liquidity king of crypto, Morgan Stanley’s MSBT will leverage a market-low 0.14% fee and $7 trillion wealth management engine to possibly challenge that dominance.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/08/morgan-stanley-s-bitcoin-etf-opens-today-giving-blackrock-s-usd55-billion-ibit-fund-its-toughest-rival-yet",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T12:45:00.000Z"
+  },
+  {
+    "id": "techcrunch-1775656182823-1",
+    "title": "X is rolling out automatic translation and photo editing powered by Grok",
+    "source": "TechCrunch",
+    "summary": "New automatic translations and photo editing on X are powered by the company's flagship AI model.",
+    "whyItMatters": "This is useful signal for founders comparing model quality, speed, and where the next product edge may come from.",
+    "url": "https://techcrunch.com/2026/04/08/x-is-rolling-out-automatic-translation-and-photo-editing-powered-by-grok/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-08T12:06:22.000Z"
+  },
+  {
     "id": "manual-ai-news-1775613643804",
     "title": "Anthropic launches new Claude tools for developers building AI agents",
     "source": "Lunchup Manual Insert",
@@ -9,6 +75,17 @@
     "region": "Global",
     "category": "AI",
     "publishedAt": "2026-04-08T12:00:43Z"
+  },
+  {
+    "id": "coindesk-1775656184493-4",
+    "title": "Move over bitcoin and quantum risks. Anthropic's Mythos AI could have major implications for DeFi",
+    "source": "CoinDesk",
+    "summary": "Claude Mythos Preview identified thousands of zero-day vulnerabilities across every major operating system and browser, including in cryptography libraries that DeFi infrastructure depends on.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/08/move-over-bitcoin-and-quantum-risks-anthropic-s-mythos-ai-changes-everything-for-defi",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T10:58:33.000Z"
   },
   {
     "id": "coindesk-1775649203229-0",
@@ -36,7 +113,7 @@
     "id": "coindesk-1775649203229-2",
     "title": "Crypto's 'AWS' Alchemy unveils tool to make AI payment systems talk to each other",
     "source": "CoinDesk",
-    "summary": "Alchemy\u2019s AgentPay addresses the problem that the agentic payment systems currently coming online don\u2019t talk to one another.",
+    "summary": "Alchemy’s AgentPay addresses the problem that the agentic payment systems currently coming online don’t talk to one another.",
     "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
     "url": "https://www.coindesk.com/tech/2026/04/08/blockchain-development-firm-alchemy-unveils-interoperable-layer-for-ai-payments",
     "region": "Global",
@@ -99,6 +176,83 @@
     "publishedAt": "2026-04-07T21:35:02.000Z"
   },
   {
+    "id": "techcrunch-1775656182823-4",
+    "title": "VC Eclipse has a new $1.3B fund to back — and build — ‘physical AI’ startups",
+    "source": "TechCrunch",
+    "summary": "Eclipse will put some of that money towards incubating, or building startups.",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://techcrunch.com/2026/04/07/vc-eclipse-has-a-new-1-3b-to-back-and-build-physical-ai-startups/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-07T21:24:54.000Z"
+  },
+  {
+    "id": "mit-news-ai-1775656184816-0",
+    "title": "Sixteen new START.nano companies are developing hard-tech solutions with the support of MIT.nano",
+    "source": "MIT News AI",
+    "summary": "Startup accelerator program grows to over 30 companies, almost half of them with MIT pedigrees.",
+    "whyItMatters": "Research matters most when it points to concrete capability gains teams can eventually turn into product advantages.",
+    "url": "https://news.mit.edu/2026/sixteen-new-startnano-companies-developing-hard-tech-solutions-with-mitnano-0407",
+    "region": "Global",
+    "category": "Research",
+    "publishedAt": "2026-04-07T20:40:00.000Z"
+  },
+  {
+    "id": "mit-news-ai-1775656184816-1",
+    "title": "Helping data centers deliver higher performance with less hardware",
+    "source": "MIT News AI",
+    "summary": "Researchers developed a system that intelligently balances workloads to improve the efficiency of flash storage hardware in a data center.",
+    "whyItMatters": "Research matters most when it points to concrete capability gains teams can eventually turn into product advantages.",
+    "url": "https://news.mit.edu/2026/helping-data-centers-deliver-higher-performance-less-hardware-0407",
+    "region": "Global",
+    "category": "Research",
+    "publishedAt": "2026-04-07T04:00:00.000Z"
+  },
+  {
+    "id": "startup-daily-1775656184292-1",
+    "title": "AI data centre startup Firmus eyes off another $725 million raise as it readies to IPO on the ASX",
+    "source": "Startup Daily",
+    "summary": "Firmus locks in A$725m ahead of IPO, promising massive green AI data centres",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://www.startupdaily.net/topic/funding/ai-data-centre-startup-firmus-eyes-off-another-725-million-raise-as-it-readies-to-ipo-on-the-asx/",
+    "region": "Australia",
+    "category": "Startup",
+    "publishedAt": "2026-04-07T02:24:00.000Z"
+  },
+  {
+    "id": "startup-daily-1775656184292-2",
+    "title": "Fintech VC Triple Bubble nails $10 million first close on its $50m fund",
+    "source": "Startup Daily",
+    "summary": "Fintech VC fund Triple Bubble has reached a $10 million in nine months, underpinned by the Commonwealth Bank&#8217;s venture scaler, x15ventures, as a cornerstone investor. A slew of fintech founders...",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://www.startupdaily.net/topic/venture-capital/fintech-vc-triple-bubble-nails-10-million-first-close-on-its-50m-fund/",
+    "region": "Australia",
+    "category": "Startup",
+    "publishedAt": "2026-04-06T21:56:42.000Z"
+  },
+  {
+    "id": "seed-au-ai-1",
+    "title": "Australia's startup and AI ecosystem continues building through community, operators, and practical adoption",
+    "source": "Lunchup News Seed",
+    "publishedAt": "2026-04-06T08:00:00.000Z",
+    "summary": "A starter item used until automated refresh brings in the latest stories. The News feed is now ready to rotate in fresh AI and Web3 headlines every few hours.",
+    "whyItMatters": "Teams move faster when useful information and good conversations circulate regularly. That is as true for ecosystems as it is inside companies.",
+    "url": "https://www.startupdaily.net/",
+    "region": "Australia",
+    "category": "AI"
+  },
+  {
+    "id": "au-web3-1-1775436328609",
+    "title": "Australian Web3 builders continue focusing on infrastructure, utility, and real-world applications",
+    "source": "Lunchup Web3 Brief",
+    "summary": "The local Web3 scene continues to evolve around builders looking beyond speculation toward infrastructure, community, and product utility.",
+    "whyItMatters": "Strong ecosystems are not only built on technology — they are built on trust, repeated interaction, and strong communities.",
+    "url": "https://www.afr.com/",
+    "region": "Australia",
+    "category": "Web3",
+    "publishedAt": "2026-04-06T00:45:28.609Z"
+  },
+  {
     "id": "coindesk-1775444784350-0",
     "title": "A simple explainer on what quantum computing actually is, and why it is terrifying for bitcoin",
     "source": "CoinDesk",
@@ -122,9 +276,9 @@
   },
   {
     "id": "techcrunch-1775444783495-1",
-    "title": "Copilot is \u2018for entertainment purposes only,\u2019 according to Microsoft\u2019s terms of use",
+    "title": "Copilot is ‘for entertainment purposes only,’ according to Microsoft’s terms of use",
     "source": "TechCrunch",
-    "summary": "AI skeptics aren\u2019t the only ones warning users not to unthinkingly trust models\u2019 outputs \u2014 that\u2019s what the AI companies say themselves in their terms of service.",
+    "summary": "AI skeptics aren’t the only ones warning users not to unthinkingly trust models’ outputs — that’s what the AI companies say themselves in their terms of service.",
     "whyItMatters": "This is useful signal for founders comparing model quality, speed, and where the next product edge may come from.",
     "url": "https://techcrunch.com/2026/04/05/copilot-is-for-entertainment-purposes-only-according-to-microsofts-terms-of-service/",
     "region": "Global",
@@ -135,7 +289,7 @@
     "id": "coindesk-1775444784350-1",
     "title": "AI is making crypto's security problem even worse, Ledger CTO warns",
     "source": "CoinDesk",
-    "summary": "Ledger\u2019s Charles Guillemet says artificial intelligence is making hacks cheaper and faster, forcing a rethink of how crypto systems stay secure.",
+    "summary": "Ledger’s Charles Guillemet says artificial intelligence is making hacks cheaper and faster, forcing a rethink of how crypto systems stay secure.",
     "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
     "url": "https://www.coindesk.com/tech/2026/04/05/ai-is-making-crypto-s-security-problem-even-worse-ledger-cto-warns",
     "region": "Global",
@@ -155,7 +309,7 @@
   },
   {
     "id": "coindesk-1775444784351-3",
-    "title": "Ant Group\u2019s blockchain arm unveils platform for AI agents to transact on crypto rails",
+    "title": "Ant Group’s blockchain arm unveils platform for AI agents to transact on crypto rails",
     "source": "CoinDesk",
     "summary": "Anvita includes tokenization services and a platform for agents to coordinate tasks and settle payments in real time using stablecoins.",
     "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
@@ -185,27 +339,5 @@
     "region": "Global",
     "category": "Startup",
     "publishedAt": "2026-04-04T21:30:00.000Z"
-  },
-  {
-    "id": "au-web3-1-1775436328609",
-    "title": "Australian Web3 builders continue focusing on infrastructure, utility, and real-world applications",
-    "source": "Lunchup Web3 Brief",
-    "summary": "The local Web3 scene continues to evolve around builders looking beyond speculation toward infrastructure, community, and product utility.",
-    "whyItMatters": "Strong ecosystems are not only built on technology \u2014 they are built on trust, repeated interaction, and strong communities.",
-    "url": "https://www.afr.com/",
-    "region": "Australia",
-    "category": "Web3",
-    "publishedAt": "2026-04-06T00:45:28.609Z"
-  },
-  {
-    "id": "seed-au-ai-1",
-    "title": "Australia's startup and AI ecosystem continues building through community, operators, and practical adoption",
-    "source": "Lunchup News Seed",
-    "publishedAt": "2026-04-06T08:00:00.000Z",
-    "summary": "A starter item used until automated refresh brings in the latest stories. The News feed is now ready to rotate in fresh AI and Web3 headlines every few hours.",
-    "whyItMatters": "Teams move faster when useful information and good conversations circulate regularly. That is as true for ecosystems as it is inside companies.",
-    "url": "https://www.startupdaily.net/",
-    "region": "Australia",
-    "category": "AI"
   }
 ]
