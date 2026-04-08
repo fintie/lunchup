@@ -5,6 +5,8 @@ const axios = require('axios');
 const DATA_PATH = path.join(__dirname, '..', 'data', 'news.json');
 const MAX_ITEMS = 100;
 const FRESH_ITEMS_PER_RUN = 12;
+const MIN_REFRESH_INTERVAL_MS = 12 * 60 * 60 * 1000;
+const META_PATH = path.join(__dirname, '..', 'data', 'news-meta.json');
 const FETCH_TIMEOUT = 12000;
 
 const FEEDS = [
@@ -108,6 +110,46 @@ function readExisting() {
 function writeItems(items) {
   fs.mkdirSync(path.dirname(DATA_PATH), { recursive: true });
   fs.writeFileSync(DATA_PATH, JSON.stringify(items, null, 2) + '\n');
+}
+
+function readMeta() {
+  try {
+    const raw = fs.readFileSync(META_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function writeMeta(meta) {
+  fs.mkdirSync(path.dirname(META_PATH), { recursive: true });
+  fs.writeFileSync(META_PATH, JSON.stringify(meta, null, 2) + '\n');
+}
+
+function getLastSuccessfulRefreshAt(existingItems, meta) {
+  if (meta.lastSuccessfulRefreshAt) {
+    const parsed = new Date(meta.lastSuccessfulRefreshAt);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  const timestamps = existingItems
+    .map(item => new Date(item.publishedAt))
+    .filter(date => !Number.isNaN(date.getTime()))
+    .sort((a, b) => b.getTime() - a.getTime());
+
+  return timestamps[0] || null;
+}
+
+function shouldSkipRefresh(existingItems, meta, force = false) {
+  if (force) return false;
+
+  const lastRefreshAt = getLastSuccessfulRefreshAt(existingItems, meta);
+  if (!lastRefreshAt) return false;
+
+  return (Date.now() - lastRefreshAt.getTime()) < MIN_REFRESH_INTERVAL_MS;
 }
 
 function decodeXml(text = '') {
@@ -227,7 +269,16 @@ function fallbackItems(existing) {
 }
 
 async function main() {
+  const force = process.argv.includes('--force');
   const existing = readExisting();
+  const meta = readMeta();
+
+  if (shouldSkipRefresh(existing, meta, force)) {
+    const nextRefreshAt = new Date(getLastSuccessfulRefreshAt(existing, meta).getTime() + MIN_REFRESH_INTERVAL_MS).toISOString();
+    console.log(`Skipping refresh. Next refresh allowed after ${nextRefreshAt}`);
+    return;
+  }
+
   const collected = [];
 
   for (const feed of FEEDS) {
