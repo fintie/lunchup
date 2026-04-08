@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Seo from './Seo';
 import './News.css';
 
 const formatDate = (value) => {
@@ -44,7 +45,20 @@ const News = () => {
   }, []);
 
   return (
-    <div className="news-page">
+    <>
+      <Seo
+        title="Australian startup news today | Lunchup"
+        description="Read the latest Australian startup and tech news, curated daily with context for founders, operators, and professional networking through Lunchup."
+        path="/news"
+        type="article"
+        keywords={[
+          'australian startup news',
+          'startup news sydney',
+          'tech news australia',
+          'founder news lunchup'
+        ]}
+      />
+      <div className="news-page">
       <section className="news-hero">
         <div className="news-hero-content">
           <span className="news-eyebrow">Lunchup News</span>
@@ -101,7 +115,8 @@ const News = () => {
           </div>
         )}
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 

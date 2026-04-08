@@ -1,10 +1,23 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Seo from './Seo';
 import './Home.css';
 
 const Home = () => {
   return (
-    <div className="home">
+    <>
+      <Seo
+        title="Lunchup, startup networking and founder connections in Australia"
+        description="Meet founders, operators, investors, and startup professionals in Australia through Lunchup, plus follow startup news and networking opportunities."
+        path="/"
+        keywords={[
+          'startup networking australia',
+          'founder networking sydney',
+          'lunch networking app',
+          'australia startup community'
+        ]}
+      />
+      <div className="home">
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-background">
@@ -145,7 +158,8 @@ const Home = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 
