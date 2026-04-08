@@ -1,5 +1,93 @@
 [
   {
+    "id": "coindesk-1775649203229-0",
+    "title": "Crypto markets rally as Trump announces two-week Iran ceasefire",
+    "source": "CoinDesk",
+    "summary": "Digital assets spiked as a surprise geopolitical de-escalation triggered $600 million in liquidations, sending Bitcoin toward $73,000 and boosting altcoin demand.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/08/crypto-markets-rally-as-trump-announces-two-week-iran-ceasefire",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T10:30:00.000Z"
+  },
+  {
+    "id": "coindesk-1775649203229-1",
+    "title": "Pre-market crypto stocks are glowing green after the ceasefire news",
+    "source": "CoinDesk",
+    "summary": "Bitcoin, equities, and gold rise while oil and volatility drop amid improving risk sentiment.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/08/pre-market-crypto-stocks-are-glowing-green-after-the-ceasefire-news",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T09:24:50.000Z"
+  },
+  {
+    "id": "coindesk-1775649203229-2",
+    "title": "Crypto's 'AWS' Alchemy unveils tool to make AI payment systems talk to each other",
+    "source": "CoinDesk",
+    "summary": "Alchemy’s AgentPay addresses the problem that the agentic payment systems currently coming online don’t talk to one another.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/tech/2026/04/08/blockchain-development-firm-alchemy-unveils-interoperable-layer-for-ai-payments",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T08:43:08.000Z"
+  },
+  {
+    "id": "coindesk-1775649203229-3",
+    "title": "Crypto whale holding oil shorts walks away with $2 million in profit",
+    "source": "CoinDesk",
+    "summary": "A trader named Loracle closed his short position in oil futures early Wednesday, pocketing $2 million in profit.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/markets/2026/04/08/crypto-whale-holding-oil-shorts-walks-away-with-usd2-million-in-profit",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T08:42:39.000Z"
+  },
+  {
+    "id": "coindesk-1775649203229-4",
+    "title": "Attacking bitcoin mining with a quantum computer would require the energy of a star, academics say",
+    "source": "CoinDesk",
+    "summary": "One paper finds that attacking the bitcoin blockchain through quantum mining would demand the energy output of a star. Another replicates every major \"quantum factoring breakthrough\" using a 1981 home computer and a dog.",
+    "whyItMatters": "In Web3, the stronger signals usually come from concrete launches, ecosystem integrations, and real user utility rather than narrative alone.",
+    "url": "https://www.coindesk.com/tech/2026/04/08/attacking-bitcoin-mining-with-a-quantum-computer-would-require-the-energy-of-a-star-academics-say",
+    "region": "Global",
+    "category": "Web3",
+    "publishedAt": "2026-04-08T05:42:54.000Z"
+  },
+  {
+    "id": "techcrunch-1775649201852-0",
+    "title": "Google quietly launched an AI dictation app that works offline",
+    "source": "TechCrunch",
+    "summary": "Google's new offline-first dictation app uses Gemma AI models to take on the apps like Wispr Flow.",
+    "whyItMatters": "This is useful signal for founders comparing model quality, speed, and where the next product edge may come from.",
+    "url": "https://techcrunch.com/2026/04/07/google-quietly-releases-an-offline-first-ai-dictation-app-on-ios/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-08T05:40:19.000Z"
+  },
+  {
+    "id": "startup-daily-1775649203038-0",
+    "title": "How elite sport and ICU medicine plunged Olympian Matt Guest into startups",
+    "source": "Startup Daily",
+    "summary": "Olympian and ICU doctor Matt Guest blends grit and innovation to reinvent cold plunges.",
+    "whyItMatters": "For startup teams, the key question is whether this turns into better products, faster execution, or stronger collaboration.",
+    "url": "https://www.startupdaily.net/advice/business-strategy/how-elite-sport-and-icu-medicine-plunged-olympian-matt-guest-into-startups/",
+    "region": "Australia",
+    "category": "Startup",
+    "publishedAt": "2026-04-07T22:54:04.000Z"
+  },
+  {
+    "id": "techcrunch-1775649201852-1",
+    "title": "I can&#8217;t help rooting for tiny open source AI model maker Arcee",
+    "source": "TechCrunch",
+    "summary": "Arcee is a tiny 26-person U.S. startup that built a high-performing, massive, open source LLM. And it's gaining popularity with OpenClaw users.",
+    "whyItMatters": "This is useful signal for founders comparing model quality, speed, and where the next product edge may come from.",
+    "url": "https://techcrunch.com/2026/04/07/i-cant-help-rooting-for-tiny-open-source-ai-model-maker-arcee/",
+    "region": "Global",
+    "category": "Startup",
+    "publishedAt": "2026-04-07T21:35:02.000Z"
+  },
+  {
     "id": "coindesk-1775444784350-0",
     "title": "A simple explainer on what quantum computing actually is, and why it is terrifying for bitcoin",
     "source": "CoinDesk",
