@@ -133,7 +133,7 @@ function scheduleNewsRefresh() {
   };
 
   runUpdate();
-  setInterval(runUpdate, 3 * 60 * 60 * 1000);
+  setInterval(runUpdate, 12 * 60 * 60 * 1000);
 }
 
 scheduleNewsRefresh();
