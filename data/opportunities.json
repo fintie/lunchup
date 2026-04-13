@@ -34,5 +34,63 @@
       "Analytics",
       "Growth"
     ]
+  },
+  {
+    "id": "remotive-1776117242076-0",
+    "title": "Office Assistant",
+    "company": "Coalition Technologies",
+    "location": "Worldwide",
+    "source": "Remotive",
+    "category": "Marketing",
+    "summary": "WHY YOU SHOULD APPLY: Coalition Technologies is devoted to delivering clients the highest quality work while providing our team a fun, thriving, and innovative environment. Along with the opportunity for tremendous career growth and rapid advancement, CT of...",
+    "publishedAt": "2026-04-11T10:16:26.000Z",
+    "applyUrl": "https://remotive.com/remote-jobs/marketing/office-assistant-1680495",
+    "url": "https://remotive.com/remote-jobs/marketing/office-assistant-1680495",
+    "isRemote": true,
+    "tags": [
+      "CSS",
+      "excel",
+      "frontend",
+      "git",
+      "html",
+      "illustrator"
+    ]
+  },
+  {
+    "id": "remotive-1776117242076-1",
+    "title": "Freelance Writer",
+    "company": "IAPWE",
+    "location": "Worldwide",
+    "source": "Remotive",
+    "category": "IT",
+    "summary": "Our organization is seeking content writers to create articles and blog posts on a variety of topics. The rate of pay is $20 per 100 words (this comes out to approximately $100 per article or $50 per hour). Some topics you may be asked to write about includ...",
+    "publishedAt": "2026-04-04T06:01:43.000Z",
+    "applyUrl": "https://remotive.com/remote-jobs/writing/freelance-writer-1185979",
+    "url": "https://remotive.com/remote-jobs/writing/freelance-writer-1185979",
+    "isRemote": true,
+    "tags": [
+      "REST"
+    ]
+  },
+  {
+    "id": "remotive-1776117242076-2",
+    "title": "Copywriter",
+    "company": "Coalition Technologies",
+    "location": "Worldwide",
+    "source": "Remotive",
+    "category": "Data",
+    "summary": "WHO WE'RE LOOKING FOR The ideal copywriter has excellent English writing skills and is excited to write high-quality, SEO-driven content that aligns with detailed, client-specific guidelines. Projects most commonly include writing web pages for eCommerce an...",
+    "publishedAt": "2026-04-02T09:01:09.000Z",
+    "applyUrl": "https://remotive.com/remote-jobs/writing/copywriter-1749306",
+    "url": "https://remotive.com/remote-jobs/writing/copywriter-1749306",
+    "isRemote": true,
+    "tags": [
+      "accounting",
+      "excel",
+      "research",
+      "data analysis",
+      "bookkeeping",
+      "google sheets"
+    ]
   }
 ]

@@ -19,10 +19,10 @@ const SOURCES = [
     mapper: mapRemotiveJobs
   },
   {
-    name: 'Working Nomads',
+    name: 'Remotive Marketing',
     type: 'json',
-    url: 'https://www.workingnomads.com/jobsapi/job/_search?sort=pub_date',
-    mapper: mapWorkingNomadsJobs
+    url: 'https://remotive.com/api/remote-jobs?search=marketing',
+    mapper: mapRemotiveJobs
   }
 ];
 
@@ -114,10 +114,13 @@ function matchesTargetFilters(job) {
     .join(' ')
     .toLowerCase();
 
-  const matchesCity = TARGET_CITIES.some(city => haystack.includes(city)) || /remote/i.test(job.location || '');
+  const location = (job.location || '').toLowerCase();
+  const isRemoteFriendly = /remote|worldwide|global|anywhere/.test(location);
+  const matchesCity = TARGET_CITIES.some(city => haystack.includes(city));
   const matchesCategory = TARGET_CATEGORIES.some(category => haystack.includes(category));
+  const inferredCategory = inferCategory(job).toLowerCase();
 
-  return matchesCity && matchesCategory;
+  return (matchesCity || isRemoteFriendly) && (matchesCategory || TARGET_CATEGORIES.includes(inferredCategory));
 }
 
 function normaliseJob(job, source, index) {
@@ -140,7 +143,7 @@ function normaliseJob(job, source, index) {
     publishedAt,
     applyUrl,
     url: job.url || applyUrl,
-    isRemote: /remote/i.test(location),
+    isRemote: /remote|worldwide|global|anywhere/i.test(location),
     tags: Array.isArray(job.tags) ? job.tags.slice(0, 6) : []
   };
 }
@@ -213,22 +216,6 @@ function mapRemotiveJobs(payload) {
     applyUrl: job.url,
     url: job.url,
     tags: job.tags || []
-  }));
-}
-
-function mapWorkingNomadsJobs(payload) {
-  const jobs = Array.isArray(payload) ? payload : [];
-  return jobs.map(job => ({
-    title: job.title,
-    company: job.company_name || job.company || 'Working Nomads',
-    location: job.location || 'Remote',
-    category: Array.isArray(job.category_name) ? job.category_name.join(' ') : (job.category_name || ''),
-    summary: job.description,
-    description: job.description,
-    publishedAt: job.pub_date || job.created_at,
-    applyUrl: job.url,
-    url: job.url,
-    tags: Array.isArray(job.tags) ? job.tags : []
   }));
 }
 
