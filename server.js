@@ -107,6 +107,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/match', require('./routes/match'));
 app.use('/api/meetings', require('./routes/meetings'));
 app.use('/api/news', require('./routes/news'));
+app.use('/api/opportunities', require('./routes/opportunities'));
 app.use('/api/seed', require('./routes/seed'));
 
 // Serve static files in production
@@ -118,25 +119,27 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+const { execFile } = require('child_process');
 const newsUpdateScript = path.join(__dirname, 'scripts', 'updateNews.js');
+const opportunitiesUpdateScript = path.join(__dirname, 'scripts', 'updateOpportunities.js');
 
-function scheduleNewsRefresh() {
+function scheduleRefresh(scriptPath, label, intervalMs) {
   const runUpdate = () => {
-    const { execFile } = require('child_process');
-    execFile('node', [newsUpdateScript], (error, stdout, stderr) => {
+    execFile('node', [scriptPath], (error, stdout, stderr) => {
       if (error) {
-        console.error('❌ News refresh failed:', stderr || error.message);
+        console.error(`❌ ${label} refresh failed:`, stderr || error.message);
         return;
       }
-      console.log(`📰 ${stdout.trim()}`);
+      console.log(`${label} ${stdout.trim()}`);
     });
   };
 
   runUpdate();
-  setInterval(runUpdate, 12 * 60 * 60 * 1000);
+  setInterval(runUpdate, intervalMs);
 }
 
-scheduleNewsRefresh();
+scheduleRefresh(newsUpdateScript, '📰', 12 * 60 * 60 * 1000);
+scheduleRefresh(opportunitiesUpdateScript, '💼', 6 * 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

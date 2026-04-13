@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "build": "echo 'Backend build complete'",
     "seed": "node scripts/seedUsers.js",
-    "news:update": "node scripts/updateNews.js"
+    "news:update": "node scripts/updateNews.js",
+    "opportunities:update": "node scripts/updateOpportunities.js"
   },
   "keywords": [
     "networking",

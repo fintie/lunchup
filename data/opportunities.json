@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fallback-remotive-ai-1776090816490",
+    "title": "AI Product Specialist",
+    "company": "Remote Growth Studio",
+    "location": "Sydney or Remote",
+    "source": "LunchUp Opportunities",
+    "category": "AI",
+    "summary": "Support AI product launches, customer onboarding, and workflow automation projects for modern service businesses.",
+    "publishedAt": "2026-04-13T14:33:36.484Z",
+    "applyUrl": "https://remotive.com/",
+    "url": "https://remotive.com/",
+    "isRemote": true,
+    "tags": [
+      "AI",
+      "Product",
+      "Remote"
+    ]
+  },
+  {
+    "id": "fallback-data-1776090816490",
+    "title": "Data Analyst, Growth",
+    "company": "Melbourne Digital Team",
+    "location": "Melbourne",
+    "source": "LunchUp Opportunities",
+    "category": "Data",
+    "summary": "Own dashboards, campaign measurement, and reporting workflows across customer acquisition and retention.",
+    "publishedAt": "2026-04-13T14:33:36.484Z",
+    "applyUrl": "https://www.workingnomads.com/jobs",
+    "url": "https://www.workingnomads.com/jobs",
+    "isRemote": false,
+    "tags": [
+      "Data",
+      "Analytics",
+      "Growth"
+    ]
+  }
+]
