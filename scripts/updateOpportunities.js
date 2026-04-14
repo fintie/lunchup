@@ -8,8 +8,8 @@ const MAX_ITEMS = 120;
 const FRESH_ITEMS_PER_RUN = 24;
 const MIN_REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const FETCH_TIMEOUT = 15000;
-const TARGET_CITIES = ['sydney', 'melbourne'];
-const TARGET_CATEGORIES = ['ai', 'data', 'it', 'marketing'];
+const TARGET_CITIES = ['sydney', 'melbourne', 'australia'];
+const TARGET_CATEGORIES = ['ai', 'data', 'it', 'marketing', 'software', 'engineering', 'developer', 'analytics', 'growth'];
 
 const SOURCES = [
   {
@@ -23,6 +23,36 @@ const SOURCES = [
     type: 'json',
     url: 'https://remotive.com/api/remote-jobs?search=marketing',
     mapper: mapRemotiveJobs
+  },
+  {
+    name: 'Jobicy',
+    type: 'json',
+    url: 'https://jobicy.com/api/v2/remote-jobs?count=60',
+    mapper: mapJobicyJobs
+  },
+  {
+    name: 'Jobicy Marketing',
+    type: 'json',
+    url: 'https://jobicy.com/api/v2/remote-jobs?count=60&tag=marketing',
+    mapper: mapJobicyJobs
+  },
+  {
+    name: 'Arbeitnow',
+    type: 'json',
+    url: 'https://www.arbeitnow.com/api/job-board-api?page=1',
+    mapper: mapArbeitnowJobs
+  },
+  {
+    name: 'Arbeitnow Page 2',
+    type: 'json',
+    url: 'https://www.arbeitnow.com/api/job-board-api?page=2',
+    mapper: mapArbeitnowJobs
+  },
+  {
+    name: 'Remote OK',
+    type: 'json',
+    url: 'https://remoteok.com/api',
+    mapper: mapRemoteOkJobs
   }
 ];
 
@@ -119,8 +149,10 @@ function matchesTargetFilters(job) {
   const matchesCity = TARGET_CITIES.some(city => haystack.includes(city));
   const matchesCategory = TARGET_CATEGORIES.some(category => haystack.includes(category));
   const inferredCategory = inferCategory(job).toLowerCase();
+  const title = (job.title || '').toLowerCase();
+  const hasRelevantRoleSignal = /(engineer|developer|marketer|marketing|analyst|analytics|data|ai|machine learning|growth|product|software|it)/.test(`${title} ${haystack}`);
 
-  return (matchesCity || isRemoteFriendly) && (matchesCategory || TARGET_CATEGORIES.includes(inferredCategory));
+  return (matchesCity || isRemoteFriendly) && (matchesCategory || TARGET_CATEGORIES.includes(inferredCategory) || hasRelevantRoleSignal);
 }
 
 function normaliseJob(job, source, index) {
@@ -150,9 +182,9 @@ function normaliseJob(job, source, index) {
 
 function inferCategory(job) {
   const haystack = [job.title, job.category, job.tags].flat().filter(Boolean).join(' ').toLowerCase();
-  if (haystack.includes('marketing') || haystack.includes('growth') || haystack.includes('seo')) return 'Marketing';
-  if (haystack.includes('data') || haystack.includes('analytics') || haystack.includes('scientist')) return 'Data';
-  if (haystack.includes('ai') || haystack.includes('machine learning') || haystack.includes('ml')) return 'AI';
+  if (haystack.includes('marketing') || haystack.includes('growth') || haystack.includes('seo') || haystack.includes('content')) return 'Marketing';
+  if (haystack.includes('data') || haystack.includes('analytics') || haystack.includes('scientist') || haystack.includes('bi')) return 'Data';
+  if (haystack.includes('ai') || haystack.includes('machine learning') || haystack.includes('ml') || haystack.includes('llm')) return 'AI';
   return 'IT';
 }
 
@@ -216,6 +248,54 @@ function mapRemotiveJobs(payload) {
     applyUrl: job.url,
     url: job.url,
     tags: job.tags || []
+  }));
+}
+
+function mapJobicyJobs(payload) {
+  const jobs = Array.isArray(payload?.jobs) ? payload.jobs : [];
+  return jobs.map(job => ({
+    title: job.jobTitle,
+    company: job.companyName,
+    location: job.jobGeo || job.jobType || 'Remote',
+    category: job.jobIndustry,
+    summary: job.jobExcerpt,
+    description: job.jobDescription,
+    publishedAt: job.pubDate,
+    applyUrl: job.url,
+    url: job.url,
+    tags: [job.jobIndustry, job.jobType, job.jobLevel].filter(Boolean)
+  }));
+}
+
+function mapArbeitnowJobs(payload) {
+  const jobs = Array.isArray(payload?.data) ? payload.data : [];
+  return jobs.map(job => ({
+    title: job.title,
+    company: job.company_name,
+    location: job.location || (job.remote ? 'Remote' : ''),
+    category: Array.isArray(job.tags) ? job.tags.join(' ') : '',
+    summary: job.description,
+    description: job.description,
+    publishedAt: job.created_at,
+    applyUrl: job.url,
+    url: job.url,
+    tags: [...(Array.isArray(job.tags) ? job.tags : []), ...(Array.isArray(job.job_types) ? job.job_types : [])]
+  }));
+}
+
+function mapRemoteOkJobs(payload) {
+  const jobs = Array.isArray(payload) ? payload.slice(1) : [];
+  return jobs.map(job => ({
+    title: job.position,
+    company: job.company,
+    location: job.location || 'Remote',
+    category: Array.isArray(job.tags) ? job.tags.join(' ') : '',
+    summary: job.description,
+    description: job.description,
+    publishedAt: job.date || (job.epoch ? new Date(job.epoch * 1000).toISOString() : undefined),
+    applyUrl: job.apply_url || job.url,
+    url: job.url,
+    tags: Array.isArray(job.tags) ? job.tags : []
   }));
 }
 

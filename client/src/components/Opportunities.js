@@ -76,7 +76,7 @@ const Opportunities = () => {
     <>
       <Seo
         title="Opportunities in Sydney and Melbourne | Lunchup"
-        description="Browse curated AI, data, IT, and marketing opportunities for Sydney and Melbourne, styled like a lightweight modern jobs board inside Lunchup."
+        description="Browse curated AI, data, IT, and marketing opportunities for Sydney and Melbourne in a cleaner, faster job discovery experience inside Lunchup."
         path="/opportunities"
         type="website"
         keywords={[
@@ -93,7 +93,7 @@ const Opportunities = () => {
               <span className="opportunities-eyebrow">Lunchup Opportunities</span>
               <h1>Find fresh AI, data, IT, and marketing roles</h1>
               <p>
-                A cleaner jobs board for Sydney and Melbourne roles, with a Jora-style browsing flow
+                A cleaner jobs board for Sydney and Melbourne roles, with a streamlined browsing experience
                 and direct links back to the original listing.
               </p>
               {updatedAt && <div className="opportunities-updated">Last updated: {formatDate(updatedAt)}</div>}
