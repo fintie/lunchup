@@ -4,9 +4,9 @@ const axios = require('axios');
 
 const DATA_PATH = path.join(__dirname, '..', 'data', 'opportunities.json');
 const META_PATH = path.join(__dirname, '..', 'data', 'opportunities-meta.json');
-const MAX_ITEMS = 120;
-const FRESH_ITEMS_PER_RUN = 24;
-const MIN_REFRESH_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const MAX_ITEMS = 180;
+const FRESH_ITEMS_PER_RUN = 36;
+const MIN_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const FETCH_TIMEOUT = 15000;
 const TARGET_CITIES = ['sydney', 'melbourne', 'australia'];
 const TARGET_CATEGORIES = ['ai', 'data', 'it', 'marketing', 'software', 'engineering', 'developer', 'analytics', 'growth'];
@@ -16,6 +16,24 @@ const SOURCES = [
     name: 'Remotive',
     type: 'json',
     url: 'https://remotive.com/api/remote-jobs',
+    mapper: mapRemotiveJobs
+  },
+  {
+    name: 'Remotive AI',
+    type: 'json',
+    url: 'https://remotive.com/api/remote-jobs?search=ai',
+    mapper: mapRemotiveJobs
+  },
+  {
+    name: 'Remotive Data',
+    type: 'json',
+    url: 'https://remotive.com/api/remote-jobs?search=data',
+    mapper: mapRemotiveJobs
+  },
+  {
+    name: 'Remotive Software',
+    type: 'json',
+    url: 'https://remotive.com/api/remote-jobs?search=software',
     mapper: mapRemotiveJobs
   },
   {
@@ -31,9 +49,21 @@ const SOURCES = [
     mapper: mapJobicyJobs
   },
   {
-    name: 'Jobicy Marketing',
+    name: 'Jobicy Dev',
     type: 'json',
-    url: 'https://jobicy.com/api/v2/remote-jobs?count=60&tag=marketing',
+    url: 'https://jobicy.com/api/v2/remote-jobs?count=60&tag=dev',
+    mapper: mapJobicyJobs
+  },
+  {
+    name: 'Jobicy Business',
+    type: 'json',
+    url: 'https://jobicy.com/api/v2/remote-jobs?count=60&tag=business',
+    mapper: mapJobicyJobs
+  },
+  {
+    name: 'Jobicy Management',
+    type: 'json',
+    url: 'https://jobicy.com/api/v2/remote-jobs?count=60&tag=management',
     mapper: mapJobicyJobs
   },
   {
@@ -46,6 +76,12 @@ const SOURCES = [
     name: 'Arbeitnow Page 2',
     type: 'json',
     url: 'https://www.arbeitnow.com/api/job-board-api?page=2',
+    mapper: mapArbeitnowJobs
+  },
+  {
+    name: 'Arbeitnow Page 3',
+    type: 'json',
+    url: 'https://www.arbeitnow.com/api/job-board-api?page=3',
     mapper: mapArbeitnowJobs
   },
   {
@@ -311,7 +347,7 @@ async function fetchSource(source) {
   return source.mapper(response.data)
     .filter(job => job.title && (job.applyUrl || job.url))
     .filter(matchesTargetFilters)
-    .slice(0, 18)
+    .slice(0, 24)
     .map((job, index) => normaliseJob(job, source.name, index));
 }
 

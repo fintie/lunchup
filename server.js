@@ -139,7 +139,7 @@ function scheduleRefresh(scriptPath, label, intervalMs) {
 }
 
 scheduleRefresh(newsUpdateScript, '📰', 12 * 60 * 60 * 1000);
-scheduleRefresh(opportunitiesUpdateScript, '💼', 6 * 60 * 60 * 1000);
+scheduleRefresh(opportunitiesUpdateScript, '💼', 24 * 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

@@ -1,5 +1,544 @@
 [
   {
+    "id": "remote-ok-1776606737707-0",
+    "title": "Project Manager I",
+    "company": "TEECOM",
+    "location": "Remote - United States",
+    "source": "Remote OK",
+    "category": "Data",
+    "summary": "About the Position The Project Manager I is an entry-level role on TEECOMâs internal Project Management path, reporting to Team Leads. You keep the teamâs delivery machinery running â tracking, documentation, coordination, and reporting â so that Te...",
+    "publishedAt": "2026-04-18T08:02:00.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-project-manager-i-teecom-1131212",
+    "url": "https://remoteOK.com/remote-jobs/remote-project-manager-i-teecom-1131212",
+    "isRemote": true,
+    "tags": [
+      "manager",
+      "training",
+      "designer",
+      "recruiter",
+      "support",
+      "travel"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-1",
+    "title": "Vice President Marketing",
+    "company": "Imagine Pediatrics",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "Who We Are Imagine Pediatrics is a tech enabled, pediatrician led medical group reimagining care for children with special health care needs. We deliver 24/7 virtual first and in home medical, behavioral, and social care, working alongside families, provide...",
+    "publishedAt": "2026-04-18T00:01:19.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-vice-president-marketing-imagine-pediatrics-1131208",
+    "url": "https://remoteOK.com/remote-jobs/remote-vice-president-marketing-imagine-pediatrics-1131208",
+    "isRemote": true,
+    "tags": [
+      "support",
+      "leader",
+      "strategy",
+      "marketing",
+      "health",
+      "non tech"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-2",
+    "title": "VP People Operations",
+    "company": "Machinify",
+    "location": "Remote - US",
+    "source": "Remote OK",
+    "category": "IT",
+    "summary": "Machinify is a leading healthcare intelligence company with expertise across the payment continuum, delivering unmatched value, transparency, and efficiency to health plan clients across the country. Deployed by over 85 health plans, including many of the t...",
+    "publishedAt": "2026-04-18T00:00:47.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-vp-people-operations-machinify-1131205",
+    "url": "https://remoteOK.com/remote-jobs/remote-vp-people-operations-machinify-1131205",
+    "isRemote": true,
+    "tags": [
+      "design",
+      "hr",
+      "system",
+      "financial",
+      "operations",
+      "health"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-3",
+    "title": "Geospatial Database Administrator",
+    "company": "Ardent",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Data",
+    "summary": "Why do you need to choose between doing important work and having a fulfilling life? At Ardent, we have both. Ardent employees are committed to solving our customers' most difficult problemsâand we are committed to the well-being, personal goals, and prof...",
+    "publishedAt": "2026-04-18T00:00:31.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-geospatial-database-administrator-ardent-1131204",
+    "url": "https://remoteOK.com/remote-jobs/remote-geospatial-database-administrator-ardent-1131204",
+    "isRemote": true,
+    "tags": [
+      "system",
+      "support",
+      "administrator",
+      "management"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-4",
+    "title": "Product Lead Agentic Ads Platform",
+    "company": "Hightouch",
+    "location": "SF, NY, Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "About Hightouch Hightouch is the modern AI platform for marketing and growth teams. Our AI agents reimagine marketing workflows, allowing marketers to create content, plan campaigns, and execute strategies with transformational velocity and performance. Hig...",
+    "publishedAt": "2026-04-18T00:00:18.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-product-lead-agentic-ads-platform-hightouch-1131203",
+    "url": "https://remoteOK.com/remote-jobs/remote-product-lead-agentic-ads-platform-hightouch-1131203",
+    "isRemote": true,
+    "tags": [
+      "strategist",
+      "test",
+      "growth",
+      "travel",
+      "cloud",
+      "ads"
+    ]
+  },
+  {
+    "id": "jobicy-1776606737328-0",
+    "title": "Customer Success Lead – APAC",
+    "company": "Elevenlabs",
+    "location": "Australia, Singapore",
+    "source": "Jobicy",
+    "category": "IT",
+    "summary": "About ElevenLabsElevenLabs is an AI research and product company transforming how we interact with technology.We launched in January 2023 with the first human-like AI voice model. Today, we serve millions...",
+    "publishedAt": "2026-04-17T16:52:42.000Z",
+    "applyUrl": "https://jobicy.com/jobs/142092-customer-success-lead-apac",
+    "url": "https://jobicy.com/jobs/142092-customer-success-lead-apac",
+    "isRemote": false,
+    "tags": [
+      [
+        "Customer Success"
+      ],
+      [
+        "Full-Time"
+      ],
+      "Senior"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-5",
+    "title": "Solution Expert",
+    "company": "360Learning",
+    "location": "Canada, Remote",
+    "source": "Remote OK",
+    "category": "IT",
+    "summary": "Our Solution Expert team plays a key role in supporting strategic customers in RUN phase, by acting as trusted advisors on complex use cases. Working closely with Sales, Product, and Customer Success, they analyze advanced client needs, challenge existing s...",
+    "publishedAt": "2026-04-17T08:01:07.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-solution-expert-360learning-1131192",
+    "url": "https://remoteOK.com/remote-jobs/remote-solution-expert-360learning-1131192",
+    "isRemote": true,
+    "tags": [
+      "saas",
+      "hr",
+      "consulting",
+      "technical",
+      "support",
+      "leader"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-6",
+    "title": "VP Sales",
+    "company": "Unlimit",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "About Unlimit Unlimit is the global financial infrastructure for the borderless agentic economy. Designed to bridge the gap between fragmented local markets and the future of autonomous commerce, Unlimit provides the programmable operating layer for the wor...",
+    "publishedAt": "2026-04-17T08:00:58.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-vp-sales-unlimit-1131191",
+    "url": "https://remoteOK.com/remote-jobs/remote-vp-sales-unlimit-1131191",
+    "isRemote": true,
+    "tags": [
+      "growth",
+      "financial",
+      "fintech",
+      "rails",
+      "management",
+      "lead"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737707-7",
+    "title": "Executive Director Regulatory Affairs",
+    "company": "Kyverna Therapeutics",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "AI",
+    "summary": "Kyverna Therapeutics is a patient-centered, clinical-stage biopharmaceutical company developing cell therapies for patients suffering from autoimmune diseases. Guided by our core values, Stay True to Why, Collaborate to Accelerate, Lead with Clarity, Boldly...",
+    "publishedAt": "2026-04-17T08:00:43.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-executive-director-regulatory-affairs-kyverna-therapeutics-1131189",
+    "url": "https://remoteOK.com/remote-jobs/remote-executive-director-regulatory-affairs-kyverna-therapeutics-1131189",
+    "isRemote": true,
+    "tags": [
+      "director",
+      "support",
+      "leader",
+      "strategy",
+      "management",
+      "lead"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-8",
+    "title": "Deputy Director Non entive Programs",
+    "company": "CALSTART",
+    "location": "Remote, CA",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "Please be aware of recruiting scams! All legitimate communication from our recruitment team will come from an official calstart.org email address via email, we will not text you about a role you have not applied to or shown interest in. We will not perform ...",
+    "publishedAt": "2026-04-17T08:00:11.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-deputy-director-non-entive-programs-calstart-1131186",
+    "url": "https://remoteOK.com/remote-jobs/remote-deputy-director-non-entive-programs-calstart-1131186",
+    "isRemote": true,
+    "tags": [
+      "director",
+      "security",
+      "training",
+      "technical",
+      "support",
+      "software"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-9",
+    "title": "Nurse Care Manager Transitions of Care",
+    "company": "Evergreen Nephrology",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "IT",
+    "summary": "Who We Are Evergreen Nephrology partners with nephrologists to transform kidney care through a value-based, person-centered, holistic, and comprehensive approach to kidney care. We believe patients living with kidney disease deserve the best care. We are co...",
+    "publishedAt": "2026-04-17T00:01:10.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-nurse-care-manager-transitions-of-care-evergreen-nephrology-1131181",
+    "url": "https://remoteOK.com/remote-jobs/remote-nurse-care-manager-transitions-of-care-evergreen-nephrology-1131181",
+    "isRemote": true,
+    "tags": [
+      "manager",
+      "system",
+      "healthcare"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-10",
+    "title": "Content Compliance Manager OTC Supplements and Cosmetics",
+    "company": "Strive Pharmacy",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "Company Overview Before we opened Strive Pharmacy we were unsatisfied with the current state of the pharmaceutical industry. Most of the current pharmaceuticals only offer a one size fits all approach and often come with unwanted and potentially dangerous s...",
+    "publishedAt": "2026-04-17T00:01:02.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-content-compliance-manager-otc-supplements-and-cosmetics-strive-pharmacy-1131180",
+    "url": "https://remoteOK.com/remote-jobs/remote-content-compliance-manager-otc-supplements-and-cosmetics-strive-pharmacy-1131180",
+    "isRemote": true,
+    "tags": [
+      "manager",
+      "content",
+      "health",
+      "healthcare",
+      "non tech"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-11",
+    "title": "Technical Support Manager",
+    "company": "Promenade",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "IT",
+    "summary": "Promenade is looking for a Technical Support Manager to lead a team responsible for high-touch escalations across our software suite. This is a player-coach role for someone who can move comfortably between operational leadership, deep technical troubleshoo...",
+    "publishedAt": "2026-04-17T00:00:44.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-technical-support-manager-promenade-1131178",
+    "url": "https://remoteOK.com/remote-jobs/remote-technical-support-manager-promenade-1131178",
+    "isRemote": true,
+    "tags": [
+      "manager",
+      "saas",
+      "technical",
+      "support",
+      "software",
+      "voice"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-12",
+    "title": "Creative Director",
+    "company": "Runway",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "We are building AI to simulate the world through merging art and science. We believe that world models are at the frontier of progress in artificial intelligence. Language models alone wonât solve the worldâs hardest problems â robotics, disease, scie...",
+    "publishedAt": "2026-04-17T00:00:38.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-creative-director-runway-1131177",
+    "url": "https://remoteOK.com/remote-jobs/remote-creative-director-runway-1131177",
+    "isRemote": true,
+    "tags": [
+      "director",
+      "video",
+      "leader",
+      "content",
+      "senior",
+      "marketing"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-13",
+    "title": "Spanish Bilingual Certified Pharmacy Technician Refill & Medication Adherence",
+    "company": "Shields Health Solutions",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Data",
+    "summary": "Bilingual (Spanish) Patient Engagement Specialist (Remote) Language Requirement: Fluent in English and Spanish (verbal and written) Location: Remote (U.S.) Make a Direct Impact on Patient CareâFrom Home Are you a certified pharmacy technician who is passi...",
+    "publishedAt": "2026-04-17T00:00:31.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-spanish-bilingual-certified-pharmacy-technician-refill-medication-adherence-shields-health-solutions-1131176",
+    "url": "https://remoteOK.com/remote-jobs/remote-spanish-bilingual-certified-pharmacy-technician-refill-medication-adherence-shields-health-solutions-1131176",
+    "isRemote": true,
+    "tags": [
+      "system",
+      "support",
+      "medical",
+      "health"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-14",
+    "title": "Manager Retention",
+    "company": "Evolve",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "IT",
+    "summary": "At Evolve, we're on a mission to make vacation rental easy for everyone. Our high-performing, customer-obsessed team runs on curiosity, communication, and accountabilityâworking together to create exceptional experiences for our owners and guests. Whether...",
+    "publishedAt": "2026-04-17T00:00:23.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-manager-retention-evolve-1131175",
+    "url": "https://remoteOK.com/remote-jobs/remote-manager-retention-evolve-1131175",
+    "isRemote": true,
+    "tags": [
+      "manager",
+      "consult",
+      "strategy",
+      "management",
+      "lead",
+      "senior"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-15",
+    "title": "Engineering Manager",
+    "company": "Calendly",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "Whatâs in it for you? Ready to make a serious impact? Millions of people already rely on Calendly, and weâre still in the midst of exciting product growth â itâs a fantastic time to join us. Everything youâll work on here will accelerate your care...",
+    "publishedAt": "2026-04-17T00:00:14.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-engineering-manager-calendly-1131174",
+    "url": "https://remoteOK.com/remote-jobs/remote-engineering-manager-calendly-1131174",
+    "isRemote": true,
+    "tags": [
+      "manager",
+      "technical",
+      "software",
+      "growth",
+      "director",
+      "api"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-16",
+    "title": "Senior React Native Developer",
+    "company": "Headway",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Data",
+    "summary": "About Headway Â Founded in 2015, Headway was born out of a passion to bring entrepreneurial ideas to market and keep them there. We work holistically with our client partners as a true extension of their product team, not just as an execution arm of their b...",
+    "publishedAt": "2026-04-16T18:16:22.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-senior-react-native-developer-headway-1131173",
+    "url": "https://remoteOK.com/remote-jobs/remote-senior-react-native-developer-headway-1131173",
+    "isRemote": true,
+    "tags": [
+      "engineer",
+      "mobile",
+      "javascript",
+      "react",
+      "dev",
+      "iOS"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-17",
+    "title": "Frontend Developer Vue.js",
+    "company": "Insider One",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "Before jumping into all the information about the role and what you can bring to the table, let us introduce ourselves real quick. About us Insider One is the #1 platform that brings everything marketing and customer engagement teams need in one place so th...",
+    "publishedAt": "2026-04-16T16:00:35.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-frontend-developer-vue-js-insider-one-1131167",
+    "url": "https://remoteOK.com/remote-jobs/remote-frontend-developer-vue-js-insider-one-1131167",
+    "isRemote": true,
+    "tags": [
+      "frontend",
+      "developer",
+      "design",
+      "saas",
+      "front-end",
+      "back-end"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-18",
+    "title": "Freelance Senior Full Stack Software Architect and Collateral Management Specialist",
+    "company": "WISE INTEGRATION",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "AI",
+    "summary": "On behalf of our client, Danske Group IT, we are looking for a Freelance Senior Full Stack Software Architect and a Collateral Management Specialist who will work on the Algo Collateral project. The candidate will work in Collateral Management, with extensi...",
+    "publishedAt": "2026-04-16T16:00:28.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-freelance-senior-full-stack-software-architect-and-collateral-management-specialist-wise-integration-1131166",
+    "url": "https://remoteOK.com/remote-jobs/remote-freelance-senior-full-stack-software-architect-and-collateral-management-specialist-wise-integration-1131166",
+    "isRemote": true,
+    "tags": [
+      "architect",
+      "software",
+      "design",
+      "training",
+      "full-stack",
+      "technical"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-19",
+    "title": "Senior Software Engineer App Infra",
+    "company": "Ocrolus Inc.",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Data",
+    "summary": "Come build at the intersection of AI and fintech. At Ocrolus, we're on a mission to help lenders automate workflows with confidenceâstreamlining how financial institutions evaluate borrowers and enabling faster, more accurate lending decisions. Our AI wor...",
+    "publishedAt": "2026-04-16T16:00:11.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-senior-software-engineer-app-infra-ocrolus-inc-1131164",
+    "url": "https://remoteOK.com/remote-jobs/remote-senior-software-engineer-app-infra-ocrolus-inc-1131164",
+    "isRemote": true,
+    "tags": [
+      "software",
+      "architect",
+      "technical",
+      "testing",
+      "financial",
+      "cloud"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-20",
+    "title": "Crypto Trader",
+    "company": "Fox GLobal Assets",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "AI",
+    "summary": "Fox Global is an international company operating at the intersection of digital assets, market intelligence, and data-driven trading strategies. Our focus is on building a strong team of professionals who want to gain real-world experience in financial mark...",
+    "publishedAt": "2026-04-16T13:41:16.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-crypto-trader-fox-global-assets-1131163",
+    "url": "https://remoteOK.com/remote-jobs/remote-crypto-trader-fox-global-assets-1131163",
+    "isRemote": true,
+    "tags": [
+      "finance",
+      "education",
+      "crypto",
+      "legal",
+      "junior",
+      "web3"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737709-21",
+    "title": "Director AI",
+    "company": "Syner-G",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "COMPANY DESCRIPTION: Â A career here is life-enhancing. At Syner-G, we enable our people to build careers that impact positively on their quality of life. Through our expertise, insight, consulting and management skills, we accelerate breakthrough science a...",
+    "publishedAt": "2026-04-16T08:00:21.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-director-ai-syner-g-1131155",
+    "url": "https://remoteOK.com/remote-jobs/remote-director-ai-syner-g-1131155",
+    "isRemote": true,
+    "tags": [
+      "director",
+      "consulting",
+      "support",
+      "growth",
+      "financial",
+      "video"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737710-22",
+    "title": "Technical Support Analyst",
+    "company": "Yuno",
+    "location": "Remote",
+    "source": "Remote OK",
+    "category": "Data",
+    "summary": "Remote, LATAM, Full Time, Individual Contributor, +1 year of experience Who We Are At Yuno, we are building the payment infrastructure that allows all companies to participate in the global market. Founded by seasoned experts from the payments and tech indu...",
+    "publishedAt": "2026-04-16T00:01:12.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-technical-support-analyst-yuno-1131151",
+    "url": "https://remoteOK.com/remote-jobs/remote-technical-support-analyst-yuno-1131151",
+    "isRemote": true,
+    "tags": [
+      "analyst",
+      "system",
+      "technical",
+      "support",
+      "api",
+      "management"
+    ]
+  },
+  {
+    "id": "remote-ok-1776606737710-23",
+    "title": "Partner Development Director",
+    "company": "Clozd",
+    "location": "Lehi, UT / Remote",
+    "source": "Remote OK",
+    "category": "Marketing",
+    "summary": "Clozd is the leader in Decision Intelligence âhelping companies uncover the truth by capturing direct feedback throughout the customer journey. We believe most revenue organizations are operating without the full picture. CRM and call data only tell part ...",
+    "publishedAt": "2026-04-16T00:00:49.000Z",
+    "applyUrl": "https://remoteOK.com/remote-jobs/remote-partner-development-director-clozd-1131148",
+    "url": "https://remoteOK.com/remote-jobs/remote-partner-development-director-clozd-1131148",
+    "isRemote": true,
+    "tags": [
+      "director",
+      "embedded",
+      "consulting",
+      "growth",
+      "leader",
+      "lead"
+    ]
+  },
+  {
+    "id": "remotive-1776606736869-0",
+    "title": "Senior Full-stack React Developer",
+    "company": "Lemon.io",
+    "location": "Americas, Europe, Asia, Oceania",
+    "source": "Remotive",
+    "category": "Data",
+    "summary": "Are you a talented Senior Developer looking for a remote job that lets you show your skills and get decent compensation? Look no further than Lemon.io — the marketplace that connects you with hand-picked startups in the US and Europe. What we offer: The rat...",
+    "publishedAt": "2026-04-15T04:19:37.000Z",
+    "applyUrl": "https://remotive.com/remote-jobs/software-development/senior-full-stack-react-developer-2088711",
+    "url": "https://remotive.com/remote-jobs/software-development/senior-full-stack-react-developer-2088711",
+    "isRemote": false,
+    "tags": [
+      ".Net",
+      "android",
+      "AWS",
+      "azure",
+      "backend",
+      "C"
+    ]
+  },
+  {
     "id": "fallback-remotive-ai-1776090816490",
     "title": "AI Product Specialist",
     "company": "Remote Growth Studio",
@@ -612,6 +1151,20 @@
       "bookkeeping",
       "google sheets"
     ]
+  },
+  {
+    "id": "arbeitnow-1776606737521-0",
+    "title": "Director, European Government Operations",
+    "company": "Rocket Lab Corporation",
+    "location": "Munich, Bavaria, Germany",
+    "source": "Arbeitnow",
+    "category": "IT",
+    "summary": "ABOUT ROCKET LAB Rocket Lab is an end-to-end space company delivering responsive launch services, complete spacecraft design and manufacturing, payloads, satellite components, and more – all with the goal of opening access space. The rockets and satellites ...",
+    "publishedAt": "1970-01-21T13:27:38.720Z",
+    "applyUrl": "https://www.arbeitnow.com/jobs/companies/rocket-lab-corporation/director-european-government-operations-munich-254393",
+    "url": "https://www.arbeitnow.com/jobs/companies/rocket-lab-corporation/director-european-government-operations-munich-254393",
+    "isRemote": false,
+    "tags": []
   },
   {
     "id": "arbeitnow-1776165126652-0",
