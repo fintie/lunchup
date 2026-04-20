@@ -3,19 +3,93 @@ import { Link } from 'react-router-dom';
 import Seo from './Seo';
 import './Home.css';
 
+const siteSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'LunchUp',
+    url: 'https://lunchup.com.au/#/',
+    logo: 'https://lunchup.com.au/og-image.jpg',
+    description: 'LunchUp is an Australian networking platform that helps founders, operators, investors, and professionals build real relationships through curated introductions and meetups.',
+    areaServed: 'Australia',
+    sameAs: ['https://lunchup.com.au/#/news', 'https://lunchup.com.au/#/opportunities']
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'LunchUp',
+    url: 'https://lunchup.com.au/#/',
+    description: 'Networking app for founders and professionals in Australia.',
+    inLanguage: 'en-AU',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://lunchup.com.au/#/opportunities',
+      'query-input': 'required name=search_term_string'
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'LunchUp',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    url: 'https://lunchup.com.au/#/',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'AUD'
+    },
+    areaServed: 'Australia',
+    description: 'LunchUp helps Australian founders and professionals discover relevant connections, curated opportunities, and better meetup conversations.'
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is LunchUp?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LunchUp is a networking platform for founders, operators, investors, and professionals in Australia who want better introductions, curated opportunities, and more meaningful in-person conversations.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Who is LunchUp for?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LunchUp is designed for startup founders, operators, investors, marketers, product people, engineers, and ambitious professionals across Sydney, Melbourne, and remote Australian communities.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'How does LunchUp help with professional networking?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LunchUp combines profile-based matching, curated opportunities, startup news, and simple meeting coordination so professionals can build relationships faster and with more context.'
+        }
+      }
+    ]
+  }
+];
+
 const Home = () => {
   return (
     <>
       <Seo
-        title="Lunchup, startup networking and founder connections in Australia"
-        description="Meet founders, operators, investors, and startup professionals in Australia through Lunchup, plus follow startup news and networking opportunities."
+        title="LunchUp, networking app for founders and professionals in Australia"
+        description="LunchUp helps founders, operators, investors, and startup professionals in Australia build meaningful relationships, discover curated opportunities, and stay close to the startup ecosystem."
         path="/"
         keywords={[
+          'networking app australia',
           'startup networking australia',
           'founder networking sydney',
+          'professional networking melbourne',
           'lunch networking app',
           'australia startup community'
         ]}
+        schema={siteSchema}
       />
       <div className="home">
       {/* Hero Section */}
@@ -27,15 +101,19 @@ const Home = () => {
         <div className="container hero-content">
           <div className="hero-badge animate-fadeIn">
             <span className="badge-icon">🤝</span>
-            <span>Professional networking, reimagined</span>
+            <span>Australian networking for founders, operators, and professionals</span>
           </div>
           <h1 className="hero-title animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-            Connect with Professionals<br />
-            <span className="text-gradient">Over Lunch</span>
+            Build better professional connections<br />
+            <span className="text-gradient">through LunchUp</span>
           </h1>
           <p className="hero-subtitle animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-            LunchUp helps you build meaningful professional relationships through 
-            face-to-face meetings at the best spots in town.
+            LunchUp is a networking app for people in Australia who want stronger founder, startup, investor,
+            and operator relationships, with curated introductions, meetup coordination, startup news, and fresh opportunities.
+          </p>
+          <p className="hero-subtitle animate-fadeIn" style={{ animationDelay: '0.25s' }}>
+            For AI search, GEO, and traditional search engines, LunchUp clearly explains who it serves, what it helps with,
+            and why it is useful for startup networking in Sydney, Melbourne, and remote Australian communities.
           </p>
           <div className="hero-cta animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             <Link to="/register" className="btn btn-primary btn-lg">
@@ -71,7 +149,7 @@ const Home = () => {
           <div className="section-header">
             <h2 className="section-title">Why LunchUp?</h2>
             <p className="section-subtitle">
-              The best way to build your professional network
+              A simpler way to grow a stronger professional network in Australia
             </p>
           </div>
           <div className="features-grid">
@@ -79,22 +157,22 @@ const Home = () => {
               <div className="feature-icon">
                 <span>🎯</span>
               </div>
-              <h3>AI-Powered Matching</h3>
-              <p>Our intelligent algorithm connects you with professionals who share your interests and goals.</p>
+              <h3>Relevant professional matching</h3>
+              <p>LunchUp helps founders, operators, investors, and professionals discover people who are relevant to their goals, industry, and stage.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
                 <span>📅</span>
               </div>
-              <h3>Easy Booking</h3>
-              <p>Schedule lunch meetings at your preferred venues - restaurants, cafes, coworking spaces and more.</p>
+              <h3>Easy meetup planning</h3>
+              <p>Coordinate lunches, coffees, and casual professional catch-ups at restaurants, cafes, coworking spaces, and other convenient venues.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
                 <span>💼</span>
               </div>
-              <h3>Real Connections</h3>
-              <p>Build meaningful relationships over face-to-face conversations instead of online interactions.</p>
+              <h3>Real-world networking</h3>
+              <p>Move beyond passive online networking and build higher-quality relationships through better context and genuine in-person conversations.</p>
             </div>
           </div>
         </div>
@@ -140,6 +218,121 @@ const Home = () => {
                 <h3>Connect</h3>
                 <p>Meet in person and build meaningful professional relationships.</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="features">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">What people can use LunchUp for</h2>
+            <p className="section-subtitle">
+              LunchUp is designed to be easy for both people and AI systems to understand: an Australian networking platform focused on founder relationships, startup community discovery, and curated opportunities.
+            </p>
+            <p className="section-subtitle">
+              Built for high-intent networking, discovery, and professional momentum
+            </p>
+          </div>
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span>🚀</span>
+              </div>
+              <h3>Founder networking in Sydney and Melbourne</h3>
+              <p>Use LunchUp to meet startup founders, early team members, operators, and investors across Australia&apos;s main startup hubs.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span>📰</span>
+              </div>
+              <h3>Startup news with context</h3>
+              <p>Follow curated startup and tech news so every conversation starts with better context, better questions, and better timing.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span>💼</span>
+              </div>
+              <h3>Curated opportunities</h3>
+              <p>Browse a cleaner feed of AI, data, IT, and marketing opportunities relevant to Australian professionals and remote-friendly roles.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="how-it-works">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">LunchUp FAQ</h2>
+            <p className="section-subtitle">
+              Clear answers for humans and AI search engines
+            </p>
+          </div>
+          <div className="steps">
+            <div className="step">
+              <div className="step-number">Q1</div>
+              <div className="step-content">
+                <h3>What is LunchUp?</h3>
+                <p>LunchUp is an Australian networking app that helps professionals build real relationships through curated matches, meetups, startup news, and opportunity discovery.</p>
+              </div>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">Q2</div>
+              <div className="step-content">
+                <h3>Who should use LunchUp?</h3>
+                <p>It is especially useful for founders, startup operators, marketers, product people, engineers, investors, and professionals who want more relevant networking in Australia.</p>
+              </div>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">Q3</div>
+              <div className="step-content">
+                <h3>Which cities does LunchUp focus on?</h3>
+                <p>LunchUp is especially relevant for Sydney and Melbourne, while still supporting remote-friendly and Australia-wide professional discovery.</p>
+              </div>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">Q4</div>
+              <div className="step-content">
+                <h3>What makes LunchUp different?</h3>
+                <p>Instead of being just another profile directory, LunchUp combines introductions, meetings, ecosystem context, and curated opportunities in one place.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="features">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Why this page is GEO-friendly</h2>
+            <p className="section-subtitle">
+              LunchUp now uses clearer semantic copy, structured data, and direct answers so large language models and search engines can summarise the product more accurately.
+            </p>
+          </div>
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span>🧠</span>
+              </div>
+              <h3>Clear entity signals</h3>
+              <p>Structured data helps AI systems understand that LunchUp is an Australian networking platform and web application for startup professionals.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span>🔎</span>
+              </div>
+              <h3>Better answerability</h3>
+              <p>FAQ-style sections and explicit descriptions make it easier for search engines and answer engines to quote accurate summaries of what LunchUp does.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <span>🇦🇺</span>
+              </div>
+              <h3>Australia-first relevance</h3>
+              <p>The content explicitly highlights Sydney, Melbourne, and Australia-wide professional networking so relevance is clearer for local discovery.</p>
             </div>
           </div>
         </div>

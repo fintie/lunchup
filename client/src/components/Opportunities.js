@@ -3,6 +3,49 @@ import axios from 'axios';
 import Seo from './Seo';
 import './Opportunities.css';
 
+const opportunitiesSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'LunchUp Opportunities',
+    url: 'https://lunchup.com.au/#/opportunities',
+    description: 'Curated AI, data, IT, and marketing opportunities for Sydney, Melbourne, and remote-friendly roles in Australia.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'LunchUp',
+      url: 'https://lunchup.com.au/#/'
+    },
+    about: [
+      'Startup jobs Australia',
+      'Sydney jobs',
+      'Melbourne jobs',
+      'Remote-friendly opportunities'
+    ]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What kinds of opportunities are listed on LunchUp?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'LunchUp highlights AI, data, IT, and marketing opportunities with a focus on Sydney, Melbourne, and remote-friendly roles relevant to Australian professionals.'
+        }
+      },
+      {
+        '@type': 'Question',
+        name: 'Who is the Opportunities page for?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'It is designed for founders, operators, marketers, engineers, analysts, and other professionals who want a cleaner view of relevant roles in the Australian startup and tech ecosystem.'
+        }
+      }
+    ]
+  }
+];
+
 const FILTERS = {
   cities: ['All', 'Sydney', 'Melbourne', 'Remote'],
   categories: ['All', 'AI', 'Data', 'IT', 'Marketing']
@@ -75,16 +118,20 @@ const Opportunities = () => {
   return (
     <>
       <Seo
-        title="Opportunities in Sydney and Melbourne | Lunchup"
-        description="Browse curated AI, data, IT, and marketing opportunities for Sydney and Melbourne in a cleaner, faster job discovery experience inside Lunchup."
+        title="Startup and tech opportunities in Sydney, Melbourne, and remote | LunchUp"
+        description="Browse curated AI, data, IT, and marketing opportunities for Sydney, Melbourne, and remote-friendly roles in Australia, with cleaner discovery inside LunchUp."
         path="/opportunities"
         type="website"
         keywords={[
-          'sydney jobs ai',
-          'melbourne jobs data',
-          'marketing jobs lunchup',
+          'sydney startup jobs',
+          'melbourne tech jobs',
+          'remote jobs australia',
+          'ai jobs sydney',
+          'data jobs melbourne',
+          'marketing opportunities australia',
           'it opportunities australia'
         ]}
+        schema={opportunitiesSchema}
       />
       <div className="opportunities-page">
         <section className="opportunities-hero">
@@ -93,8 +140,12 @@ const Opportunities = () => {
               <span className="opportunities-eyebrow">Lunchup Opportunities</span>
               <h1>Find fresh AI, data, IT, and marketing roles</h1>
               <p>
-                A cleaner jobs board for Sydney and Melbourne roles, with a streamlined browsing experience
+                A cleaner jobs board for Sydney, Melbourne, and remote-friendly roles, with a streamlined browsing experience
                 and direct links back to the original listing.
+              </p>
+              <p>
+                This page is written to be easy for both people and AI search systems to understand: it clearly signals role categories,
+                location focus, and how LunchUp helps professionals discover relevant opportunities in Australia.
               </p>
               {updatedAt && <div className="opportunities-updated">Last updated: {formatDate(updatedAt)}</div>}
             </div>
@@ -146,6 +197,7 @@ const Opportunities = () => {
                 <div className="opportunities-sidebar-card">
                   <h2>Filters</h2>
                   <p>Focused on Sydney, Melbourne, and remote-friendly roles across the four categories you asked for.</p>
+                  <p>That makes this page more useful for GEO too, because the topic, city intent, and job intent are all explicit.</p>
                   <ul>
                     <li>AI</li>
                     <li>Data</li>
@@ -199,6 +251,19 @@ const Opportunities = () => {
               </div>
             </div>
           )}
+        </section>
+
+        <section className="opportunities-content">
+          <div className="opportunities-layout">
+            <aside className="opportunities-sidebar">
+              <div className="opportunities-sidebar-card">
+                <h2>LunchUp Opportunities FAQ</h2>
+                <p><strong>What is this page for?</strong><br />It helps Australian professionals quickly find relevant startup and tech roles without digging through noisy job feeds.</p>
+                <p><strong>Which locations does it focus on?</strong><br />Sydney, Melbourne, and remote-friendly opportunities across Australia.</p>
+                <p><strong>Which role categories are covered?</strong><br />AI, data, IT, and marketing roles that fit the broader LunchUp community.</p>
+              </div>
+            </aside>
+          </div>
         </section>
       </div>
     </>
