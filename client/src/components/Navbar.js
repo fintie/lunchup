@@ -63,6 +63,13 @@ const Navbar = ({ user, logout }) => {
                   My Meetings
                 </Link>
                 <Link
+                  to="/projects"
+                  className={`nav-link ${isActive('/projects') ? 'active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My Projects
+                </Link>
+                <Link
                   to="/profile"
                   className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
                   onClick={() => setMobileMenuOpen(false)}

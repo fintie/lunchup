@@ -394,6 +394,11 @@ function Meetings({ user }) {
                     </div>
                     
                     <div className="meeting-actions">
+                      {meeting.status === 'confirmed' && (
+                        <a href="#/projects" className="btn btn-primary btn-sm">
+                          Start a Project Together →
+                        </a>
+                      )}
                       <button className="btn btn-secondary btn-sm">Message</button>
                       <button className="btn btn-outline btn-sm">Reschedule</button>
                     </div>
