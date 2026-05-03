@@ -24,6 +24,17 @@ const projectSchema = new mongoose.Schema({
         enum: ['draft', 'active', 'completed'],
         default: 'draft'
     },
+    aiPlan: {
+        projectIdea: String,
+        taskBreakdown: [String],
+        roles: [String],
+        nextSteps: [String]
+    },
+    harnessStatus: {
+        type: String,
+        enum: ['pending', 'generated', 'confirmed'],
+        default: 'pending'
+    },
     createdAt: {
         type: Date,
         default: Date.now
