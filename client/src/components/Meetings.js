@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Meetings.css';
+import HarnessFlow from './HarnessFlow';
 
 function Meetings({ user }) {
   const [meetings, setMeetings] = useState([]);
@@ -8,6 +9,7 @@ function Meetings({ user }) {
   const [showSchedule, setShowSchedule] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [harnessTarget, setHarnessTarget] = useState(null);
   const [newMeeting, setNewMeeting] = useState({
     date: '',
     time: '',
@@ -395,13 +397,27 @@ function Meetings({ user }) {
                     
                     <div className="meeting-actions">
                       {meeting.status === 'confirmed' && (
-                        <a href="#/projects" className="btn btn-primary btn-sm">
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => setHarnessTarget(meeting)}
+                        >
                           Start a Project Together →
-                        </a>
+                        </button>
                       )}
                       <button className="btn btn-secondary btn-sm">Message</button>
                       <button className="btn btn-outline btn-sm">Reschedule</button>
                     </div>
+                    {meeting.status === 'confirmed' && (
+                      <div className="harness-prompt">
+                        <span>Ready to build something together?</span>
+                        <button
+                          className="btn btn-link"
+                          onClick={() => setHarnessTarget(meeting)}
+                        >
+                          Start a guided project →
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -409,6 +425,14 @@ function Meetings({ user }) {
           )
         )}
       </div>
+      {harnessTarget && (
+        <HarnessFlow
+          meeting={harnessTarget}
+          user={user}
+          onClose={() => setHarnessTarget(null)}
+          onCreated={() => {}}
+        />
+      )}
     </div>
   );
 }

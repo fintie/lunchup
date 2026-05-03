@@ -1,0 +1,224 @@
+.sessions-page {
+  min-height: 100vh;
+  padding: var(--space-8, 32px) 0;
+  background: var(--gray-50, #f9fafb);
+}
+
+.sessions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+.sessions-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: #1a1a2e;
+}
+.sessions-header p {
+  color: #888;
+  margin: 0;
+  font-size: 14px;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.session-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.session-card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.session-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.session-title-row h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+.session-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.status-badge {
+  border: 1.5px solid;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.harness-badge {
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.session-description {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.session-plan {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #fafafa;
+}
+.plan-block h4 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin: 0 0 10px;
+}
+.plan-block p {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  background: #fff;
+  border-left: 3px solid #ff6b35;
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+}
+
+.roles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.role-badge {
+  background: #fff3ee;
+  color: #e8532a;
+  border: 1px solid #ffc4a8;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.task-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+}
+.task-list input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: #ff6b35;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.task-list label {
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.next-steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.next-steps-list li {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.next-steps-list li::before {
+  content: '→';
+  color: #ff6b35;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.session-card-footer {
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+}
+.session-date {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0;
+  gap: 12px;
+  color: #888;
+}
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+.empty-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+.empty-state h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #1a1a2e;
+}
+.empty-state p {
+  color: #888;
+  margin: 0 0 24px;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.97); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease both;
+}
+
+@media (max-width: 600px) {
+  .session-title-row { flex-direction: column; }
+  .sessions-header { flex-direction: column; gap: 12px; }
+}

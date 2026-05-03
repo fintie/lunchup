@@ -428,3 +428,26 @@
     justify-content: center;
   }
 }
+
+.harness-prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff8f0;
+  border-top: 1px solid #ffdcc8;
+  font-size: 13px;
+  color: #666;
+  border-radius: 0 0 12px 12px;
+}
+.btn-link {
+  background: none;
+  border: none;
+  color: #ff6b35;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.btn-link:hover { color: #e8532a; }
