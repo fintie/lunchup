@@ -110,6 +110,8 @@ app.use('/api/news', require('./routes/news'));
 app.use('/api/opportunities', require('./routes/opportunities'));
 app.use('/api/seed', require('./routes/seed'));
 app.use('/api/projects', require('./routes/projects'));
+app.use('/api/harness', require('./routes/harness'));
+
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

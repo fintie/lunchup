@@ -38,3 +38,10 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Claude / AI tooling
+.claude/
+*.claude-plan
+
+# Local secrets and render config
+RENDER-VARS.md
