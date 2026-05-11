@@ -8,7 +8,8 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 
 // In-memory demo users (fallback when MongoDB is unavailable)
-const demoUsers = new Map();
+const { demoUsers } = require('../utils/demoStore');
+const { assignRole } = require('../utils/roleAssigner');
 
 // Australian first names
 const firstNames = [
@@ -134,14 +135,16 @@ const generateDemoUsers = () => {
     const password = 'password123'; // Same password for all demo users
     
     const locationData = locations[Math.floor(Math.random() * locations.length)];
-    
+    const userSkills = getRandomItems(allSkills, Math.floor(Math.random() * 3) + 3);
+
     demoUsers.set(email, {
       _id: `demo_${i + 1}`,
       name,
       email,
       password: '$2a$10$demoHashedPasswordForAllDemoUsers123456789', // Pre-hashed for demo
       professionalBackground: backgrounds[Math.floor(Math.random() * backgrounds.length)],
-      skills: getRandomItems(allSkills, Math.floor(Math.random() * 3) + 3),
+      skills: userSkills,
+      role: assignRole(userSkills),
       preferredTopics: getRandomItems(allTopics, Math.floor(Math.random() * 2) + 2),
       preferredLocation: locationData.location,
       preferredMeetingPoint: locationData.meetingPoint,

@@ -46,6 +46,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  role: {
+    type: String,
+    enum: ['Builder', 'Designer', 'AI Engineer', 'Product Thinker'],
+    default: 'Builder'
+  },
+  buildPreferences: [{
+    type: String
+  }],
   resetPasswordToken: {
     type: String,
     default: null

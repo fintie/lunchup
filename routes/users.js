@@ -3,9 +3,10 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { assignRole } = require('../utils/roleAssigner');
 
-// In-memory demo users storage (same as auth.js)
-const demoUsers = new Map();
+// Shared demo users map
+const { demoUsers } = require('../utils/demoStore');
 let demoUserId = 1;
 
 // Middleware to verify JWT token
@@ -164,6 +165,8 @@ router.get('/', authMiddleware, async (req, res) => {
         preferredMeetingPoint: u.preferredMeetingPoint,
         profilePicture: u.profilePicture,
         bio: u.bio,
+        role: u.role,
+        buildPreferences: u.buildPreferences,
         isOnline: u.isOnline,
         lastActive: u.lastActive
       }));
@@ -195,6 +198,12 @@ router.get('/', authMiddleware, async (req, res) => {
 // Get current user profile
 router.get('/me', authMiddleware, async (req, res) => {
   try {
+    if (req.userId.startsWith('demo_')) {
+      const user = Array.from(demoUsers.values()).find(u => u._id === req.userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      const { password, ...safeUser } = user;
+      return res.json(safeUser);
+    }
     const user = await User.findById(req.userId).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -208,6 +217,12 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Get user profile by ID
 router.get('/:id', async (req, res) => {
   try {
+    if (req.params.id.startsWith('demo_')) {
+      const user = Array.from(demoUsers.values()).find(u => u._id === req.params.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      const { password, ...safeUser } = user;
+      return res.json(safeUser);
+    }
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -226,9 +241,24 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
+    const updateData = { ...req.body };
+    if (updateData.skills) {
+      updateData.role = assignRole(updateData.skills);
+    }
+
+    // Demo user fallback
+    if (req.params.id.startsWith('demo_')) {
+      const existingUser = Array.from(demoUsers.values()).find(u => u._id === req.params.id);
+      if (!existingUser) return res.status(404).json({ message: 'User not found' });
+      const updatedUser = { ...existingUser, ...updateData };
+      demoUsers.set(existingUser.email, updatedUser);
+      const { password, ...safeUser } = updatedUser;
+      return res.json(safeUser);
+    }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: updateData },
       { new: true, runValidators: true }
     ).select('-password');
 
