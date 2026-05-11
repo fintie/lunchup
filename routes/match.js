@@ -50,7 +50,15 @@ router.get('/suggest', async (req, res) => {
       if (currentUser.preferredMeetingPoint === user.preferredMeetingPoint) {
         score += 20;
       }
-
+      
+      // Compare role complementarity
+      if (currentUser.role && user.role) {
+        if (currentUser.role !== user.role) {
+          score += 20;
+        } else {
+          score -= 5;
+        }
+      }
       return {
         user: user.toObject(),
         score
