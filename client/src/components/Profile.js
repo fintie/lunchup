@@ -11,7 +11,9 @@ function Profile({ user }) {
     skills: '',
     preferredTopics: '',
     preferredLocation: '',
-    preferredMeetingPoint: ''
+    preferredMeetingPoint: '',
+    role: '',
+    buildPreferences: ''
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -34,7 +36,9 @@ function Profile({ user }) {
             skills: Array.isArray(data.skills) ? data.skills.join(', ') : '',
             preferredTopics: Array.isArray(data.preferredTopics) ? data.preferredTopics.join(', ') : '',
             preferredLocation: data.preferredLocation || '',
-            preferredMeetingPoint: data.preferredMeetingPoint || ''
+            preferredMeetingPoint: data.preferredMeetingPoint || '',
+            role: data.role || '',
+            buildPreferences: Array.isArray(data.buildPreferences) ? data.buildPreferences.join(', ') : ''
           });
         }
       } catch (error) {
@@ -58,7 +62,8 @@ function Profile({ user }) {
       const updateData = {
         ...profile,
         skills: profile.skills.split(',').map(s => s.trim()).filter(s => s),
-        preferredTopics: profile.preferredTopics.split(',').map(t => t.trim()).filter(t => t)
+        preferredTopics: profile.preferredTopics.split(',').map(t => t.trim()).filter(t => t),
+        buildPreferences: profile.buildPreferences.split(',').map(b => b.trim()).filter(b => b)
       };
 
       await axios.put(`/users/${user.id}`, updateData, {
@@ -86,6 +91,7 @@ function Profile({ user }) {
           <div className="profile-title">
             <h1>{profile.name}</h1>
             <p>{profile.professionalBackground || 'Professional'}</p>
+            {profile.role && <span className="role-badge">{profile.role}</span>}
           </div>
         </div>
 
@@ -159,6 +165,19 @@ function Profile({ user }) {
                 placeholder="e.g., marketing, development, design"
               />
               <span className="form-hint">Separate multiple skills with commas</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Build Preferences</label>
+              <input
+                type="text"
+                name="buildPreferences"
+                value={profile.buildPreferences}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="e.g., SaaS, Mobile App, AI Tools"
+              />
+              <span className="form-hint">Separate multiple preferences with commas</span>
             </div>
 
             <div className="form-group">
