@@ -10,6 +10,7 @@ function Matches({ user }) {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [roleFilter, setRoleFilter] = useState('All');
 
   useEffect(() => {
     fetchMatches(); // Auto-load matches on page visit
@@ -263,6 +264,12 @@ function Matches({ user }) {
         }
       }
 
+      // Role complementarity
+      if (currentUser.role && otherUser.role) {
+        if (currentUser.role !== otherUser.role) score += 20;
+        else score -= 5;
+      }
+
       return { ...otherUser, matchScore: Math.min(score, 99) };
     }).sort((a, b) => b.matchScore - a.matchScore);
   };
@@ -346,6 +353,18 @@ function Matches({ user }) {
           )}
         </div>
 
+        <div className="role-filter">
+          {['All', 'Builder', 'Designer', 'AI Engineer', 'Product Thinker'].map(role=> (
+            <button
+              key={role}
+              className={`filter-btn ${roleFilter === role ? 'active' : ''}`}
+              onClick={() => setRoleFilter(role)}
+              >
+                {role}
+              </button>
+          ))}
+        </div>
+
         {message.text && (
           <div className={`alert alert-${message.type}`}>
             {message.type === 'success' ? '✅' : '⚠️'} {message.text}
@@ -390,9 +409,22 @@ function Matches({ user }) {
               {findingMatches ? 'Finding...' : 'Find Matches Now'}
             </button>
           </div>
-        ) : (
+        ) : (() => {
+          const filtered = matches.filter(m => roleFilter === 'All' || m.role === roleFilter);
+          if (filtered.length === 0) return (
+            <div className="empty-state animate-scaleIn">
+              <div className="empty-icon">🔍</div>
+              <h2>No {roleFilter}s in your matches</h2>
+              <p>Try a different role filter or refresh to find more professionals</p>
+              <button onClick={() => setRoleFilter('All')} className="btn btn-primary btn-lg">
+                Show All
+              </button>
+            </div>
+          );
+          return (
           <div className="matches-grid">
-            {matches.map((match, index) => (
+            {filtered
+              .map((match, index) => (
               <div
                 key={match._id}
                 className="match-card animate-scaleIn"
@@ -415,6 +447,8 @@ function Matches({ user }) {
                 <div className="match-body">
                   <h3>{match.name}</h3>
                   <p className="match-background">{match.professionalBackground}</p>
+                  {match.role && <span className="role-badge">{match.role}</span>}
+
 
                   <div className="match-section">
                     <span className="match-label">Skills</span>
@@ -451,7 +485,8 @@ function Matches({ user }) {
               </div>
             ))}
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );
