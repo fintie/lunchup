@@ -1,9 +1,11 @@
 const crypto = require('crypto');
 const Event = require('../models/Event');
 const EventRecommendation = require('../models/EventRecommendation');
+const EventRegistration = require('../models/EventRegistration');
 const User = require('../models/User');
 
 const organizersWithBoost = new Set(['Fishburners', 'Stone & Chalk', 'UTS']);
+const WHATSAPP_EVENT_NUMBER = process.env.WHATSAPP_EVENT_NUMBER || process.env.WHATSAPP_PHONE_NUMBER || '';
 
 const sampleEvents = () => {
   const now = Date.now();
@@ -167,6 +169,16 @@ const scoreEventForUser = (user, event) => {
   };
 };
 
+const buildWhatsAppText = ({ event, userName }) => {
+  return [
+    `Hi, I'd like to register for ${event.title}.`,
+    userName ? `My name: ${userName}` : null,
+    `When: ${new Date(event.startTime).toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })}`,
+    `Where: ${event.venueName || 'Venue TBC'}, ${event.city}`,
+    `Event link: ${event.url}`
+  ].filter(Boolean).join('\n');
+};
+
 async function seedSampleEvents() {
   const events = sampleEvents();
   let created = 0;
@@ -184,6 +196,42 @@ async function seedSampleEvents() {
 async function listEvents(city) {
   const query = city ? { city: new RegExp(`^${city}$`, 'i') } : {};
   return Event.find(query).sort({ startTime: 1 }).lean();
+}
+
+async function buildWhatsAppRegistration({ eventId, userId, userName, phoneNumber } = {}) {
+  const event = await Event.findById(eventId).lean();
+  if (!event) {
+    throw new Error('Event not found');
+  }
+
+  const message = buildWhatsAppText({ event, userName });
+  const target = String(WHATSAPP_EVENT_NUMBER || '').replace(/\D/g, '');
+  const shareUrl = target
+    ? `https://wa.me/${target}?text=${encodeURIComponent(message)}`
+    : `https://wa.me/?text=${encodeURIComponent(message)}`;
+
+  const registrationPayload = {
+    userId: userId || null,
+    phoneNumber: phoneNumber || '',
+    status: target ? 'ready' : 'pending-number',
+    shareUrl,
+    notes: message
+  };
+
+  const registration = userId
+    ? await EventRegistration.findOneAndUpdate(
+      { eventId: event._id, userId: String(userId), channel: 'whatsapp' },
+      registrationPayload,
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    )
+    : await EventRegistration.create({ eventId: event._id, ...registrationPayload, channel: 'whatsapp' });
+
+  return {
+    registrationId: registration._id,
+    shareUrl,
+    message,
+    targetConfigured: Boolean(target)
+  };
 }
 
 async function runRecommendations({ userId } = {}) {
@@ -260,6 +308,7 @@ async function getRecommendationsForUser(userId) {
 module.exports = {
   seedSampleEvents,
   listEvents,
+  buildWhatsAppRegistration,
   runRecommendations,
   getRecommendationsForUser
 };

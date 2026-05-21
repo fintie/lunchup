@@ -4,7 +4,8 @@ const {
   seedSampleEvents,
   listEvents,
   runRecommendations,
-  getRecommendationsForUser
+  getRecommendationsForUser,
+  buildWhatsAppRegistration
 } = require('../services/nixieEvents');
 
 router.get('/', async (req, res) => {
@@ -24,6 +25,21 @@ router.post('/seed', async (req, res) => {
   } catch (error) {
     console.error('Seed events error:', error);
     return res.status(500).json({ message: 'Failed to seed events', error: error.message });
+  }
+});
+
+router.post('/:eventId/register-whatsapp', async (req, res) => {
+  try {
+    const result = await buildWhatsAppRegistration({
+      eventId: req.params.eventId,
+      userId: req.body.userId,
+      userName: req.body.userName,
+      phoneNumber: req.body.phoneNumber
+    });
+    return res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error('WhatsApp event registration error:', error);
+    return res.status(500).json({ message: 'Failed to build WhatsApp event registration', error: error.message });
   }
 });
 

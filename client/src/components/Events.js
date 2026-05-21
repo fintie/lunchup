@@ -19,6 +19,7 @@ const Events = ({ user }) => {
   const [digest, setDigest] = useState('');
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
+  const [registeringId, setRegisteringId] = useState('');
   const [error, setError] = useState('');
   const [cityFilter, setCityFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
@@ -29,7 +30,6 @@ const Events = ({ user }) => {
     const { data } = await axios.get('/events');
     setEvents(data.items || []);
   };
-
 
   useEffect(() => {
     const init = async () => {
@@ -71,6 +71,25 @@ const Events = ({ user }) => {
       setError('Failed to generate event recommendations.');
     } finally {
       setRunning(false);
+    }
+  };
+
+  const registerViaWhatsApp = async (event) => {
+    try {
+      setRegisteringId(event._id || event.id);
+      const { data } = await axios.post(`/events/${event._id || event.id}/register-whatsapp`, {
+        userId,
+        userName: user?.name
+      });
+      if (data?.shareUrl) {
+        window.open(data.shareUrl, '_blank', 'noopener,noreferrer');
+      }
+      setError(data?.targetConfigured ? '' : 'WhatsApp number not configured yet, so this opens a generic share draft for now.');
+    } catch (err) {
+      console.error('WhatsApp registration error:', err);
+      setError('Failed to open WhatsApp registration for this event.');
+    } finally {
+      setRegisteringId('');
     }
   };
 
@@ -214,7 +233,17 @@ const Events = ({ user }) => {
                         <strong>{event.venueName || 'Venue TBC'}</strong>
                         <div>{event.city}</div>
                       </div>
-                      <a href={event.url} target="_blank" rel="noreferrer">Open ↗</a>
+                      <div className="event-actions">
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => registerViaWhatsApp(event)}
+                          disabled={registeringId === (event._id || event.id)}
+                        >
+                          {registeringId === (event._id || event.id) ? 'Opening…' : 'Register via WhatsApp'}
+                        </button>
+                        <a href={event.url} target="_blank" rel="noreferrer">Open ↗</a>
+                      </div>
                     </div>
                   </article>
                 ))}
