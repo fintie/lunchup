@@ -82,7 +82,10 @@ const Events = ({ user }) => {
         userName: user?.name
       });
       if (data?.shareUrl) {
-        window.open(data.shareUrl, '_blank', 'noopener,noreferrer');
+        const popup = window.open(data.shareUrl, '_blank', 'noopener,noreferrer');
+        if (!popup) {
+          window.location.href = data.shareUrl;
+        }
       }
       setError(data?.targetConfigured ? '' : 'WhatsApp number not configured yet, so this opens a generic share draft for now.');
     } catch (err) {
