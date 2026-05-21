@@ -23,6 +23,8 @@ services:
           name: lunchup-web
           type: web
           envVarKey: RENDER_EXTERNAL_URL
+      - key: WHATSAPP_EVENT_NUMBER
+        sync: false
     healthCheckPath: /
 
   # Frontend Web Service
