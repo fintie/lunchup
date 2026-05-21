@@ -30,15 +30,6 @@ const Events = ({ user }) => {
     setEvents(data.items || []);
   };
 
-  const loadRecommendations = async () => {
-    if (!userId) {
-      setRecommendations([]);
-      return;
-    }
-
-    const { data } = await axios.get(`/events/recommendations/${userId}`);
-    setRecommendations(Array.isArray(data) ? data : []);
-  };
 
   useEffect(() => {
     const init = async () => {
@@ -47,7 +38,8 @@ const Events = ({ user }) => {
         await axios.post('/events/seed');
         await loadEvents();
         if (userId) {
-          await loadRecommendations();
+          const { data } = await axios.get(`/events/recommendations/${userId}`);
+          setRecommendations(Array.isArray(data) ? data : []);
         }
         setError('');
       } catch (err) {
@@ -71,7 +63,8 @@ const Events = ({ user }) => {
       setRunning(true);
       const { data } = await axios.post('/events/recommendations/run', { userId });
       setDigest(data.digests?.[0]?.message || 'Recommendations generated.');
-      await loadRecommendations();
+      const { data: recommendationData } = await axios.get(`/events/recommendations/${userId}`);
+      setRecommendations(Array.isArray(recommendationData) ? recommendationData : []);
       setError('');
     } catch (err) {
       console.error('Run recommendations error:', err);
