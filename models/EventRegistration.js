@@ -12,17 +12,26 @@ const eventRegistrationSchema = new mongoose.Schema({
     default: null,
     index: true
   },
+  phoneNumber: {
+    type: String,
+    default: '',
+    index: true
+  },
+  attendeeName: {
+    type: String,
+    default: ''
+  },
   channel: {
     type: String,
     default: 'whatsapp'
   },
-  phoneNumber: {
+  source: {
     type: String,
-    default: ''
+    default: 'web_button'
   },
   status: {
     type: String,
-    default: 'pending'
+    default: 'draft'
   },
   shareUrl: {
     type: String,
@@ -31,9 +40,15 @@ const eventRegistrationSchema = new mongoose.Schema({
   notes: {
     type: String,
     default: ''
+  },
+  conversationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'WhatsAppConversation',
+    default: null
   }
 }, { timestamps: true });
 
-eventRegistrationSchema.index({ eventId: 1, userId: 1, channel: 1 }, { unique: true, sparse: true });
+eventRegistrationSchema.index({ eventId: 1, phoneNumber: 1, channel: 1 }, { unique: true, sparse: true });
+eventRegistrationSchema.index({ phoneNumber: 1, status: 1 });
 
 module.exports = mongoose.model('EventRegistration', eventRegistrationSchema);

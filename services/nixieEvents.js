@@ -171,7 +171,7 @@ const scoreEventForUser = (user, event) => {
 
 const buildWhatsAppText = ({ event, userName }) => {
   return [
-    `Hi, I'd like to register for ${event.title}.`,
+    `Hi, I'd like to register for ${event.title}. REF: EVT_${event._id}`,
     userName ? `My name: ${userName}` : null,
     `When: ${new Date(event.startTime).toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })}`,
     `Where: ${event.venueName || 'Venue TBC'}, ${event.city}`,
@@ -226,36 +226,24 @@ async function buildWhatsAppRegistration({ eventId, userId, userName, phoneNumbe
     : `https://wa.me/?text=${encodeURIComponent(message)}`;
 
   const registrationPayload = {
+    userId: userId ? String(userId) : null,
     phoneNumber: phoneNumber || '',
-    status: target ? 'ready' : 'pending-number',
+    attendeeName: userName || '',
+    source: 'web_button',
+    status: userName ? 'confirmed' : (target ? 'draft' : 'pending-number'),
     shareUrl,
     notes: message
   };
 
-  let registration;
+  const registrationQuery = phoneNumber
+    ? { eventId: event._id, phoneNumber: phoneNumber || '', channel: 'whatsapp' }
+    : { eventId: event._id, userId: userId ? String(userId) : null, channel: 'whatsapp' };
 
-  if (userId) {
-    registration = await EventRegistration.findOneAndUpdate(
-      { eventId: event._id, userId: String(userId), channel: 'whatsapp' },
-      { $set: registrationPayload },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-  } else {
-    const anonymousUserId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    registration = await EventRegistration.findOneAndUpdate(
-      { eventId: event._id, userId: null, channel: 'whatsapp' },
-      {
-        $set: registrationPayload,
-        $setOnInsert: { userId: anonymousUserId }
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-
-    if (registration.userId === null) {
-      registration.userId = anonymousUserId;
-      await registration.save();
-    }
-  }
+  const registration = await EventRegistration.findOneAndUpdate(
+    registrationQuery,
+    { $set: registrationPayload },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 
   return {
     registrationId: registration._id,
