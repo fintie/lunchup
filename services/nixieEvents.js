@@ -233,13 +233,22 @@ async function buildWhatsAppRegistration({ eventId, userId, userName, phoneNumbe
     notes: message
   };
 
-  const registration = userId
-    ? await EventRegistration.findOneAndUpdate(
+  let registration;
+
+  if (userId) {
+    registration = await EventRegistration.findOneAndUpdate(
       { eventId: event._id, userId: String(userId), channel: 'whatsapp' },
       registrationPayload,
       { upsert: true, new: true, setDefaultsOnInsert: true }
-    )
-    : await EventRegistration.create({ eventId: event._id, ...registrationPayload, channel: 'whatsapp' });
+    );
+  } else {
+    registration = await EventRegistration.create({
+      eventId: event._id,
+      userId: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+      ...registrationPayload,
+      channel: 'whatsapp'
+    });
+  }
 
   return {
     registrationId: registration._id,
