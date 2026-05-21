@@ -182,15 +182,30 @@ const buildWhatsAppText = ({ event, userName }) => {
 async function seedSampleEvents() {
   const events = sampleEvents();
   let created = 0;
+  let updated = 0;
+
   for (const payload of events) {
-    const existing = await Event.findOne({ contentHash: payload.contentHash });
+    const existing = await Event.findOne({
+      $or: [
+        { contentHash: payload.contentHash },
+        { source: payload.source, sourceEventId: payload.sourceEventId }
+      ]
+    });
+
     if (existing) {
+      await Event.updateOne(
+        { _id: existing._id },
+        { $set: payload }
+      );
+      updated += 1;
       continue;
     }
+
     await Event.create(payload);
     created += 1;
   }
-  return { created, total: await Event.countDocuments() };
+
+  return { created, updated, total: await Event.countDocuments() };
 }
 
 async function listEvents(city) {
