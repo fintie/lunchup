@@ -226,7 +226,6 @@ async function buildWhatsAppRegistration({ eventId, userId, userName, phoneNumbe
     : `https://wa.me/?text=${encodeURIComponent(message)}`;
 
   const registrationPayload = {
-    userId: userId || null,
     phoneNumber: phoneNumber || '',
     status: target ? 'ready' : 'pending-number',
     shareUrl,
@@ -238,16 +237,24 @@ async function buildWhatsAppRegistration({ eventId, userId, userName, phoneNumbe
   if (userId) {
     registration = await EventRegistration.findOneAndUpdate(
       { eventId: event._id, userId: String(userId), channel: 'whatsapp' },
-      registrationPayload,
+      { $set: registrationPayload },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
   } else {
-    registration = await EventRegistration.create({
-      eventId: event._id,
-      userId: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-      ...registrationPayload,
-      channel: 'whatsapp'
-    });
+    const anonymousUserId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    registration = await EventRegistration.findOneAndUpdate(
+      { eventId: event._id, userId: null, channel: 'whatsapp' },
+      {
+        $set: registrationPayload,
+        $setOnInsert: { userId: anonymousUserId }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    if (registration.userId === null) {
+      registration.userId = anonymousUserId;
+      await registration.save();
+    }
   }
 
   return {
