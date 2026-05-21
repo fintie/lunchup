@@ -78,17 +78,10 @@ const Home = () => {
   return (
     <>
       <Seo
-        title="LunchUp, networking app for founders and professionals in Australia"
-        description="LunchUp helps founders, operators, investors, and startup professionals in Australia build meaningful relationships, discover curated opportunities, and stay close to the startup ecosystem."
+        title="LunchUp"
+        description="LunchUp helps professionals connect through better matches, meetups, news, and opportunities."
         path="/"
-        keywords={[
-          'networking app australia',
-          'startup networking australia',
-          'founder networking sydney',
-          'professional networking melbourne',
-          'lunch networking app',
-          'australia startup community'
-        ]}
+        keywords={['networking app', 'professional networking', 'meetups', 'opportunities']}
         schema={siteSchema}
       />
       <div className="home">
@@ -101,15 +94,14 @@ const Home = () => {
         <div className="container hero-content">
           <div className="hero-badge animate-fadeIn">
             <span className="badge-icon">🤝</span>
-            <span>Australian networking for founders, operators, and professionals</span>
+            <span>Professional networking made easier</span>
           </div>
           <h1 className="hero-title animate-fadeIn" style={{ animationDelay: '0.1s' }}>
             Build better professional connections<br />
             <span className="text-gradient">through LunchUp</span>
           </h1>
           <p className="hero-subtitle animate-fadeIn" style={{ animationDelay: '0.2s' }}>
-            LunchUp is a networking app for people in Australia who want stronger founder, startup, investor,
-            and operator relationships, with curated introductions, meetup coordination, startup news, and fresh opportunities.
+            LunchUp helps people build stronger professional relationships through curated introductions, meetup coordination, news, and opportunities.
           </p>
           <div className="hero-cta animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             <Link to="/register" className="btn btn-primary btn-lg">
@@ -145,7 +137,7 @@ const Home = () => {
           <div className="section-header">
             <h2 className="section-title">Why LunchUp?</h2>
             <p className="section-subtitle">
-              A simpler way to grow a stronger professional network in Australia
+              A simpler way to grow a stronger professional network
             </p>
           </div>
           <div className="features-grid">
@@ -224,10 +216,7 @@ const Home = () => {
           <div className="section-header">
             <h2 className="section-title">What people can use LunchUp for</h2>
             <p className="section-subtitle">
-              LunchUp is designed to be easy for both people and AI systems to understand: an Australian networking platform focused on founder relationships, startup community discovery, and curated opportunities.
-            </p>
-            <p className="section-subtitle">
-              Built for high-intent networking, discovery, and professional momentum
+              Built for networking, discovery, and professional momentum.
             </p>
           </div>
           <div className="features-grid">
@@ -235,8 +224,8 @@ const Home = () => {
               <div className="feature-icon">
                 <span>🚀</span>
               </div>
-              <h3>Founder networking in Sydney and Melbourne</h3>
-              <p>Use LunchUp to meet startup founders, early team members, operators, and investors across Australia&apos;s main startup hubs.</p>
+              <h3>Founder and operator networking</h3>
+              <p>Use LunchUp to meet founders, early team members, operators, and investors in one place.</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">
@@ -250,7 +239,7 @@ const Home = () => {
                 <span>💼</span>
               </div>
               <h3>Curated opportunities</h3>
-              <p>Browse a cleaner feed of AI, data, IT, and marketing opportunities relevant to Australian professionals and remote-friendly roles.</p>
+              <p>Browse a cleaner feed of relevant opportunities and roles.</p>
             </div>
           </div>
         </div>
@@ -261,7 +250,7 @@ const Home = () => {
           <div className="section-header">
             <h2 className="section-title">LunchUp FAQ</h2>
             <p className="section-subtitle">
-              Clear answers for humans and AI search engines
+              Clear answers about what LunchUp does
             </p>
           </div>
           <div className="steps">
@@ -277,15 +266,15 @@ const Home = () => {
               <div className="step-number">Q2</div>
               <div className="step-content">
                 <h3>Who should use LunchUp?</h3>
-                <p>It is especially useful for founders, startup operators, marketers, product people, engineers, investors, and professionals who want more relevant networking in Australia.</p>
+                <p>It is especially useful for founders, operators, marketers, product people, engineers, investors, and professionals who want more relevant networking.</p>
               </div>
             </div>
             <div className="step-connector"></div>
             <div className="step">
               <div className="step-number">Q3</div>
               <div className="step-content">
-                <h3>Which cities does LunchUp focus on?</h3>
-                <p>LunchUp is especially relevant for Sydney and Melbourne, while still supporting remote-friendly and Australia-wide professional discovery.</p>
+                <h3>Where can people use LunchUp?</h3>
+                <p>LunchUp supports in-person and remote-friendly professional discovery.</p>
               </div>
             </div>
             <div className="step-connector"></div>
