@@ -46,6 +46,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  rawInterestText: {
+    type: String,
+    default: ''
+  },
+  eventInterests: [{
+    type: String
+  }],
+  eventNotificationFrequency: {
+    type: String,
+    default: 'DAILY'
+  },
   resetPasswordToken: {
     type: String,
     default: null

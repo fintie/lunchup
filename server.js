@@ -90,7 +90,8 @@ app.get('/', (req, res) => {
       auth: '/api/auth/login',
       users: '/api/users',
       match: '/api/match',
-      meetings: '/api/meetings'
+      meetings: '/api/meetings',
+      events: '/api/events'
     },
     environment: process.env.NODE_ENV || 'development'
   });
@@ -108,6 +109,7 @@ app.use('/api/match', require('./routes/match'));
 app.use('/api/meetings', require('./routes/meetings'));
 app.use('/api/news', require('./routes/news'));
 app.use('/api/opportunities', require('./routes/opportunities'));
+app.use('/api/events', require('./routes/events'));
 app.use('/api/seed', require('./routes/seed'));
 
 // Serve static files in production

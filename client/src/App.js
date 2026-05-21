@@ -16,6 +16,7 @@ import Navbar from './components/Navbar';
 import Live from './components/Live';
 import News from './components/News';
 import Opportunities from './components/Opportunities';
+import Events from './components/Events';
 
 // Determine API URL based on environment
 const getApiUrl = () => {
@@ -129,6 +130,10 @@ function AppContent() {
           <Route
             path="/opportunities"
             element={<Opportunities />}
+          />
+          <Route
+            path="/events"
+            element={<Events user={user} />}
           />
           <Route
             path="/meetings"
