@@ -111,10 +111,6 @@ const Home = () => {
             LunchUp is a networking app for people in Australia who want stronger founder, startup, investor,
             and operator relationships, with curated introductions, meetup coordination, startup news, and fresh opportunities.
           </p>
-          <p className="hero-subtitle animate-fadeIn" style={{ animationDelay: '0.25s' }}>
-            For AI search, GEO, and traditional search engines, LunchUp clearly explains who it serves, what it helps with,
-            and why it is useful for startup networking in Sydney, Melbourne, and remote Australian communities.
-          </p>
           <div className="hero-cta animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             <Link to="/register" className="btn btn-primary btn-lg">
               Get Started Free
@@ -304,39 +300,6 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="features">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Why this page is GEO-friendly</h2>
-            <p className="section-subtitle">
-              LunchUp now uses clearer semantic copy, structured data, and direct answers so large language models and search engines can summarise the product more accurately.
-            </p>
-          </div>
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">
-                <span>🧠</span>
-              </div>
-              <h3>Clear entity signals</h3>
-              <p>Structured data helps AI systems understand that LunchUp is an Australian networking platform and web application for startup professionals.</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <span>🔎</span>
-              </div>
-              <h3>Better answerability</h3>
-              <p>FAQ-style sections and explicit descriptions make it easier for search engines and answer engines to quote accurate summaries of what LunchUp does.</p>
-            </div>
-            <div className="feature-card">
-              <div className="feature-icon">
-                <span>🇦🇺</span>
-              </div>
-              <h3>Australia-first relevance</h3>
-              <p>The content explicitly highlights Sydney, Melbourne, and Australia-wide professional networking so relevance is clearer for local discovery.</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="cta">
