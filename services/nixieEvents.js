@@ -134,9 +134,9 @@ const cosineSimilarity = (a, b) => {
   return dot / (normA * normB);
 };
 
-const normalizeTopics = (rawInterestText = '', preferredTopics = []) => {
+const normalizeTopics = (rawInterestText = '', preferredTopics = [], eventInterests = []) => {
   const fromText = rawInterestText.split(',').map((item) => item.trim()).filter(Boolean);
-  const merged = [...preferredTopics, ...fromText];
+  const merged = [...preferredTopics, ...eventInterests, ...fromText];
   return [...new Set(merged.map((item) => item.trim()).filter(Boolean))];
 };
 
@@ -150,7 +150,7 @@ const buildDigest = (recommendations) => {
 };
 
 const scoreEventForUser = (user, event) => {
-  const userTopics = normalizeTopics(user.rawInterestText, user.preferredTopics || []);
+  const userTopics = normalizeTopics(user.rawInterestText, user.preferredTopics || [], user.eventInterests || []);
   const userTokens = tokenize(`${user.professionalBackground || ''} ${user.bio || ''} ${userTopics.join(' ')}`);
   const eventTokens = tokenize(`${event.title} ${event.description} ${(event.categoryJson?.categories || []).join(' ')} ${event.organizer || ''}`);
   const similarity = cosineSimilarity(userTokens, eventTokens);
@@ -196,7 +196,8 @@ async function runRecommendations({ userId } = {}) {
   const digests = [];
 
   for (const user of users) {
-    const events = await Event.find({ city: new RegExp(`^${user.preferredLocation?.split('-')[0]?.trim() || user.preferredLocation || 'Sydney'}$`, 'i') }).lean();
+    const preferredCity = (user.preferredLocation?.split('-')[0] || user.preferredLocation || 'Sydney').trim();
+    const events = await Event.find({ city: new RegExp(`^${preferredCity}$`, 'i') }).lean();
     const scored = events.map((event) => ({ event, ...scoreEventForUser(user, event) }));
     const topMatches = scored.sort((a, b) => b.score - a.score).slice(0, 5);
 

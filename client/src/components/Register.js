@@ -12,7 +12,10 @@ const Register = ({ onAuth }) => {
     skills: '',
     preferredTopics: '',
     preferredLocation: '',
-    preferredMeetingPoint: ''
+    preferredMeetingPoint: '',
+    rawInterestText: '',
+    eventInterests: '',
+    eventNotificationFrequency: 'DAILY'
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +37,8 @@ const Register = ({ onAuth }) => {
       const formattedData = {
         ...formData,
         skills: formData.skills.split(',').map(skill => skill.trim()).filter(skill => skill),
-        preferredTopics: formData.preferredTopics.split(',').map(topic => topic.trim()).filter(topic => topic)
+        preferredTopics: formData.preferredTopics.split(',').map(topic => topic.trim()).filter(topic => topic),
+        eventInterests: formData.eventInterests.split(',').map(topic => topic.trim()).filter(topic => topic)
       };
 
       const res = await axios.post('/users/register', formattedData);
@@ -165,6 +169,47 @@ const Register = ({ onAuth }) => {
                 required
               />
               <span className="form-hint">What would you like to discuss over lunch?</span>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="rawInterestText" className="form-label">What events are you into?</label>
+              <textarea
+                id="rawInterestText"
+                name="rawInterestText"
+                className="form-input"
+                value={formData.rawInterestText}
+                onChange={handleChange}
+                placeholder="e.g., AI founder breakfasts, startup investor nights, food and culture events"
+                rows={3}
+              />
+              <span className="form-hint">Used to personalize the Nixie-style events feed.</span>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="eventInterests" className="form-label">Event Categories</label>
+              <input
+                type="text"
+                id="eventInterests"
+                name="eventInterests"
+                className="form-input"
+                value={formData.eventInterests}
+                onChange={handleChange}
+                placeholder="e.g., AI, startups, web3, music"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="eventNotificationFrequency" className="form-label">Event Digest Frequency</label>
+              <select
+                id="eventNotificationFrequency"
+                name="eventNotificationFrequency"
+                className="form-input"
+                value={formData.eventNotificationFrequency}
+                onChange={handleChange}
+              >
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+              </select>
             </div>
 
             <div className="form-row form-row-2">
