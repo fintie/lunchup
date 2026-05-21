@@ -65,6 +65,7 @@ PORT=3001
 MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/lunchup
 JWT_SECRET=your-secret-key-min-32-characters-long-for-security
 CORS_ORIGIN=https://lunchup-web.onrender.com
+WHATSAPP_EVENT_NUMBER=61412345678
 ```
 
 6. Click **Create Web Service**
@@ -172,6 +173,7 @@ PORT=3001
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=your-secret-key
 CORS_ORIGIN=https://your-frontend-url.com
+WHATSAPP_EVENT_NUMBER=61412345678
 ```
 
 ### Frontend (lunchup-web)
