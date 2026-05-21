@@ -20,6 +20,8 @@ const Events = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
+  const [cityFilter, setCityFilter] = useState('ALL');
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
 
   const userId = user?.id;
 
@@ -79,6 +81,26 @@ const Events = ({ user }) => {
     }
   };
 
+  const availableCities = useMemo(() => {
+    return ['ALL', ...new Set(events.map((event) => event.city).filter(Boolean))];
+  }, [events]);
+
+  const availableCategories = useMemo(() => {
+    const categories = new Set();
+    events.forEach((event) => {
+      (event.categoryJson?.categories || []).forEach((category) => categories.add(category));
+    });
+    return ['ALL', ...Array.from(categories)];
+  }, [events]);
+
+  const filteredEvents = useMemo(() => {
+    return events.filter((event) => {
+      const cityMatch = cityFilter === 'ALL' || event.city === cityFilter;
+      const categoryMatch = categoryFilter === 'ALL' || (event.categoryJson?.categories || []).includes(categoryFilter);
+      return cityMatch && categoryMatch;
+    });
+  }, [events, cityFilter, categoryFilter]);
+
   const topCategories = useMemo(() => {
     const counts = new Map();
     events.forEach((event) => {
@@ -94,17 +116,16 @@ const Events = ({ user }) => {
       <section className="events-hero">
         <div className="events-hero-content">
           <span className="events-eyebrow">Lunchup x Nixie</span>
-          <h1>Discover events that fit your networking goals</h1>
+          <h1>All events in one place</h1>
           <p>
-            This brings Nixie-style event discovery into Lunchup, aligned to your profile,
-            interests, and the kinds of people you actually want to meet.
+            Browse the full Lunchup events feed on one page, then optionally generate tailored picks based on your profile and event interests.
           </p>
           <div className="events-actions">
             <button className="btn btn-primary" onClick={runRecommendations} disabled={!userId || running}>
               {running ? 'Finding events…' : 'Generate My Event Picks'}
             </button>
           </div>
-          {!userId && <div className="events-note">Sign in to get personalized event recommendations.</div>}
+          {!userId && <div className="events-note">You can browse all events now. Sign in only if you want personalized picks.</div>}
           {error && <div className="events-error">{error}</div>}
         </div>
       </section>
@@ -121,69 +142,102 @@ const Events = ({ user }) => {
               </div>
             )}
 
-            <div className="events-grid-layout">
-              <div>
-                <div className="section-header-row">
-                  <h2>Upcoming events</h2>
-                  <span>{events.length} loaded</span>
-                </div>
-                <div className="events-grid">
-                  {events.map((event) => (
-                    <article className="event-card" key={event._id || event.id}>
-                      <div className="event-meta">
-                        <span className="event-badge">{event.source}</span>
-                        <span>{formatDate(event.startTime)}</span>
-                      </div>
-                      <h3>{event.title}</h3>
-                      <p>{event.description}</p>
-                      <div className="event-tags">
-                        {(event.categoryJson?.categories || []).map((category) => (
-                          <span className="event-tag" key={category}>{category}</span>
-                        ))}
-                      </div>
-                      <div className="event-footer">
-                        <div>
-                          <strong>{event.venueName || 'Venue TBC'}</strong>
-                          <div>{event.city}</div>
-                        </div>
-                        <a href={event.url} target="_blank" rel="noreferrer">Open ↗</a>
-                      </div>
-                    </article>
-                  ))}
-                </div>
+            <div className="events-summary-row">
+              <div className="events-state-card small">
+                <strong>{events.length}</strong>
+                <span>Total events</span>
               </div>
+              <div className="events-state-card small">
+                <strong>{filteredEvents.length}</strong>
+                <span>Showing now</span>
+              </div>
+              <div className="events-state-card small">
+                <strong>{recommendations.length}</strong>
+                <span>Your picks</span>
+              </div>
+            </div>
 
-              <aside className="recommendations-panel">
+            <div className="events-toolbar">
+              <div className="toolbar-group">
+                <label>City</label>
+                <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)} className="form-input">
+                  {availableCities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="toolbar-group">
+                <label>Category</label>
+                <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="form-input">
+                  {availableCategories.map((category) => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {recommendations.length > 0 && (
+              <section className="recommendations-strip">
                 <div className="section-header-row">
-                  <h2>Your picks</h2>
+                  <h2>Your recommended events</h2>
                   <span>{recommendations.length}</span>
                 </div>
-                {recommendations.length ? (
-                  <div className="recommendation-list">
-                    {recommendations.map((item) => (
-                      <div className="recommendation-card" key={item.id}>
-                        <div className="recommendation-score">{item.score.toFixed(2)}</div>
-                        <div>
-                          <h3>{item.title}</h3>
-                          <p>{item.reason}</p>
-                          <div className="recommendation-meta">{formatDate(item.startTime)} • {item.city}</div>
-                        </div>
+                <div className="recommendation-list compact">
+                  {recommendations.map((item) => (
+                    <div className="recommendation-card" key={item.id}>
+                      <div className="recommendation-score">{item.score.toFixed(2)}</div>
+                      <div>
+                        <h3>{item.title}</h3>
+                        <p>{item.reason}</p>
+                        <div className="recommendation-meta">{formatDate(item.startTime)} • {item.city}</div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="events-state-card small">Run recommendations to see personalized event picks.</div>
-                )}
-
-                <div className="category-card">
-                  <h3>Top categories in the feed</h3>
-                  <div className="event-tags">
-                    {topCategories.map(([category, count]) => (
-                      <span className="event-tag" key={category}>{category} ({count})</span>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              </aside>
+              </section>
+            )}
+
+            <section>
+              <div className="section-header-row">
+                <h2>Upcoming events</h2>
+                <span>{filteredEvents.length} loaded</span>
+              </div>
+              <div className="events-grid full-width">
+                {filteredEvents.map((event) => (
+                  <article className="event-card" key={event._id || event.id}>
+                    <div className="event-meta">
+                      <span className="event-badge">{event.source}</span>
+                      <span>{formatDate(event.startTime)}</span>
+                    </div>
+                    <h3>{event.title}</h3>
+                    <p>{event.description}</p>
+                    <div className="event-tags">
+                      {(event.categoryJson?.categories || []).map((category) => (
+                        <span className="event-tag" key={category}>{category}</span>
+                      ))}
+                    </div>
+                    <div className="event-footer">
+                      <div>
+                        <strong>{event.venueName || 'Venue TBC'}</strong>
+                        <div>{event.city}</div>
+                      </div>
+                      <a href={event.url} target="_blank" rel="noreferrer">Open ↗</a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {filteredEvents.length === 0 && (
+                <div className="events-state-card small">No events match the current filters.</div>
+              )}
+            </section>
+
+            <div className="category-card standalone">
+              <h3>Top categories in the feed</h3>
+              <div className="event-tags">
+                {topCategories.map(([category, count]) => (
+                  <span className="event-tag" key={category}>{category} ({count})</span>
+                ))}
+              </div>
             </div>
           </>
         )}
