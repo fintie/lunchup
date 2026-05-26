@@ -73,7 +73,23 @@ const userSchema = new mongoose.Schema({
   isOnline: {
     type: Boolean,
     default: false
-  }
+  },
+  githubToken: {
+    type: String,
+    default: null
+  },
+  githubUserName: {
+    type: String,
+    default: null
+  },
+  reputationScore: {
+    type: Number,
+    default: 0
+  },
+  collaborators: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProjectSession' }
+  }]
 });
 
 module.exports = mongoose.model('User', userSchema);

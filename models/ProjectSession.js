@@ -42,7 +42,21 @@ const projectSchema = new mongoose.Schema({
     createdFromMeeting: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Meeting'
-    }
+    },
+    github: {
+        repoUrl: { type: String, default: null },
+        repoName: { type: String, default: null },
+        issuesCreated: [{ type: String }],
+        prUrl: { type: String, default: null },
+        linkedAt: { type: Date, default: null }
+    },
+    timeline: [{
+        action: String,
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        detail: String,
+        createdAt: { type: Date, default: Date.now } 
+    }],
+    completedTasks: [{ type: String }]
 });
 
 module.exports = mongoose.model('ProjectSession', projectSchema);

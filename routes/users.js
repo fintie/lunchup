@@ -3,7 +3,9 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const ProjectSession = require('../models/ProjectSession');
 const { assignRole } = require('../utils/roleAssigner');
+const { calculateReputation } = require('../utils/reputationCalculator');
 
 // Shared demo users map
 const { demoUsers } = require('../utils/demoStore');
@@ -167,6 +169,7 @@ router.get('/', authMiddleware, async (req, res) => {
         bio: u.bio,
         role: u.role,
         buildPreferences: u.buildPreferences,
+        reputationScore: u.reputationScore || 0,
         isOnline: u.isOnline,
         lastActive: u.lastActive
       }));
@@ -221,13 +224,18 @@ router.get('/:id', async (req, res) => {
       const user = Array.from(demoUsers.values()).find(u => u._id === req.params.id);
       if (!user) return res.status(404).json({ message: 'User not found' });
       const { password, ...safeUser } = user;
-      return res.json(safeUser);
+      return res.json({
+        reputationScore: 0,
+        collaborators: [],
+        ...safeUser   // safeUser fields override defaults if present
+      });
     }
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+    const projects = await ProjectSession.find({ 'participants.userId': req.params.id });
+    res.json({ ...user.toObject(), projects });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -266,10 +274,43 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const projects = await ProjectSession.find({ 'participants.userId': user._id });
+    const newScore = calculateReputation(user, projects);
+    await User.findByIdAndUpdate(user._id, { $set: { reputationScore: newScore } });
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
+});
+
+// Get reputation breakdown
+router.get('/:id/reputation', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const projects = await ProjectSession.find({ 'participants.userId': user._id });
+
+        const completedProjects = projects.filter(p => p.status === 'completed').length;
+        const githubRepos = projects.filter(p => p.github?.repoUrl).length;
+        const completedTasks = projects.reduce((sum, p) => sum + p.completedTasks.length, 0);
+        const collaborators = new Set(user.collaborators.map(c => c.userId.toString())).size;
+
+        const rolesPlayed = [...new Set(
+            projects.flatMap(p => p.participants
+                .filter(pt => pt.userId.toString() === user._id.toString())
+                .map(pt => pt.role)
+            )
+        )];
+
+        res.json({
+            score: user.reputationScore,
+            breakdown: { completedProjects, githubRepos, completedTasks, collaborators, rolesPlayed }
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
 });
 
 module.exports = router;

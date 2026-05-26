@@ -111,7 +111,7 @@ app.use('/api/opportunities', require('./routes/opportunities'));
 app.use('/api/seed', require('./routes/seed'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/harness', require('./routes/harness'));
-
+app.use('/api/github', require('./routes/github'));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

@@ -5,7 +5,7 @@ async function generateProjectPlan(title, description, participants) {
         return getMockPlan(title);
     }
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const participantText = participants.map(p => `- ${p.name}: ${(p.skills || []).join(', ')}`).join('\n');
+    const participantText = participants.map(p => `- ${p.name} (Role: ${p.role || 'Unknown'}): ${(p.skills || []).join(', ')}`).join('\n');
     const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
@@ -21,7 +21,13 @@ async function generateProjectPlan(title, description, participants) {
     });
 
     const text = message.content[0].text;
-    return JSON.parse(text);
+    const cleaned = text.replace(/```(?:json)?\n?/g, '').trim();
+    try {
+        return JSON.parse(cleaned);
+    } catch (e) {
+        console.warn('AI response parse failed, using mock plan');
+        return getMockPlan(title);
+    }
 }
 
 function getMockPlan(title) {
