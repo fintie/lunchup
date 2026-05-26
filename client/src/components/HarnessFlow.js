@@ -10,8 +10,8 @@ function HarnessFlow({ meeting, user, onClose, onCreated }) {
   const [error, setError] = useState('');
 
   const participants = meeting
-    ? [{ name: meeting.with?.name || 'Collaborator', skills: [] }, { name: user?.name || 'You', skills: [] }]
-    : [{ name: user?.name || 'You', skills: [] }];
+    ? [{ name: meeting.with?.name || 'Collaborator', skills: meeting.with?.skills || [], role: meeting.with?.role || '' }, { name: user?.name || 'You', skills: user?.skills || [], role: user?.role || '' }]
+    : [{ name: user?.name || 'You', skills: user?.skills || [], role: user?.role || '' }];
 
   const handleGenerate = async () => {
     if (!idea.trim()) return;

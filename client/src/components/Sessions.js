@@ -8,13 +8,15 @@ function Sessions({ user }) {
   const [loading, setLoading] = useState(false);
   const [showHarness, setShowHarness] = useState(false);
   const [regenerating, setRegenerating] = useState(null);
+  const [githubConnected, setGithubConnected] = useState(false);
+  const [githubError, setGithubError] = useState('');
 
   const fetchProjects = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const res = await axios.get(
-        `/projects/user/${user._id}`,
+        `/projects/user/${user.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSessions(res.data);
@@ -27,7 +29,31 @@ function Sessions({ user }) {
 
   useEffect(() => {
     fetchProjects();
+    const fetchGithubStatus = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`/users/me?t=${Date.now()}`, { headers: { Authorization: `Bearer ${token}` } });
+        setGithubConnected(!!res.data.githubToken);
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchGithubStatus();
   }, []);
+
+  const handleCompleteTask = async (sessionId, taskText) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.put(
+        `/projects/${sessionId}/tasks/complete`,
+        { taskText, userId: user?.id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSessions(prev => prev.map(s => s._id === sessionId ? res.data : s));
+    } catch (err) {
+      console.error('Complete task failed:', err);
+    }
+  };
 
   const handleRegenerate = async (sessionId) => {
     setRegenerating(sessionId);
@@ -44,6 +70,17 @@ function Sessions({ user }) {
     } finally {
       setRegenerating(null);
     }
+  };
+
+  const formatTimelineAction = (action) => {
+    const map = {
+      project_created: '🚀 Project created',
+      task_completed: '✅ Task completed',
+      github_linked: '🔗 GitHub connected',
+      plan_generated: '🤖 AI plan generated',
+      status_changed: '🔄 Status updated',
+    };
+    return map[action] || action;
   };
 
   const getStatusBadge = (status) => {
@@ -139,14 +176,34 @@ function Sessions({ user }) {
 
                       {plan.taskBreakdown && plan.taskBreakdown.length > 0 && (
                         <div className="plan-block">
-                          <h4>✅ Tasks</h4>
+                          <div className="task-header-row">
+                            <h4>✅ Tasks</h4>
+                            <span className="task-progress-label">
+                              {(session.completedTasks || []).length}/{plan.taskBreakdown.length} done
+                            </span>
+                          </div>
+                          <div className="task-progress-bar">
+                            <div
+                              className="task-progress-fill"
+                              style={{ width: `${Math.round(((session.completedTasks || []).length / plan.taskBreakdown.length) * 100)}%` }}
+                            />
+                          </div>
                           <ul className="task-list">
-                            {plan.taskBreakdown.map((task, i) => (
-                              <li key={i}>
-                                <input type="checkbox" id={`task-${session._id}-${i}`} />
-                                <label htmlFor={`task-${session._id}-${i}`}>{task}</label>
-                              </li>
-                            ))}
+                            {plan.taskBreakdown.map((task, i) => {
+                              const done = (session.completedTasks || []).includes(task);
+                              return (
+                                <li key={i} className={done ? 'task-done' : ''}>
+                                  <input
+                                    type="checkbox"
+                                    id={`task-${session._id}-${i}`}
+                                    checked={done}
+                                    disabled={done}
+                                    onChange={() => !done && handleCompleteTask(session._id, task)}
+                                  />
+                                  <label htmlFor={`task-${session._id}-${i}`}>{task}</label>
+                                </li>
+                              );
+                            })}
                           </ul>
                         </div>
                       )}
@@ -164,17 +221,118 @@ function Sessions({ user }) {
                     </div>
                   )}
 
+                  {session.github?.repoUrl ? (
+                    <div className="plan-block">
+                      <h4>GitHub</h4>
+                      <a href={session.github.repoUrl} target="_blank" rel="noreferrer">
+                        {session.github.repoName}
+                      </a>
+                      <p>{session.github.issuesCreated?.length || 0} issues created</p>
+                      {!session.github?.prUrl && (
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={async () => {
+                            const token = localStorage.getItem('token');
+                            await axios.post('/github/create-pr-draft',
+                              { sessionId: session._id, repoName: session.github.repoName },
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            fetchProjects();
+                          }}
+                        >
+                          Create Draft PR
+                        </button>
+                      )}
+                      {session.github?.prUrl && (
+                        <a href={session.github.prUrl} target="_blank" rel="noreferrer">
+                          View Draft PR
+                        </a>
+                      )}
+                    </div>
+                  ) : githubConnected ? (
+                    <div className="plan-block">
+                      {githubError && session._id === githubError.sessionId && (
+                        <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '8px' }}>{githubError.msg}</p>
+                      )}
+                      <button
+                        onClick={async () => {
+                          setGithubError('');
+                          const token = localStorage.getItem('token');
+                          const repoName = session.title.replace(/\s+/g, '-');
+                          try {
+                            await axios.post('/github/create-repo',
+                              { sessionId: session._id, repoName },
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            await axios.post('/github/create-issues',
+                              { sessionId: session._id, repoName, tasks: session.aiPlan?.taskBreakdown },
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            fetchProjects();
+                          } catch (err) {
+                            setGithubError({ sessionId: session._id, msg: err.response?.data?.message || 'GitHub action failed' });
+                          }
+                        }}
+                      >
+                        Create Repo + Issues
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="plan-block">
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => {
+                          const token = localStorage.getItem('token');
+                          window.location.href = `${axios.defaults.baseURL}/github/auth?token=${token}`;
+                        }}
+                      >
+                        Connect GitHub
+                      </button>
+                    </div>
+                  )}
+
+                  {session.timeline && session.timeline.length > 0 && (
+                    <div className="plan-block timeline-block">
+                      <h4>📋 Timeline</h4>
+                      <ul className="timeline-list">
+                        {[...session.timeline].reverse().slice(0, 5).map((event, i) => (
+                          <li key={i} className="timeline-item">
+                            <span className="timeline-action">{formatTimelineAction(event.action)}</span>
+                            {event.detail && <span className="timeline-detail"> — {event.detail}</span>}
+                            <span className="timeline-date">
+                              {new Date(event.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   <div className="session-card-footer">
                     <span className="session-date">
                       Created {new Date(session.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
-                    <button
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => handleRegenerate(session._id)}
-                      disabled={regenerating === session._id}
-                    >
-                      {regenerating === session._id ? 'Regenerating...' : '✨ Regenerate Plan'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {session.status !== 'completed' && (
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={async () => {
+                            const token = localStorage.getItem('token');
+                            await axios.put(`/projects/${session._id}/status`, { status: 'completed' }, { headers: { Authorization: `Bearer ${token}` } });
+                            fetchProjects();
+                          }}
+                        >
+                          Mark Complete
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => handleRegenerate(session._id)}
+                        disabled={regenerating === session._id}
+                      >
+                        {regenerating === session._id ? 'Regenerating...' : '✨ Regenerate Plan'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

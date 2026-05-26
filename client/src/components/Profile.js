@@ -17,6 +17,8 @@ function Profile({ user }) {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [projects, setProjects] = useState([]);
+  const [reputationData, setReputationData] = useState(null);
 
   useEffect(() => {
     // Fetch user profile data
@@ -40,6 +42,10 @@ function Profile({ user }) {
             role: data.role || '',
             buildPreferences: Array.isArray(data.buildPreferences) ? data.buildPreferences.join(', ') : ''
           });
+          // For demo users, use the score embedded in user data directly
+          if (user?.id?.startsWith('demo_') && data.reputationScore != null) {
+            setReputationData({ score: data.reputationScore, breakdown: null });
+          }
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -47,6 +53,73 @@ function Profile({ user }) {
     };
     fetchProfile();
   }, [user?.id]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token && user?.id) {
+          const res = await axios.get(`/projects/user/${user.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setProjects(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch projects:', err);
+      }
+    };
+    fetchProjects();
+  }, [user?.id]);
+
+  useEffect(() => {
+    const fetchReputation = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token && user?.id && !user.id.startsWith('demo_')) {
+          const res = await axios.get(`/users/${user.id}/reputation`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setReputationData(res.data);
+        }
+      } catch (err) {
+        // ignore — demo users or no DB
+      }
+    };
+    fetchReputation();
+  }, [user?.id]);
+
+  const getReputationTier = (score) => {
+    if (score >= 100) return 'Top Builder';
+    if (score >= 50) return 'Active Builder';
+    if (score >= 20) return 'Rising Star';
+    return 'New Member';
+  };
+
+  const getRoleStats = () => {
+    const roleCounts = {};
+    projects.forEach(project => {
+      const me = project.participants?.find(p => String(p.userId) === String(user?.id));
+      if (me?.role) {
+        roleCounts[me.role] = (roleCounts[me.role] || 0) + 1;
+      }
+    });
+    return roleCounts;
+  };
+
+  const getCollaborators = () => {
+    const seen = new Set();
+    const result = [];
+    projects.forEach(project => {
+      project.participants?.forEach(p => {
+        const uid = String(p.userId);
+        if (uid !== String(user?.id) && !seen.has(uid)) {
+          seen.add(uid);
+          result.push({ userId: uid, role: p.role });
+        }
+      });
+    });
+    return result;
+  };
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -66,9 +139,22 @@ function Profile({ user }) {
         buildPreferences: profile.buildPreferences.split(',').map(b => b.trim()).filter(b => b)
       };
 
-      await axios.put(`/users/${user.id}`, updateData, {
+      const res = await axios.put(`/users/${user.id}`, updateData, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      const data = res.data;
+      setProfile(prev => ({
+        ...prev,
+        role: data.role || prev.role,
+        skills: Array.isArray(data.skills) ? data.skills.join(', ') : prev.skills,
+        buildPreferences: Array.isArray(data.buildPreferences) ? data.buildPreferences.join(', ') : prev.buildPreferences,
+      }));
+      if (!user.id.startsWith('demo_')) {
+        try {
+          const repRes = await axios.get(`/users/${user.id}/reputation`, { headers: { Authorization: `Bearer ${token}` } });
+          setReputationData(repRes.data);
+        } catch (_) {}
+      }
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to update profile' });
@@ -91,7 +177,14 @@ function Profile({ user }) {
           <div className="profile-title">
             <h1>{profile.name}</h1>
             <p>{profile.professionalBackground || 'Professional'}</p>
-            {profile.role && <span className="role-badge">{profile.role}</span>}
+            <div className="profile-badges-row">
+              {profile.role && <span className="role-badge">{profile.role}</span>}
+              {reputationData && (
+                <span className="reputation-badge">
+                  ⭐ {reputationData.score} pts · {getReputationTier(reputationData.score)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -225,6 +318,76 @@ function Profile({ user }) {
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </form>
+            {projects.length > 0 && (
+              <div className="profile-section">
+                <h3>Projects Built</h3>
+                <div className="projects-list">
+                  {projects.map((project, i) => {
+                    const total = project.aiPlan?.taskBreakdown?.length || 0;
+                    const done = project.completedTasks?.length || 0;
+                    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+                    return (
+                      <div key={i} className="project-card">
+                        <div className="project-card-header">
+                          <h4>{project.title}</h4>
+                          {project.github?.repoUrl && (
+                            <a href={project.github.repoUrl} target="_blank" rel="noreferrer">
+                              View on GitHub →
+                            </a>
+                          )}
+                        </div>
+                        <p>{project.description}</p>
+                        {project.aiPlan?.roles && (
+                          <div className="roles-row">
+                            {project.aiPlan.roles.map((role, j) => (
+                              <span key={j} className="role-badge">{role}</span>
+                            ))}
+                          </div>
+                        )}
+                        {total > 0 && (
+                          <div className="project-task-progress">
+                            <div className="task-progress-header">
+                              <span>Tasks</span>
+                              <span>{done}/{total} ({pct}%)</span>
+                            </div>
+                            <div className="task-progress-bar">
+                              <div className="task-progress-fill" style={{ width: `${pct}%` }} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {reputationData && Object.keys(getRoleStats()).length > 0 && (
+              <div className="profile-section">
+                <h3>Roles Played</h3>
+                <div className="roles-row">
+                  {Object.entries(getRoleStats()).map(([role, count], i) => (
+                    <span key={i} className="role-stat-badge">
+                      {role} ×{count}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {getCollaborators().length > 0 && (
+              <div className="profile-section">
+                <h3>Collaborators ({getCollaborators().length})</h3>
+                <div className="collaborators-row">
+                  {getCollaborators().map((c, i) => (
+                    <div key={i} className="collaborator-chip">
+                      <div className="collaborator-avatar">{String(c.userId).slice(-2).toUpperCase()}</div>
+                      <span className="collaborator-role">{c.role || 'Collaborator'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       </div>
     </div>
