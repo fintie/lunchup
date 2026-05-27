@@ -32,7 +32,7 @@ const whatsappConversationSchema = new mongoose.Schema({
   state: {
     type: String,
     default: 'idle',
-    enum: ['idle', 'awaiting_event_ref', 'awaiting_name', 'awaiting_email', 'awaiting_confirmation', 'registered', 'stopped']
+    enum: ['idle', 'awaiting_preferences', 'preferences_collected', 'awaiting_event_ref', 'awaiting_name', 'awaiting_email', 'awaiting_confirmation', 'registered', 'stopped']
   },
   lastInboundMessage: {
     type: String,

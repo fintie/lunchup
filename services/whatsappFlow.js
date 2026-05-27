@@ -8,6 +8,73 @@ const EVT_ID_REGEX = /EVT[_-]?([a-fA-F0-9]{24})/i;
 const EMAIL_REGEX = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 const YES_REGEX = /^(yes|y(es)?|sure|yeah|ok|okay|confirm|confirmed|👍|✅)$/i;
 const DECLINE_REGEX = /^(no|not now|nope|nah)$/i;
+const SYDNEY_CITIES = ['sydney', 'nsw', 'new south wales'];
+const MELBOURNE_CITIES = ['melbourne', 'vic', 'victoria'];
+const BRISBANE_CITIES = ['brisbane', 'qld', 'queensland'];
+
+const INTEREST_KEYWORDS = {
+  tech: ['tech', 'startup', 'software', 'developer', 'engineering', 'ai', 'machine learning', 'saas', 'web3'],
+  business: ['business', 'entrepreneur', 'finance', 'investment', 'marketing', 'sales', 'ceo', 'founder'],
+  networking: ['networking', 'professional', 'corporate', 'industry', 'community'],
+  hobbies: ['hobby', 'hobbies', 'music', 'art', 'sports', 'wellness', 'health', 'fitness', 'cooking']
+};
+
+function normalizeCity(text = '') {
+  const lower = text.toLowerCase();
+  if (SYDNEY_CITIES.some(c => lower.includes(c))) return 'Sydney';
+  if (MELBOURNE_CITIES.some(c => lower.includes(c))) return 'Melbourne';
+  if (BRISBANE_CITIES.some(c => lower.includes(c))) return 'Brisbane';
+  return null;
+}
+
+function extractInterests(text = '') {
+  const lower = text.toLowerCase();
+  const matched = [];
+  for (const [interest, keywords] of Object.entries(INTEREST_KEYWORDS)) {
+    if (keywords.some(kw => lower.includes(kw))) {
+      matched.push(interest);
+    }
+  }
+  return matched.length > 0 ? matched : [];
+}
+
+async function findEventsByPreferences(city = '', interests = []) {
+  if (!city && interests.length === 0) {
+    return [];
+  }
+
+  const query = {};
+  if (city) {
+    query.city = { $regex: city, $options: 'i' };
+  }
+
+  let events = await Event.find(query).sort({ startTime: 1 }).limit(10);
+
+  if (interests.length > 0) {
+    const interestPattern = interests.map(i => `\\b${i}\\b`).join('|');
+    const regex = new RegExp(interestPattern, 'i');
+    events = events.filter(
+      e => regex.test(e.title) || 
+           regex.test(e.description) || 
+           (e.audienceJson?.audience || []).some(a => regex.test(a))
+    );
+  }
+
+  return events;
+}
+
+function buildPreferencePrompt() {
+  return `Hey there! 🦊 I'm Nexty, your personal event scout. I'd love to help you find great events! To get started, where are you based, and what kind of events catch your eye? (Think tech, networking, hobbies, or specific industries you're in.)`;
+}
+
+function buildEventsFoundReply(city, interests, eventCount) {
+  const interestStr = interests.join(', ');
+  return `Got it, ${city} ${interestStr}! 🦊 I found ${eventCount} awesome event${eventCount !== 1 ? 's' : ''} for you. Reply with the event code (like EVT_12345) to register, or send me another city + interest combo to see more!`;
+}
+
+function buildNoEventsReply(city, interests) {
+  return `Hmm, I didn't find any events in ${city} matching ${interests.join(', ')} right now. Try a different city or interest, or just send me an event code!`;
+}
 
 function extractMessageEntries(payload = {}) {
   if (payload.From) {
@@ -358,6 +425,72 @@ async function processInboundMessage({ message, contact }) {
     }
   }
 
+  if (conversation?.state === 'awaiting_preferences') {
+    const city = normalizeCity(normalizedText);
+    const interests = extractInterests(normalizedText);
+
+    if (!city && interests.length === 0) {
+      const outboundText = 'I didn\'t quite catch that. Please tell me your city and interests (like Sydney + tech, or Melbourne + networking).';
+      const updatedConversation = await upsertConversation({
+        phoneNumber,
+        profileName,
+        userId: conversation.userId,
+        lastInboundMessage: normalizedText,
+        lastOutboundMessage: outboundText,
+        state: 'awaiting_preferences',
+        metadata: conversation.metadata || {}
+      });
+
+      const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+      await recordMessage({
+        conversationId: updatedConversation._id,
+        phoneNumber,
+        direction: 'outbound',
+        twilioMessageSid: outbound.messageId || '',
+        body: outboundText,
+        status: outbound.ok ? 'queued' : 'failed',
+        rawPayload: outbound
+      });
+      return { ok: true, conversation: updatedConversation, outbound, inboundMessage };
+    }
+
+    const events = await findEventsByPreferences(city, interests);
+    const eventList = events.slice(0, 5).map(e => `${e.title} (EVT_${e._id})`).join('\n');
+    
+    let outboundText;
+    if (events.length > 0) {
+      outboundText = buildEventsFoundReply(city || 'your area', interests, events.length);
+      if (eventList) {
+        outboundText += '\n\n' + eventList;
+      }
+    } else {
+      outboundText = buildNoEventsReply(city || 'your area', interests);
+    }
+
+    const updatedConversation = await upsertConversation({
+      phoneNumber,
+      profileName,
+      userId: conversation.userId,
+      lastInboundMessage: normalizedText,
+      lastOutboundMessage: outboundText,
+      state: 'preferences_collected',
+      metadata: { city, interests, eventCount: events.length }
+    });
+
+    const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+    await recordMessage({
+      conversationId: updatedConversation._id,
+      phoneNumber,
+      direction: 'outbound',
+      twilioMessageSid: outbound.messageId || '',
+      body: outboundText,
+      status: outbound.ok ? 'queued' : 'failed',
+      rawPayload: outbound
+    });
+
+    return { ok: true, conversation: updatedConversation, events, outbound, inboundMessage };
+  }
+
   if (matchedEvent) {
     const event = matchedEvent;
     const attendeeName = profileName || '';
@@ -407,14 +540,14 @@ async function processInboundMessage({ message, contact }) {
     return { ok: true, event, registration, conversation: updatedConversation, outbound, inboundMessage };
   }
 
-  const fallbackText = buildFallbackReply();
+  const fallbackText = buildPreferencePrompt();
   const updatedConversation = await upsertConversation({
     phoneNumber,
     profileName,
     userId: conversation?.userId || null,
     lastInboundMessage: normalizedText,
     lastOutboundMessage: fallbackText,
-    state: 'awaiting_event_ref'
+    state: 'awaiting_preferences'
   });
 
   const outbound = await sendTextMessage({ to: phoneNumber, body: fallbackText });
