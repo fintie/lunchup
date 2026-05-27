@@ -1,0 +1,26 @@
+name: Update Events
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # daily at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-events:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run events importer
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          EVENTBRITE_API_KEY: ${{ secrets.EVENTBRITE_API_KEY }}
+          MEETUP_API_KEY: ${{ secrets.MEETUP_API_KEY }}
+          LUMA_API_KEY: ${{ secrets.LUMA_API_KEY }}
+          HUMANITIX_API_KEY: ${{ secrets.HUMANITIX_API_KEY }}
+        run: npm run events:update
