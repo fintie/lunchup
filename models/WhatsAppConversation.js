@@ -13,6 +13,12 @@ const whatsappConversationSchema = new mongoose.Schema({
     default: null,
     index: true
   },
+  eventId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
+    default: null,
+    index: true
+  },
   currentEventId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Event',
@@ -26,17 +32,21 @@ const whatsappConversationSchema = new mongoose.Schema({
   state: {
     type: String,
     default: 'idle',
-    enum: ['idle', 'awaiting_event', 'awaiting_name', 'awaiting_confirmation', 'confirmed', 'subscribed', 'stopped']
+    enum: ['idle', 'awaiting_event_ref', 'awaiting_name', 'awaiting_email', 'awaiting_confirmation', 'registered', 'stopped']
   },
-  lastInboundText: {
+  lastInboundMessage: {
     type: String,
     default: ''
   },
-  lastOutboundText: {
+  lastOutboundMessage: {
     type: String,
     default: ''
   },
   profileName: {
+    type: String,
+    default: ''
+  },
+  twilioProfileName: {
     type: String,
     default: ''
   },

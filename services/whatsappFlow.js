@@ -1,11 +1,18 @@
 const Event = require('../models/Event');
 const EventRegistration = require('../models/EventRegistration');
 const WhatsAppConversation = require('../models/WhatsAppConversation');
-const { formatPhoneNumber, sendTextMessage } = require('./whatsapp');
+const WhatsAppMessage = require('../models/WhatsAppMessage');
+const { normalizePhoneNumber, sendTextMessage } = require('./whatsapp');
 
-const REF_REGEX = /REF\s*:\s*EVT_([a-fA-F0-9]{24})/i;
+const EVT_ID_REGEX = /EVT[_-]?([a-fA-F0-9]{24})/i;
+const EMAIL_REGEX = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+const YES_REGEX = /^(yes|y(es)?|sure|yeah|ok|okay|confirm|confirmed|👍|✅)$/i;
+const DECLINE_REGEX = /^(no|not now|nope|nah)$/i;
 
 function extractMessageEntries(payload = {}) {
+  if (payload.From) {
+    return [payload];
+  }
   return (payload.entry || []).flatMap((entry) =>
     (entry.changes || []).flatMap((change) => change.value?.messages || [])
   );
@@ -16,7 +23,7 @@ function extractContacts(payload = {}) {
   for (const entry of payload.entry || []) {
     for (const change of entry.changes || []) {
       for (const contact of change.value?.contacts || []) {
-        const phone = formatPhoneNumber(contact.wa_id || contact.phone_number || '');
+        const phone = normalizePhoneNumber(contact.wa_id || contact.phone_number || '');
         if (phone) {
           map.set(phone, contact);
         }
@@ -27,6 +34,9 @@ function extractContacts(payload = {}) {
 }
 
 function getMessageText(message = {}) {
+  if (typeof message.Body === 'string') {
+    return message.Body.trim();
+  }
   if (message.type === 'text') {
     return String(message.text?.body || '').trim();
   }
@@ -40,19 +50,33 @@ function getMessageText(message = {}) {
 }
 
 function buildEventPrompt(event) {
-  return `Great, I can help with that. You’re registering for ${event.title} on ${new Date(event.startTime).toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' })} at ${event.venueName || event.city}. What name should I register you under?`;
+  const eventDate = new Date(event.startTime).toLocaleString('en-AU', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+  return `Nice — you’re joining Lunchup: ${event.title} on ${eventDate}. What’s your full name?`;
 }
 
-function buildConfirmedReply({ event, attendeeName }) {
-  return `Done, ${attendeeName}. You’re registered for ${event.title}. Event link: ${event.url}`;
+function buildAskEmailReply(attendeeName) {
+  return attendeeName
+    ? `Thanks ${attendeeName}. What’s your email?`
+    : 'Great, what’s your email?';
+}
+
+function buildConfirmationPrompt(event, attendeeName) {
+  return `Perfect. Reply YES to confirm your registration for ${event.title}.`;
+}
+
+function buildRegistrationSuccess(event) {
+  return `You’re in ✅ I’ve registered you for ${event.title}. I’ll message you if details change.`;
 }
 
 function buildFallbackReply() {
-  return 'I can help you register for Lunchup events on WhatsApp. Try sending: “Register me for AI Founder Breakfast at UTS”.';
+  return 'Send me the event code, like EVT_12345, and I’ll register you.';
 }
 
 async function resolveEventFromText(text = '') {
-  const refMatch = text.match(REF_REGEX);
+  const refMatch = text.match(EVT_ID_REGEX);
   if (refMatch) {
     const event = await Event.findById(refMatch[1]);
     if (event) {
@@ -65,34 +89,38 @@ async function resolveEventFromText(text = '') {
   return events.find((event) => normalized.includes(String(event.title || '').toLowerCase())) || null;
 }
 
-async function upsertConversation({ phoneNumber, profileName, userId, eventId, lastInboundText }) {
+async function upsertConversation({ phoneNumber, profileName, userId, eventId, lastInboundMessage, state, lastOutboundMessage, metadata = {} }) {
   return WhatsAppConversation.findOneAndUpdate(
     { phoneNumber },
     {
       $set: {
+        twilioProfileName: profileName || '',
         profileName: profileName || '',
         userId: userId || null,
+        eventId: eventId || null,
         currentEventId: eventId || null,
-        lastInboundText: lastInboundText || '',
-        lastMessageAt: new Date()
+        lastInboundMessage: lastInboundMessage || '',
+        lastOutboundMessage: lastOutboundMessage || '',
+        lastMessageAt: new Date(),
+        state: state || 'idle',
+        metadata: metadata || {}
       }
     },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 }
 
-async function upsertRegistration({ eventId, phoneNumber, attendeeName, conversationId, source = 'whatsapp_inbound', shareUrl = '', notes = '', userId = null }) {
-  const nextStatus = attendeeName ? 'confirmed' : 'awaiting_name';
+async function createOrUpdateRegistration({ eventId, phoneNumber, attendeeName, email, conversationId, sourceRef = '', userId = null, status = 'awaiting_name' }) {
   return EventRegistration.findOneAndUpdate(
     { eventId, phoneNumber, channel: 'whatsapp' },
     {
       $set: {
         userId,
         attendeeName: attendeeName || '',
-        source,
-        status: nextStatus,
-        shareUrl,
-        notes,
+        email: email || '',
+        source: 'whatsapp',
+        sourceRef,
+        status,
         conversationId
       }
     },
@@ -100,9 +128,21 @@ async function upsertRegistration({ eventId, phoneNumber, attendeeName, conversa
   );
 }
 
+async function recordMessage({ conversationId, phoneNumber, direction, twilioMessageSid, body, status, rawPayload = {} }) {
+  return WhatsAppMessage.create({
+    conversationId,
+    phoneNumber,
+    direction,
+    twilioMessageSid: twilioMessageSid || '',
+    body: body || '',
+    status: status || (direction === 'inbound' ? 'received' : 'queued'),
+    rawPayload
+  });
+}
+
 async function processInboundMessage({ message, contact }) {
-  const phoneNumber = formatPhoneNumber(message.from || contact?.wa_id || '');
-  const profileName = contact?.profile?.name || '';
+  const phoneNumber = normalizePhoneNumber(message.From || message.from || contact?.wa_id || '');
+  const profileName = String(message.ProfileName || contact?.profile?.name || '').trim();
   const text = getMessageText(message);
 
   if (!phoneNumber || !text) {
@@ -110,128 +150,285 @@ async function processInboundMessage({ message, contact }) {
   }
 
   const normalizedText = text.trim();
-  const existingConversation = await WhatsAppConversation.findOne({ phoneNumber });
+  const conversation = await WhatsAppConversation.findOne({ phoneNumber });
+
+  const inboundMessage = await recordMessage({
+    conversationId: conversation?._id || null,
+    phoneNumber,
+    direction: 'inbound',
+    twilioMessageSid: message.MessageSid || message.SmsMessageSid || '',
+    body: normalizedText,
+    status: 'received',
+    rawPayload: message
+  });
 
   if (/^stop$/i.test(normalizedText)) {
-    const stoppedConversation = await WhatsAppConversation.findOneAndUpdate(
-      { phoneNumber },
-      {
-        $set: {
-          profileName,
-          lastInboundText: normalizedText,
-          lastOutboundText: 'You’re opted out of WhatsApp follow-ups. Message again anytime to restart.',
-          lastMessageAt: new Date(),
-          state: 'stopped'
-        }
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
-
     const outboundText = 'You’re opted out of WhatsApp follow-ups. Message again anytime to restart.';
+    const updatedConversation = await upsertConversation({
+      phoneNumber,
+      profileName,
+      userId: conversation?.userId || null,
+      lastInboundMessage: normalizedText,
+      lastOutboundMessage: outboundText,
+      state: 'stopped'
+    });
+
     const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
-    return { ok: true, conversation: stoppedConversation, outbound };
+    await recordMessage({
+      conversationId: updatedConversation._id,
+      phoneNumber,
+      direction: 'outbound',
+      twilioMessageSid: outbound.messageId || '',
+      body: outboundText,
+      status: outbound.ok ? 'queued' : 'failed',
+      rawPayload: outbound
+    });
+
+    return { ok: true, conversation: updatedConversation, outbound, inboundMessage };
   }
 
-  if (existingConversation?.state === 'awaiting_name' && existingConversation.currentEventId && existingConversation.currentRegistrationId) {
+  const eventRef = normalizedText.match(EVT_ID_REGEX);
+  const hasEventRef = Boolean(eventRef);
+  const matchedEvent = hasEventRef ? await Event.findById(eventRef[1]) : null;
+
+  if (conversation?.state === 'awaiting_name' && conversation.currentEventId && conversation.currentRegistrationId) {
     const attendeeName = normalizedText;
     const registration = await EventRegistration.findByIdAndUpdate(
-      existingConversation.currentRegistrationId,
+      conversation.currentRegistrationId,
       {
         $set: {
           attendeeName,
-          status: 'confirmed'
+          status: 'awaiting_email'
         }
       },
       { new: true }
     );
 
-    const event = registration ? await Event.findById(registration.eventId) : null;
-    const outboundText = event ? buildConfirmedReply({ event, attendeeName }) : 'Done, you’re registered.';
-    const conversation = await WhatsAppConversation.findOneAndUpdate(
-      { phoneNumber },
-      {
-        $set: {
-          profileName,
-          lastInboundText: normalizedText,
-          lastOutboundText: outboundText,
-          lastMessageAt: new Date(),
-          state: 'confirmed'
-        }
-      },
-      { new: true }
-    );
+    const outboundText = buildAskEmailReply(attendeeName);
+    const updatedConversation = await upsertConversation({
+      phoneNumber,
+      profileName,
+      userId: conversation.userId,
+      eventId: conversation.currentEventId,
+      lastInboundMessage: normalizedText,
+      lastOutboundMessage: outboundText,
+      state: 'awaiting_email'
+    });
 
     const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
-    return { ok: true, event, registration, conversation, outbound };
+    await recordMessage({
+      conversationId: updatedConversation._id,
+      phoneNumber,
+      direction: 'outbound',
+      twilioMessageSid: outbound.messageId || '',
+      body: outboundText,
+      status: outbound.ok ? 'queued' : 'failed',
+      rawPayload: outbound
+    });
+
+    return { ok: true, conversation: updatedConversation, registration, outbound, inboundMessage };
   }
 
-  const event = await resolveEventFromText(normalizedText);
-  if (!event) {
-    const fallbackText = buildFallbackReply();
-    const conversation = await WhatsAppConversation.findOneAndUpdate(
-      { phoneNumber },
+  if (conversation?.state === 'awaiting_email' && conversation.currentEventId && conversation.currentRegistrationId) {
+    const emailMatch = normalizedText.match(EMAIL_REGEX);
+    if (!emailMatch) {
+      const outboundText = 'I didn’t catch an email address. What is your email?';
+      const updatedConversation = await upsertConversation({
+        phoneNumber,
+        profileName,
+        userId: conversation.userId,
+        eventId: conversation.currentEventId,
+        lastInboundMessage: normalizedText,
+        lastOutboundMessage: outboundText,
+        state: 'awaiting_email'
+      });
+
+      const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+      await recordMessage({
+        conversationId: updatedConversation._id,
+        phoneNumber,
+        direction: 'outbound',
+        twilioMessageSid: outbound.messageId || '',
+        body: outboundText,
+        status: outbound.ok ? 'queued' : 'failed',
+        rawPayload: outbound
+      });
+      return { ok: true, conversation: updatedConversation, outbound, inboundMessage };
+    }
+
+    const email = emailMatch[0];
+    const registration = await EventRegistration.findByIdAndUpdate(
+      conversation.currentRegistrationId,
       {
         $set: {
-          profileName,
-          lastInboundText: normalizedText,
-          lastOutboundText: fallbackText,
-          lastMessageAt: new Date(),
-          state: 'awaiting_event'
+          email,
+          status: 'awaiting_confirmation'
         }
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { new: true }
     );
 
-    const outbound = await sendTextMessage({ to: phoneNumber, body: fallbackText });
-    return { ok: true, conversation, outbound, event: null };
+    const event = await Event.findById(conversation.currentEventId);
+    const outboundText = buildConfirmationPrompt(event, registration.attendeeName || profileName || 'there');
+    const updatedConversation = await upsertConversation({
+      phoneNumber,
+      profileName,
+      userId: conversation.userId,
+      eventId: conversation.currentEventId,
+      lastInboundMessage: normalizedText,
+      lastOutboundMessage: outboundText,
+      state: 'awaiting_confirmation'
+    });
+
+    const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+    await recordMessage({
+      conversationId: updatedConversation._id,
+      phoneNumber,
+      direction: 'outbound',
+      twilioMessageSid: outbound.messageId || '',
+      body: outboundText,
+      status: outbound.ok ? 'queued' : 'failed',
+      rawPayload: outbound
+    });
+
+    return { ok: true, conversation: updatedConversation, registration, event, outbound, inboundMessage };
   }
 
-  const conversation = await upsertConversation({
+  if (conversation?.state === 'awaiting_confirmation' && conversation.currentEventId && conversation.currentRegistrationId) {
+    if (YES_REGEX.test(normalizedText)) {
+      const registration = await EventRegistration.findByIdAndUpdate(
+        conversation.currentRegistrationId,
+        {
+          $set: {
+            status: 'confirmed'
+          }
+        },
+        { new: true }
+      );
+
+      const event = await Event.findById(conversation.currentEventId);
+      const outboundText = buildRegistrationSuccess(event);
+      const updatedConversation = await upsertConversation({
+        phoneNumber,
+        profileName,
+        userId: conversation.userId,
+        eventId: conversation.currentEventId,
+        lastInboundMessage: normalizedText,
+        lastOutboundMessage: outboundText,
+        state: 'registered'
+      });
+
+      const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+      await recordMessage({
+        conversationId: updatedConversation._id,
+        phoneNumber,
+        direction: 'outbound',
+        twilioMessageSid: outbound.messageId || '',
+        body: outboundText,
+        status: outbound.ok ? 'queued' : 'failed',
+        rawPayload: outbound
+      });
+
+      return { ok: true, conversation: updatedConversation, registration, event, outbound, inboundMessage };
+    }
+
+    if (DECLINE_REGEX.test(normalizedText)) {
+      const outboundText = 'No problem. Reply YES when you’re ready to confirm your registration.';
+      const updatedConversation = await upsertConversation({
+        phoneNumber,
+        profileName,
+        userId: conversation.userId,
+        eventId: conversation.currentEventId,
+        lastInboundMessage: normalizedText,
+        lastOutboundMessage: outboundText,
+        state: 'awaiting_confirmation'
+      });
+
+      const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+      await recordMessage({
+        conversationId: updatedConversation._id,
+        phoneNumber,
+        direction: 'outbound',
+        twilioMessageSid: outbound.messageId || '',
+        body: outboundText,
+        status: outbound.ok ? 'queued' : 'failed',
+        rawPayload: outbound
+      });
+      return { ok: true, conversation: updatedConversation, outbound, inboundMessage };
+    }
+  }
+
+  if (matchedEvent) {
+    const event = matchedEvent;
+    const attendeeName = profileName || '';
+    const registrationStatus = attendeeName ? 'awaiting_email' : 'awaiting_name';
+
+    const registration = await createOrUpdateRegistration({
+      eventId: event._id,
+      phoneNumber,
+      attendeeName,
+      email: '',
+      conversationId: conversation?._id || null,
+      sourceRef: message.MessageSid || message.SmsMessageSid || '',
+      userId: conversation?.userId || null,
+      status: registrationStatus
+    });
+
+    const outboundText = attendeeName
+      ? buildAskEmailReply(attendeeName)
+      : buildEventPrompt(event);
+    const nextState = attendeeName ? 'awaiting_email' : 'awaiting_name';
+
+    const updatedConversation = await upsertConversation({
+      phoneNumber,
+      profileName,
+      userId: conversation?.userId || null,
+      eventId: event._id,
+      lastInboundMessage: normalizedText,
+      lastOutboundMessage: outboundText,
+      state: nextState
+    });
+
+    await WhatsAppConversation.findByIdAndUpdate(updatedConversation._id, {
+      $set: { currentRegistrationId: registration._id }
+    });
+
+    const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
+    await recordMessage({
+      conversationId: updatedConversation._id,
+      phoneNumber,
+      direction: 'outbound',
+      twilioMessageSid: outbound.messageId || '',
+      body: outboundText,
+      status: outbound.ok ? 'queued' : 'failed',
+      rawPayload: outbound
+    });
+
+    return { ok: true, event, registration, conversation: updatedConversation, outbound, inboundMessage };
+  }
+
+  const fallbackText = buildFallbackReply();
+  const updatedConversation = await upsertConversation({
     phoneNumber,
     profileName,
-    userId: existingConversation?.userId || null,
-    eventId: event._id,
-    lastInboundText: normalizedText
+    userId: conversation?.userId || null,
+    lastInboundMessage: normalizedText,
+    lastOutboundMessage: fallbackText,
+    state: 'awaiting_event_ref'
   });
 
-  const attendeeName = profileName || '';
-  const registration = await upsertRegistration({
-    eventId: event._id,
+  const outbound = await sendTextMessage({ to: phoneNumber, body: fallbackText });
+  await recordMessage({
+    conversationId: updatedConversation._id,
     phoneNumber,
-    attendeeName,
-    conversationId: conversation._id,
-    notes: normalizedText,
-    userId: conversation.userId || null
+    direction: 'outbound',
+    twilioMessageSid: outbound.messageId || '',
+    body: fallbackText,
+    status: outbound.ok ? 'queued' : 'failed',
+    rawPayload: outbound
   });
 
-  const outboundText = attendeeName
-    ? buildConfirmedReply({ event, attendeeName })
-    : buildEventPrompt(event);
-
-  const nextState = attendeeName ? 'confirmed' : 'awaiting_name';
-  const updatedConversation = await WhatsAppConversation.findByIdAndUpdate(
-    conversation._id,
-    {
-      $set: {
-        currentRegistrationId: registration._id,
-        state: nextState,
-        lastOutboundText: outboundText,
-        lastMessageAt: new Date()
-      }
-    },
-    { new: true }
-  );
-
-  if (!attendeeName) {
-    await EventRegistration.findByIdAndUpdate(registration._id, {
-      $set: {
-        status: 'awaiting_name'
-      }
-    });
-  }
-
-  const outbound = await sendTextMessage({ to: phoneNumber, body: outboundText });
-  return { ok: true, event, registration, conversation: updatedConversation, outbound };
+  return { ok: true, conversation: updatedConversation, outbound, inboundMessage };
 }
 
 async function handleIncomingWebhook(payload = {}) {
@@ -240,7 +437,7 @@ async function handleIncomingWebhook(payload = {}) {
   const results = [];
 
   for (const message of messages) {
-    const phoneNumber = formatPhoneNumber(message.from || '');
+    const phoneNumber = normalizePhoneNumber(message.From || message.from || '');
     const contact = contacts.get(phoneNumber);
     results.push(await processInboundMessage({ message, contact }));
   }

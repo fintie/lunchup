@@ -21,6 +21,10 @@ const eventRegistrationSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  email: {
+    type: String,
+    default: ''
+  },
   channel: {
     type: String,
     default: 'whatsapp'
@@ -28,6 +32,10 @@ const eventRegistrationSchema = new mongoose.Schema({
   source: {
     type: String,
     default: 'web_button'
+  },
+  sourceRef: {
+    type: String,
+    default: ''
   },
   status: {
     type: String,
