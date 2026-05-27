@@ -262,31 +262,34 @@ async function fetchHumanTixEvents() {
         const response = await axios.get('https://api.humanitix.com/v1/events', config);
 
         if (response.data?.events) {
-          events.push(...response.data.events.map(e => ({
-            source: 'humanitix',
-            sourceEventId: e.id,
-            title: e.title || '',
-            description: e.description || '',
-            startTime: new Date(e.start_date),
-            endTime: e.end_date ? new Date(e.end_date) : null,
-            timezone: 'Australia/Sydney',
-            venueName: e.venue?.name || '',
-            address: e.venue?.address || '',
-            city: city,
-            state: '',
-            country: 'Australia',
-            latitude: e.venue?.latitude || null,
-            longitude: e.venue?.longitude || null,
-            categoryJson: { categories: e.categories || [] },
-            audienceJson: { audience: [], personas: [] },
-            priceMin: e.min_price || 0,
-            priceMax: e.max_price || null,
-            url: e.url || '',
-            imageUrl: e.image_url || '',
-            organizer: e.organizer?.name || '',
-            rawPayload: e,
-            contentHash: ''
-          }));
+          const mapped = response.data.events.map(e => {
+            return {
+              source: 'humanitix',
+              sourceEventId: e.id,
+              title: e.title || '',
+              description: e.description || '',
+              startTime: new Date(e.start_date),
+              endTime: e.end_date ? new Date(e.end_date) : null,
+              timezone: 'Australia/Sydney',
+              venueName: e.venue?.name || '',
+              address: e.venue?.address || '',
+              city: city,
+              state: '',
+              country: 'Australia',
+              latitude: e.venue?.latitude || null,
+              longitude: e.venue?.longitude || null,
+              categoryJson: { categories: e.categories || [] },
+              audienceJson: { audience: [], personas: [] },
+              priceMin: e.min_price || 0,
+              priceMax: e.max_price || null,
+              url: e.url || '',
+              imageUrl: e.image_url || '',
+              organizer: e.organizer?.name || '',
+              rawPayload: e,
+              contentHash: ''
+            };
+          });
+          events.push(...mapped);
         }
       } catch (err) {
         console.warn(`HumanTix fetch for ${city} failed:`, err.message);
