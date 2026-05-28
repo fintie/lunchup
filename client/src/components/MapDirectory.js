@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapDirectory.css';
 
@@ -429,6 +429,24 @@ const CATEGORIES = [
   { key: 'event', label: 'Events' }
 ];
 
+const MapRefresher = ({ locations }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!locations || locations.length === 0) return;
+
+    if (locations.length === 1) {
+      map.setView(locations[0].position, 13);
+      return;
+    }
+
+    const bounds = locations.map((location) => location.position);
+    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 13 });
+  }, [locations, map]);
+
+  return null;
+};
+
 const MapDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('startup');
@@ -500,6 +518,7 @@ const MapDirectory = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <MapRefresher locations={filteredLocations} />
               {filteredLocations.map((item) => (
                 <CircleMarker
                   key={item.id}

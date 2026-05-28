@@ -74,7 +74,33 @@ WHATSAPP_EVENT_NUMBER=61412345678
 
 Render does not support MongoDB natively, but you can still schedule a backend job by using a Render cron job that runs against your deployed API or directly against your repo.
 
-### Option A: Use a Render Cron Job for the Backend
+### Option A: Use an OpenClaw Cron Job (recommended)
+
+OpenClaw can replace the Render cron job by running the existing `scripts/updateEvents.js` on a fixed schedule from this workspace.
+
+Recommended OpenClaw cron configuration:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `lunchup-events-update` |
+| **Schedule** | `0 2 * * *` (daily at 02:00 UTC) |
+| **Session target** | `isolated` |
+| **Payload kind** | `agentTurn` |
+| **Prompt** | `In /Users/nic/.openclaw/workspace/lunchup, run npm run events:update. Report success/failure briefly and include created/updated totals if available. Do not message the user unless the run fails repeatedly or needs a decision.` |
+
+Required environment/secrets still need to exist wherever the script runs:
+
+```
+MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/lunchup
+EVENTBRITE_API_KEY=your-eventbrite-api-key
+MEETUP_API_KEY=your-meetup-api-key
+LUMA_API_KEY=your-luma-api-key
+HUMANITIX_API_KEY=your-humanitix-api-key
+```
+
+### Option B: Keep Render cron
+
+If you want the scheduler to live with the deployed app instead, keep the existing Render cron approach.
 
 1. Go to [Render Dashboard](https://dashboard.render.com/).
 2. Click **New** → **Cron Job**.
@@ -89,33 +115,19 @@ Render does not support MongoDB natively, but you can still schedule a backend j
 | **Command** | `npm run events:update` |
 | **Root Directory** | (leave blank or the repo root) |
 
-5. Add environment variables for the cron job:
+5. Add the same environment variables.
 
-```
-MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/lunchup
-EVENTBRITE_API_KEY=your-eventbrite-api-key
-MEETUP_API_KEY=your-meetup-api-key
-LUMA_API_KEY=your-luma-api-key
-HUMANITIX_API_KEY=your-humanitix-api-key
-```
+### Option C: Trigger the Backend Endpoint from a Cron Job
 
-6. Save the cron job.
-
-### Option B: Trigger the Backend Endpoint from a Cron Job
-
-If you prefer to keep the API deployment separate, create a Render Cron Job that calls a secure endpoint on the deployed backend.
-
-1. Deploy the backend as described above.
-2. Create a small cron job with these settings:
+If you prefer to keep the API deployment separate, create a cron job that calls a secure endpoint on the deployed backend.
 
 | Setting | Value |
 |---------|-------|
 | **Name** | `lunchup-events-trigger` |
-| **Environment** | `Node 18` |
 | **Schedule** | `0 2 * * *` |
-| **Command** | `curl -s -X POST https://lunchup-api.onrender.com/api/events/refresh` |
+| **Command** | `curl -s -X POST https://lunchup-api.onrender.com/api/events/update` |
 
-3. Secure the endpoint with a secret token or restrict access by IP if needed.
+Secure the endpoint with a secret token or restrict access by IP if needed.
 
 ## Step 5: Deploy Frontend
 

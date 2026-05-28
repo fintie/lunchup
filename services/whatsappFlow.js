@@ -2,6 +2,8 @@ const Event = require('../models/Event');
 const EventRegistration = require('../models/EventRegistration');
 const WhatsAppConversation = require('../models/WhatsAppConversation');
 const WhatsAppMessage = require('../models/WhatsAppMessage');
+
+const canPersistMessages = () => !!(WhatsAppMessage && typeof WhatsAppMessage.create === 'function');
 const { normalizePhoneNumber, sendTextMessage } = require('./whatsapp');
 
 const EVT_ID_REGEX = /EVT[_-]?([a-fA-F0-9]{24})/i;
@@ -196,15 +198,44 @@ async function createOrUpdateRegistration({ eventId, phoneNumber, attendeeName, 
 }
 
 async function recordMessage({ conversationId, phoneNumber, direction, twilioMessageSid, body, status, rawPayload = {} }) {
-  return WhatsAppMessage.create({
-    conversationId,
-    phoneNumber,
-    direction,
-    twilioMessageSid: twilioMessageSid || '',
-    body: body || '',
-    status: status || (direction === 'inbound' ? 'received' : 'queued'),
-    rawPayload
-  });
+  if (!canPersistMessages()) {
+    return {
+      _id: null,
+      conversationId: conversationId || null,
+      phoneNumber,
+      direction,
+      twilioMessageSid: twilioMessageSid || '',
+      body: body || '',
+      status: status || (direction === 'inbound' ? 'received' : 'queued'),
+      rawPayload,
+      skippedPersistence: true
+    };
+  }
+
+  try {
+    return await WhatsAppMessage.create({
+      conversationId,
+      phoneNumber,
+      direction,
+      twilioMessageSid: twilioMessageSid || '',
+      body: body || '',
+      status: status || (direction === 'inbound' ? 'received' : 'queued'),
+      rawPayload
+    });
+  } catch (error) {
+    return {
+      _id: null,
+      conversationId: conversationId || null,
+      phoneNumber,
+      direction,
+      twilioMessageSid: twilioMessageSid || '',
+      body: body || '',
+      status: status || (direction === 'inbound' ? 'received' : 'queued'),
+      rawPayload,
+      skippedPersistence: true,
+      persistenceError: error.message
+    };
+  }
 }
 
 async function processInboundMessage({ message, contact }) {

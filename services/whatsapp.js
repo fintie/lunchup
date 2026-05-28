@@ -4,7 +4,7 @@ const { URLSearchParams } = require('url');
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
-const TWILIO_WHATSAPP_FROM = process.env.TWILIO_WHATSAPP_FROM || '';
+const TWILIO_WHATSAPP_FROM_RAW = process.env.TWILIO_WHATSAPP_FROM || '';
 const WHATSAPP_API_VERSION = process.env.WHATSAPP_API_VERSION || 'v20.0';
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
 const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN || '';
@@ -17,6 +17,8 @@ function buildWhatsAppAddress(phoneNumber = '') {
   const normalized = normalizePhoneNumber(phoneNumber);
   return normalized ? `whatsapp:+${normalized}` : '';
 }
+
+const TWILIO_WHATSAPP_FROM = buildWhatsAppAddress(TWILIO_WHATSAPP_FROM_RAW);
 
 function buildTwilioMessageUrl() {
   return `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;

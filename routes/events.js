@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { execFile } = require('child_process');
+const path = require('path');
 const {
   seedSampleEvents,
   listEvents,
@@ -25,6 +27,22 @@ router.post('/seed', async (req, res) => {
   } catch (error) {
     console.error('Seed events error:', error);
     return res.status(500).json({ message: 'Failed to seed events', error: error.message });
+  }
+});
+
+router.post('/update', async (req, res) => {
+  try {
+    const updateScript = path.join(__dirname, '..', 'scripts', 'updateEvents.js');
+    execFile('node', [updateScript], { timeout: 10 * 60 * 1000 }, (error, stdout, stderr) => {
+      if (error) {
+        console.error('Update events error:', stderr || error.message);
+        return res.status(500).json({ ok: false, message: 'Failed to update events', error: (stderr || error.message || '').trim() });
+      }
+      return res.json({ ok: true, message: stdout.trim() });
+    });
+  } catch (error) {
+    console.error('Update events error:', error);
+    return res.status(500).json({ ok: false, message: 'Failed to trigger event update', error: error.message });
   }
 });
 

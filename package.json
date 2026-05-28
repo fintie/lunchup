@@ -9,6 +9,7 @@
     "build": "echo 'Backend build complete'",
     "seed": "node scripts/seedUsers.js",
     "news:update": "node scripts/updateNews.js",
+    "events:update": "node scripts/updateEvents.js",
     "opportunities:update": "node scripts/updateOpportunities.js"
   },
   "keywords": [

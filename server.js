@@ -125,6 +125,7 @@ if (process.env.NODE_ENV === 'production') {
 const { execFile } = require('child_process');
 const newsUpdateScript = path.join(__dirname, 'scripts', 'updateNews.js');
 const opportunitiesUpdateScript = path.join(__dirname, 'scripts', 'updateOpportunities.js');
+const eventsUpdateScript = path.join(__dirname, 'scripts', 'updateEvents.js');
 
 function scheduleRefresh(scriptPath, label, intervalMs) {
   const runUpdate = () => {
@@ -143,6 +144,7 @@ function scheduleRefresh(scriptPath, label, intervalMs) {
 
 scheduleRefresh(newsUpdateScript, '📰', 12 * 60 * 60 * 1000);
 scheduleRefresh(opportunitiesUpdateScript, '💼', 24 * 60 * 60 * 1000);
+scheduleRefresh(eventsUpdateScript, '📅', 24 * 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
