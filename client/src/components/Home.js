@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from './Seo';
+import MapDirectory from './MapDirectory';
 import './Home.css';
 
 const siteSchema = [
@@ -130,6 +131,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <MapDirectory />
 
       {/* Features Section */}
       <section className="features">
