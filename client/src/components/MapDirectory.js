@@ -21,6 +21,7 @@ const LOCATIONS = [
     description: 'Global software leader with Sydney innovation teams building collaboration and AI products.',
     website: 'https://www.atlassian.com',
     contact: 'info@atlassian.com',
+    address: '341 George St, Sydney NSW 2000',
     upcomingEvents: 'AI product leadership meetup',
     relatedUsers: 16,
     tags: ['AI', 'collaboration', 'Sydney CBD'],
@@ -33,10 +34,11 @@ const LOCATIONS = [
     description: 'Design platform with strong AI, startup growth, and Sydney headquarters presence.',
     website: 'https://www.canva.com',
     contact: 'hello@canva.com',
+    address: '1 Denison St, North Sydney NSW 2060',
     upcomingEvents: 'Design + AI networking brunch',
     relatedUsers: 24,
     tags: ['AI', 'design', 'growth'],
-    position: [-33.8688, 151.2093]
+    position: [-33.8329, 151.2060]
   },
   {
     id: 'harrison-ai',
@@ -45,6 +47,7 @@ const LOCATIONS = [
     description: 'Healthcare AI startup building machine learning solutions for medical imaging.',
     website: 'https://www.harrison.ai',
     contact: 'contact@harrison.ai',
+    address: '303 George St, Sydney NSW 2000',
     upcomingEvents: 'Healthtech founder roundtable',
     relatedUsers: 8,
     tags: ['healthtech', 'AI', 'startup'],
@@ -57,10 +60,11 @@ const LOCATIONS = [
     description: 'AI research and product startup with a focus on generative intelligence and innovation.',
     website: 'https://www.leonardo.ai',
     contact: 'hello@leonardo.ai',
+    address: '201 Sussex St, Sydney NSW 2000',
     upcomingEvents: 'AI research lab open night',
     relatedUsers: 7,
     tags: ['AI', 'research', 'machine learning'],
-    position: [-33.7766, 151.1275]
+    position: [-33.8762, 151.2001]
   },
   {
     id: 'relevance-ai',
@@ -69,10 +73,11 @@ const LOCATIONS = [
     description: 'Data and AI startup helping companies build better machine learning workflows.',
     website: 'https://www.relevance.ai',
     contact: 'team@relevance.ai',
+    address: '501 George St, Sydney NSW 2000',
     upcomingEvents: 'AI data practitioners meetup',
     relatedUsers: 10,
     tags: ['AI', 'data', 'analytics'],
-    position: [-33.886, 151.209]
+    position: [-33.8766, 151.2044]
   },
   {
     id: 'eucalyptus',
@@ -81,6 +86,7 @@ const LOCATIONS = [
     description: 'AI startup working on computer vision and generative intelligence solutions.',
     website: 'https://www.eucalyptus.ai',
     contact: 'contact@eucalyptus.ai',
+    address: '90 George St, Sydney NSW 2000',
     upcomingEvents: 'Computer vision founders session',
     relatedUsers: 5,
     tags: ['AI', 'computer vision'],
@@ -93,6 +99,7 @@ const LOCATIONS = [
     description: 'Blockchain and gaming startup with strong Australian roots and engineering talent.',
     website: 'https://www.immutable.com',
     contact: 'info@immutable.com',
+    address: '1 Barangaroo Ave, Barangaroo NSW 2000',
     upcomingEvents: 'Web3 builder breakfast',
     relatedUsers: 12,
     tags: ['blockchain', 'AI', 'startup'],
@@ -105,10 +112,11 @@ const LOCATIONS = [
     description: 'Sydney venture capital fund investing in Australian founders across AI, software, and consumer.',
     website: 'https://airtree.vc',
     contact: 'hello@airtree.vc',
+    address: '83 Clarence St, Sydney NSW 2000',
     upcomingEvents: 'Seed investor office hours',
     relatedUsers: 3,
     tags: ['VC', 'seed', 'AI'],
-    position: [-33.872, 151.207]
+    position: [-33.8730, 151.2066]
   },
   {
     id: 'blackbird',
@@ -117,10 +125,11 @@ const LOCATIONS = [
     description: 'Early-stage Australian VC backing technology founders across SaaS, fintech and AI.',
     website: 'https://blackbird.vc',
     contact: 'team@blackbird.vc',
+    address: '75 Castlereagh St, Sydney NSW 2000',
     upcomingEvents: 'Founder pitch prep session',
     relatedUsers: 4,
     tags: ['VC', 'growth', 'AI'],
-    position: [-33.87, 151.206]
+    position: [-33.8703, 151.2065]
   },
   {
     id: 'square-peg',
@@ -129,10 +138,11 @@ const LOCATIONS = [
     description: 'Global investor with a strong presence in Australian startups and AI-enabled businesses.',
     website: 'https://www.squarepegcap.com',
     contact: 'info@squarepegcap.com',
+    address: '100 William St, Sydney NSW 2010',
     upcomingEvents: 'Investor networking dinner',
     relatedUsers: 2,
     tags: ['VC', 'growth', 'AI'],
-    position: [-33.8705, 151.2065]
+    position: [-33.8735, 151.2057]
   },
   {
     id: 'main-sequence',
@@ -141,10 +151,11 @@ const LOCATIONS = [
     description: 'Australian deep tech VC partnering with science, health, robotics and AI founders.',
     website: 'https://mains.sequence.com',
     contact: 'info@mains.sequence.com',
+    address: '1 Farrer Pl, Sydney NSW 2000',
     upcomingEvents: 'Deep tech founder lunch',
     relatedUsers: 3,
     tags: ['VC', 'deep tech', 'AI'],
-    position: [-33.879, 151.2]
+    position: [-33.8695, 151.2040]
   },
   {
     id: 'unsw',
@@ -153,6 +164,7 @@ const LOCATIONS = [
     description: 'Leading Sydney university with strong AI research labs and innovation programs.',
     website: 'https://www.unsw.edu.au',
     contact: 'info@unsw.edu.au',
+    address: 'Gate 9, High St, Kensington NSW 2052',
     upcomingEvents: 'AI research student open day',
     relatedUsers: 18,
     tags: ['education', 'AI', 'research'],
@@ -165,6 +177,7 @@ const LOCATIONS = [
     description: 'University of Technology Sydney with applied AI research and industry collaboration.',
     website: 'https://www.uts.edu.au',
     contact: 'info@uts.edu.au',
+    address: '15 Broadway, Ultimo NSW 2007',
     upcomingEvents: 'AI internships showcase',
     relatedUsers: 14,
     tags: ['education', 'AI', 'industry'],
@@ -177,6 +190,7 @@ const LOCATIONS = [
     description: 'Research university with AI labs, biomedical engineering and startup support programs.',
     website: 'https://www.sydney.edu.au',
     contact: 'info@sydney.edu.au',
+    address: 'Camperdown NSW 2006',
     upcomingEvents: 'AI and society symposium',
     relatedUsers: 21,
     tags: ['education', 'research', 'AI'],
@@ -189,6 +203,7 @@ const LOCATIONS = [
     description: 'University with strong data science, engineering and AI research labs in Sydney.',
     website: 'https://www.mq.edu.au',
     contact: 'info@mq.edu.au',
+    address: 'Balaclava Rd, Macquarie Park NSW 2113',
     upcomingEvents: 'Graduate AI internship fair',
     relatedUsers: 10,
     tags: ['education', 'AI', 'internships'],
@@ -201,6 +216,7 @@ const LOCATIONS = [
     description: 'Startup coworking community supporting founders, operators and early-stage startups.',
     website: 'https://fishburners.org',
     contact: 'team@fishburners.org',
+    address: '11 York St, Sydney NSW 2000',
     upcomingEvents: 'Founder coffee circle',
     relatedUsers: 6,
     tags: ['coworking', 'startup', 'community'],
@@ -213,6 +229,7 @@ const LOCATIONS = [
     description: 'Coworking hub for startups, investors and corporate innovation teams.',
     website: 'https://stoneandchalk.com.au',
     contact: 'hello@stoneandchalk.com.au',
+    address: '11 York St, Sydney NSW 2000',
     upcomingEvents: 'Investor coffee meetup',
     relatedUsers: 11,
     tags: ['coworking', 'startup', 'investor'],
@@ -225,6 +242,7 @@ const LOCATIONS = [
     description: 'Flexible co-working space for tech founders and lean startup teams in the CBD.',
     website: 'https://tankstreamlabs.com.au',
     contact: 'info@tankstreamlabs.com.au',
+    address: '1 Kent St, Sydney NSW 2000',
     upcomingEvents: 'Startup pitch night',
     relatedUsers: 8,
     tags: ['coworking', 'startup', 'networking'],
@@ -237,6 +255,7 @@ const LOCATIONS = [
     description: 'Global workspace with flexible office and community events for Sydney founders.',
     website: 'https://www.wework.com',
     contact: 'australia@wework.com',
+    address: '60 Margaret St, Sydney NSW 2000',
     upcomingEvents: 'Startup networking breakfast',
     relatedUsers: 9,
     tags: ['coworking', 'professional', 'community'],
@@ -249,6 +268,7 @@ const LOCATIONS = [
     description: 'Deep tech accelerator supporting science, health and AI startups.',
     website: 'https://cicadainnovations.com.au',
     contact: 'grow@cicadainnovations.com.au',
+    address: '1 Chifley Rd, Eveleigh NSW 2015',
     upcomingEvents: 'Deep tech accelerator showcase',
     relatedUsers: 5,
     tags: ['accelerator', 'deep tech', 'AI'],
@@ -261,10 +281,11 @@ const LOCATIONS = [
     description: 'Founder community hosting monthly talks and networking for startup builders.',
     website: 'https://www.startupgrind.com/sydney',
     contact: 'sydney@startupgrind.com',
+    address: '160 Pitt St, Sydney NSW 2000',
     upcomingEvents: 'Founder story night',
     relatedUsers: 14,
     tags: ['community', 'events', 'networking'],
-    position: [-33.869, 151.21]
+    position: [-33.8732, 151.2064]
   },
   {
     id: 'nextgenius',
@@ -273,10 +294,11 @@ const LOCATIONS = [
     description: 'Community for founders, investors and operators learning AI and startup best practices.',
     website: 'https://nextgenius.co',
     contact: 'community@nextgenius.co',
+    address: '20 Hunter St, Sydney NSW 2000',
     upcomingEvents: 'AI founders workshop',
     relatedUsers: 7,
     tags: ['community', 'AI', 'founders'],
-    position: [-33.868, 151.207]
+    position: [-33.8737, 151.2052]
   },
   {
     id: 'acs',
@@ -285,10 +307,11 @@ const LOCATIONS = [
     description: 'Australian Computer Society community events for tech professionals and students.',
     website: 'https://www.acs.org.au',
     contact: 'info@acs.org.au',
+    address: '18/181 William St, Sydney NSW 2000',
     upcomingEvents: 'Data science panel discussion',
     relatedUsers: 10,
     tags: ['community', 'professional', 'education'],
-    position: [-33.866, 151.208]
+    position: [-33.8717, 151.2053]
   },
   {
     id: 'producttank-sydney',
@@ -297,6 +320,7 @@ const LOCATIONS = [
     description: 'Product and UX community meetup for building better startup product teams.',
     website: 'https://www.meetup.com/ProductTank-Sydney',
     contact: 'sydney@producttank.com',
+    address: '301 Kent St, Sydney NSW 2000',
     upcomingEvents: 'Product leadership panel',
     relatedUsers: 9,
     tags: ['community', 'product', 'meetup'],
@@ -309,10 +333,11 @@ const LOCATIONS = [
     description: 'Sydney meetup for artificial intelligence founders, engineers and operators.',
     website: 'https://www.meetup.com/sydney-ai',
     contact: 'organiser@sydneyai.com',
+    address: '168 Sussex St, Sydney NSW 2000',
     upcomingEvents: 'AI networking drinks',
     relatedUsers: 18,
     tags: ['AI', 'meetup', 'events'],
-    position: [-33.8698, 151.2092]
+    position: [-33.8716, 151.2068]
   },
   {
     id: 'ai-founders-lunch',
@@ -321,6 +346,7 @@ const LOCATIONS = [
     description: 'Weekly founder meetup to discuss AI startups, fundraising and hiring.',
     website: 'https://lunchup.com.au/events',
     contact: 'events@lunchup.com.au',
+    address: '55 Pitt St, Sydney NSW 2000',
     upcomingEvents: 'Next lunch on Friday at 12pm',
     relatedUsers: 20,
     tags: ['event', 'networking', 'AI'],
@@ -333,6 +359,7 @@ const LOCATIONS = [
     description: 'Hiring and internships event for machine learning engineers and data scientists.',
     website: 'https://lunchup.com.au/opportunities',
     contact: 'jobs@lunchup.com.au',
+    address: '1 Chifley Pl, Sydney NSW 2000',
     upcomingEvents: 'Next session this Thursday',
     relatedUsers: 31,
     tags: ['hiring', 'internships', 'AI'],
@@ -364,6 +391,7 @@ const MapDirectory = () => {
       const joinedFields = [
         item.name,
         item.description,
+        item.address || '',
         item.tags.join(' '),
         item.category,
         item.upcomingEvents
@@ -413,7 +441,7 @@ const MapDirectory = () => {
           <div className="map-directory-map-shell">
             <MapContainer
               center={[-33.8688, 151.2093]}
-              zoom={12}
+              zoom={13}
               scrollWheelZoom={false}
               className="map-directory-map"
             >
@@ -433,6 +461,7 @@ const MapDirectory = () => {
                       <strong>{item.name}</strong>
                       <p>{item.description}</p>
                       <p><strong>Category:</strong> {CATEGORY_STYLES[item.category]?.label}</p>
+                      <p><strong>Address:</strong> {item.address}</p>
                       <p><strong>Website:</strong> <a href={item.website} target="_blank" rel="noreferrer">Visit</a></p>
                       <p><strong>Upcoming:</strong> {item.upcomingEvents}</p>
                       <p><strong>Nearby LunchUp users:</strong> {item.relatedUsers}</p>
@@ -472,6 +501,7 @@ const MapDirectory = () => {
                   </div>
                   <p className="location-description">{item.description}</p>
                   <div className="location-meta">
+                    <span>{item.address}</span>
                     <span>{item.tags.join(' · ')}</span>
                     <span>{item.relatedUsers} nearby LunchUp users</span>
                   </div>
