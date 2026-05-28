@@ -106,6 +106,58 @@ const LOCATIONS = [
     position: [-33.8675, 151.205]
   },
   {
+    id: 'culture-amp',
+    name: 'Culture Amp',
+    category: 'startup',
+    description: 'People analytics and AI-powered employee experience platform for modern teams.',
+    website: 'https://www.cultureamp.com',
+    contact: 'hello@cultureamp.com',
+    address: '80 Mount St, North Sydney NSW 2060',
+    upcomingEvents: 'People analytics roundtable',
+    relatedUsers: 9,
+    tags: ['AI', 'HR', 'analytics'],
+    position: [-33.839, 151.206]
+  },
+  {
+    id: 'safetyculture',
+    name: 'SafetyCulture',
+    category: 'startup',
+    description: 'Operational safety platform using AI to help teams stay compliant and efficient.',
+    website: 'https://www.safetyculture.com',
+    contact: 'support@safetyculture.com',
+    address: '43-47 Alexander St, Crows Nest NSW 2065',
+    upcomingEvents: 'Safety tech networking breakfast',
+    relatedUsers: 7,
+    tags: ['AI', 'safety', 'operations'],
+    position: [-33.832, 151.206]
+  },
+  {
+    id: 'airwallex',
+    name: 'Airwallex',
+    category: 'startup',
+    description: 'Cross-border payments startup with AI-driven global finance tools for businesses.',
+    website: 'https://www.airwallex.com',
+    contact: 'hello@airwallex.com',
+    address: '85 York St, Sydney NSW 2000',
+    upcomingEvents: 'Fintech founders drinks',
+    relatedUsers: 11,
+    tags: ['AI', 'fintech', 'startup'],
+    position: [-33.8697, 151.2062]
+  },
+  {
+    id: 'afterpay',
+    name: 'Afterpay',
+    category: 'startup',
+    description: 'Australian buy-now-pay-later fintech with a large Sydney product and engineering team.',
+    website: 'https://www.afterpay.com',
+    contact: 'hello@afterpay.com',
+    address: '1 Shelley St, Sydney NSW 2000',
+    upcomingEvents: 'Retail tech meetup',
+    relatedUsers: 8,
+    tags: ['finance', 'AI', 'payments'],
+    position: [-33.8684, 151.214]
+  },
+  {
     id: 'airtree',
     name: 'Airtree',
     category: 'investor',
@@ -368,7 +420,6 @@ const LOCATIONS = [
 ];
 
 const CATEGORIES = [
-  { key: 'all', label: 'All' },
   { key: 'startup', label: 'Startups' },
   { key: 'investor', label: 'Investors' },
   { key: 'university', label: 'Universities' },
@@ -380,12 +431,12 @@ const CATEGORIES = [
 
 const MapDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('startup');
 
   const filteredLocations = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     return LOCATIONS.filter((item) => {
-      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+      const matchesCategory = item.category === selectedCategory;
       if (!query) return matchesCategory;
 
       const joinedFields = [
