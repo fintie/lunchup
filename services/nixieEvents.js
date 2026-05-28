@@ -5,8 +5,8 @@ const EventRegistration = require('../models/EventRegistration');
 const User = require('../models/User');
 
 const organizersWithBoost = new Set(['Fishburners', 'Stone & Chalk', 'UTS']);
-const DEFAULT_WHATSAPP_EVENT_NUMBER = '15559826782';
-const WHATSAPP_EVENT_NUMBER = process.env.WHATSAPP_EVENT_NUMBER || process.env.WHATSAPP_PHONE_NUMBER || DEFAULT_WHATSAPP_EVENT_NUMBER;
+// Always link WhatsApp event registrations to the Lunchup business account.
+const WHATSAPP_EVENT_NUMBER = '15559826782';
 
 const sampleEvents = () => {
   const now = Date.now();

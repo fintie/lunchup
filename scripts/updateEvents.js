@@ -31,66 +31,67 @@ function calculateQualityScore(event) {
 }
 
 async function fetchLumaEvents() {
+  if (!LUMA_API_KEY) {
+    return [];
+  }
+
   try {
     const now = new Date();
     const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const events = [];
+    const response = await axios.get('https://public-api.luma.com/v1/calendar/list-events', {
+      params: {
+        after: now.toISOString(),
+        before: nextMonth.toISOString(),
+        pagination_limit: 100,
+        platforms: 'luma,external',
+        sort_column: 'start_at',
+        sort_direction: 'asc'
+      },
+      headers: { 'x-luma-api-key': LUMA_API_KEY },
+      timeout: 8000
+    });
 
-    for (const city of AUSTRALIAN_CITIES) {
-      try {
-        const response = await axios.get('https://api.lu.ma/public/events', {
-          params: {
-            city: city,
-            country: 'AU',
-            after: now.toISOString(),
-            before: nextMonth.toISOString(),
-            limit: 20
-          },
-          timeout: 8000
-        });
-
-        if (response.data?.events) {
-          const mapped = response.data.events.map(e => ({
-            source: 'luma',
-            sourceEventId: e.id,
-            title: e.name || '',
-            description: e.description || '',
-            startTime: new Date(e.start_at),
-            endTime: e.end_at ? new Date(e.end_at) : null,
-            timezone: 'Australia/Sydney',
-            venueName: e.venue_name || '',
-            address: e.venue_address || '',
-            city: city,
-            state: '',
-            country: 'Australia',
-            latitude: e.venue_lat || null,
-            longitude: e.venue_lon || null,
-            categoryJson: { categories: e.categories || [] },
-            audienceJson: { audience: e.topics || [], personas: [] },
-            priceMin: e.ticket_price_min || 0,
-            priceMax: e.ticket_price_max || null,
-            url: e.url || '',
-            imageUrl: e.cover_url || '',
-            organizer: e.organizer_name || '',
-            rawPayload: e,
-            contentHash: ''
-          }));
-          events.push(...mapped);
-        }
-      } catch (err) {
-        console.warn(`Luma fetch for ${city} failed:`, err.message);
-      }
-    }
-
-    return events;
+    const entries = response.data?.entries || [];
+    return entries
+      .filter(e => {
+        const city = (e.geo_address_json?.city || e.geo_address_info?.city || '').trim();
+        const country = (e.geo_address_json?.country || e.geo_address_info?.country || '').toLowerCase();
+        return AUSTRALIAN_CITIES.includes(city) || country === 'au' || country.includes('australia');
+      })
+      .map(e => ({
+        source: 'luma',
+        sourceEventId: e.api_id || e.id,
+        title: e.name || '',
+        description: e.description || e.description_md || '',
+        startTime: new Date(e.start_at),
+        endTime: e.end_at ? new Date(e.end_at) : null,
+        timezone: e.timezone || 'Australia/Sydney',
+        venueName: e.geo_address_json?.name || e.location_name || '',
+        address: e.geo_address_json?.address || '',
+        city: e.geo_address_json?.city || '',
+        state: e.geo_address_json?.region || '',
+        country: e.geo_address_json?.country || 'Australia',
+        latitude: e.geo_latitude || null,
+        longitude: e.geo_longitude || null,
+        categoryJson: { categories: e.tags || [] },
+        audienceJson: { audience: e.topics || [], personas: [] },
+        priceMin: 0,
+        priceMax: null,
+        url: e.url || '',
+        imageUrl: e.cover_url || e.avatar_url || '',
+        organizer: e.calendar?.name || e.user?.name || '',
+        rawPayload: e,
+        contentHash: ''
+      }));
   } catch (error) {
-    console.error('Luma fetch error:', error.message);
+    console.error('Luma fetch error:', error.response?.data || error.message);
     return [];
   }
 }
 
 async function fetchEventbriteEvents() {
   if (!EVENTBRITE_API_KEY) {
+    console.warn('Eventbrite API key missing; Eventbrite fetch skipped.');
     return [];
   }
 
@@ -101,54 +102,53 @@ async function fetchEventbriteEvents() {
 
     for (const city of AUSTRALIAN_CITIES) {
       try {
-        const response = await axios.get('https://www.eventbriteapi.com/v3/events/search/', {
+        console.log(`Fetching Eventbrite events for ${city}`);
+        const response = await axios.get('https://www.eventbriteapi.com/v3/destination/events/', {
           params: {
-            'location.address': city + ', Australia',
+            'location.address': `${city}, Australia`,
             'start_date.range_start': now.toISOString(),
             'start_date.range_end': nextMonth.toISOString(),
-            sort_by: 'date',
+            expand: 'event_sales_status,image,primary_venue,ticket_availability,primary_organizer',
             page_size: 20
           },
           headers: { Authorization: `Bearer ${EVENTBRITE_API_KEY}` },
           timeout: 8000
         });
 
-        if (response.data?.events) {
-          const mapped = response.data.events.map(e => ({
-            source: 'eventbrite',
-            sourceEventId: e.id,
-            title: e.name?.text || '',
-            description: e.description?.text || '',
-            startTime: new Date(e.start.utc),
-            endTime: e.end ? new Date(e.end.utc) : null,
-            timezone: e.start.timezone || 'Australia/Sydney',
-            venueName: e.venue?.name || '',
-            address: e.venue?.address?.address_1 || '',
-            city: city,
-            state: '',
-            country: 'Australia',
-            latitude: e.venue?.latitude || null,
-            longitude: e.venue?.longitude || null,
-            categoryJson: { categories: [e.category?.name || 'Event'] },
-            audienceJson: { audience: [], personas: [] },
-            priceMin: e.ticket_classes?.[0]?.free ? 0 : (e.ticket_classes?.[0]?.cost?.minor_value ? e.ticket_classes[0].cost.minor_value / 100 : 0),
-            priceMax: e.ticket_classes?.[e.ticket_classes.length - 1]?.cost?.minor_value ? e.ticket_classes[e.ticket_classes.length - 1].cost.minor_value / 100 : null,
-            url: e.url || '',
-            imageUrl: e.logo?.original?.url || '',
-            organizer: e.organizer?.name || '',
-            rawPayload: e,
-            contentHash: ''
-          }));
-          events.push(...mapped);
-        }
+        const mapped = (response.data?.events || []).map(e => ({
+          source: 'eventbrite',
+          sourceEventId: e.event?.id || e.id,
+          title: e.event?.name || e.name?.text || '',
+          description: e.event?.summary || e.description?.text || '',
+          startTime: new Date(e.event?.start_date?.utc || e.start?.utc),
+          endTime: e.event?.end_date?.utc || e.end?.utc ? new Date(e.event?.end_date?.utc || e.end?.utc) : null,
+          timezone: e.event?.timezone || e.start?.timezone || 'Australia/Sydney',
+          venueName: e.primary_venue?.name || '',
+          address: e.primary_venue?.address?.localized_address_display || '',
+          city: e.primary_venue?.address?.city || city,
+          state: e.primary_venue?.address?.region || '',
+          country: e.primary_venue?.address?.country || 'Australia',
+          latitude: e.primary_venue?.latitude || null,
+          longitude: e.primary_venue?.longitude || null,
+          categoryJson: { categories: ['Event'] },
+          audienceJson: { audience: [], personas: [] },
+          priceMin: e.ticket_availability?.minimum_ticket_price?.major_value || 0,
+          priceMax: e.ticket_availability?.maximum_ticket_price?.major_value || null,
+          url: e.event?.url || e.url || '',
+          imageUrl: e.image?.url || '',
+          organizer: e.primary_organizer?.name || '',
+          rawPayload: e,
+          contentHash: ''
+        }));
+        events.push(...mapped);
       } catch (err) {
-        console.warn(`Eventbrite fetch for ${city} failed:`, err.message);
+        console.warn(`Eventbrite fetch for ${city} failed:`, err.response?.data || err.message);
       }
     }
 
     return events;
   } catch (error) {
-    console.error('Eventbrite fetch error:', error.message);
+    console.error('Eventbrite fetch error:', error.response?.data || error.message);
     return [];
   }
 }
@@ -240,79 +240,92 @@ async function fetchMeetupEvents() {
 }
 
 async function fetchHumanTixEvents() {
+  if (!HUMANITIX_API_KEY) {
+    console.warn('Humanitix API key missing; Humanitix fetch skipped.');
+    return [];
+  }
+
   try {
     const now = new Date();
     const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     const events = [];
+    let page = 1;
 
-    for (const city of AUSTRALIAN_CITIES) {
-      try {
-        const config = {
-          params: {
-            city: city,
-            country: 'AU',
-            after: now.toISOString(),
-            before: nextMonth.toISOString(),
-            limit: 20
-          },
-          timeout: 8000,
-          headers: HUMANITIX_API_KEY ? { Authorization: `Bearer ${HUMANITIX_API_KEY}` } : {}
-        };
+    while (page <= 5) {
+      console.log(`Fetching Humanitix events page ${page}`);
+      const response = await axios.get('https://api.humanitix.com/v1/events', {
+        params: { page },
+        timeout: 8000,
+        headers: { 'x-api-key': HUMANITIX_API_KEY }
+      });
 
-        const response = await axios.get('https://api.humanitix.com/v1/events', config);
-
-        if (response.data?.events) {
-          const mapped = response.data.events.map(e => {
-            return {
-              source: 'humanitix',
-              sourceEventId: e.id,
-              title: e.title || '',
-              description: e.description || '',
-              startTime: new Date(e.start_date),
-              endTime: e.end_date ? new Date(e.end_date) : null,
-              timezone: 'Australia/Sydney',
-              venueName: e.venue?.name || '',
-              address: e.venue?.address || '',
-              city: city,
-              state: '',
-              country: 'Australia',
-              latitude: e.venue?.latitude || null,
-              longitude: e.venue?.longitude || null,
-              categoryJson: { categories: e.categories || [] },
-              audienceJson: { audience: [], personas: [] },
-              priceMin: e.min_price || 0,
-              priceMax: e.max_price || null,
-              url: e.url || '',
-              imageUrl: e.image_url || '',
-              organizer: e.organizer?.name || '',
-              rawPayload: e,
-              contentHash: ''
-            };
-          });
-          events.push(...mapped);
-        }
-      } catch (err) {
-        console.warn(`HumanTix fetch for ${city} failed:`, err.message);
+      const batch = (response.data?.events || []).filter(e => {
+        const start = new Date(e.startDate || e.start_date || e.startTime || 0);
+        return start >= now && start <= nextMonth;
+      });
+      if (!batch.length) {
+        break;
       }
+
+      const mapped = batch
+        .filter(e => {
+          const city = (e.eventLocation?.city || e.locationCity || e.venue?.city || e.location?.city || '').trim();
+          const country = (e.eventLocation?.country || e.locationCountry || e.venue?.country || e.location?.country || e.location || '').toString().toLowerCase();
+          return AUSTRALIAN_CITIES.includes(city) || country === 'au' || country.includes('australia');
+        })
+        .map(e => ({
+          source: 'humanitix',
+          sourceEventId: e._id || e.id,
+          title: e.title || e.name || '',
+          description: e.description || e.sharingDescription || '',
+          startTime: new Date(e.startDate || e.start_date || e.startTime),
+          endTime: e.endDate || e.end_date || e.endTime ? new Date(e.endDate || e.end_date || e.endTime) : null,
+          timezone: e.timezone || 'Australia/Sydney',
+          venueName: e.eventLocation?.venueName || e.locationName || e.venue?.name || e.location?.name || '',
+          address: e.eventLocation?.address || e.locationAddress || e.venue?.address || e.location?.address || '',
+          city: e.eventLocation?.city || e.locationCity || e.venue?.city || e.location?.city || '',
+          state: e.eventLocation?.region || e.locationState || e.venue?.state || e.location?.state || '',
+          country: e.eventLocation?.country || e.locationCountry || e.venue?.country || e.location?.country || 'Australia',
+          latitude: e.eventLocation?.latLng?.[0] || e.locationLatitude || e.venue?.latitude || null,
+          longitude: e.eventLocation?.latLng?.[1] || e.locationLongitude || e.venue?.longitude || null,
+          categoryJson: { categories: [e.classification?.category || e.classification?.type].filter(Boolean) },
+          audienceJson: { audience: [], personas: [] },
+          priceMin: e.pricing?.minimumPrice || e.min_price || e.price_min || e.ticketPriceMin || 0,
+          priceMax: e.pricing?.maximumPrice || e.max_price || e.price_max || e.ticketPriceMax || null,
+          url: e.url || `https://events.humanitix.com/${e.slug || ''}`,
+          imageUrl: e.bannerImage?.url || e.image_url || e.image?.url || e.imageUrl || '',
+          organizer: e.organizer?.name || '',
+          rawPayload: e,
+          contentHash: ''
+        }));
+
+      events.push(...mapped);
+
+      if (!response.data?.total || page * (response.data?.pageSize || 100) >= response.data.total || batch.length === 0) {
+        break;
+      }
+      page += 1;
     }
 
     return events;
   } catch (error) {
-    console.error('HumanTix fetch error:', error.message);
+    console.error('HumanTix fetch error:', error.response?.data || error.message);
     return [];
   }
 }
 
 async function mergeAndSaveEvents() {
   try {
-    const sources = await Promise.all([
+    const [lumaEvents, eventbriteEvents, meetupEvents, humanitixEvents] = await Promise.all([
       fetchLumaEvents(),
       fetchEventbriteEvents(),
       fetchMeetupEvents(),
       fetchHumanTixEvents()
     ]);
 
-    const allEvents = sources.flat();
+    console.log(`Fetch results: Luma=${lumaEvents.length}, Eventbrite=${eventbriteEvents.length}, Meetup=${meetupEvents.length}, Humanitix=${humanitixEvents.length}`);
+
+    const allEvents = [...lumaEvents, ...eventbriteEvents, ...meetupEvents, ...humanitixEvents];
 
     if (allEvents.length === 0) {
       console.log('📅 No events found from any source');
