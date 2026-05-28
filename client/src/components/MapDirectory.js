@@ -435,13 +435,7 @@ const MapRefresher = ({ locations }) => {
   useEffect(() => {
     if (!locations || locations.length === 0) return;
 
-    if (locations.length === 1) {
-      map.setView(locations[0].position, 13);
-      return;
-    }
-
-    const bounds = locations.map((location) => location.position);
-    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 13 });
+    map.setView(locations[0].position, 13);
   }, [locations, map]);
 
   return null;
