@@ -4,7 +4,10 @@ import 'leaflet/dist/leaflet.css';
 import './MapDirectory.css';
 
 const CATEGORY_STYLES = {
-  startup: { label: 'AI Startup', color: '#f97316', icon: '🤖' },
+  startupProductive: { label: 'Productive AI Startup', color: '#f97316', icon: '🤖' },
+  startupFintech: { label: 'Fintech Startup', color: '#f59e0b', icon: '💳' },
+  startupHealthcare: { label: 'Healthcare Startup', color: '#22c55e', icon: '🩺' },
+  startupCulture: { label: 'Culture Startup', color: '#8b5cf6', icon: '🎭' },
   investor: { label: 'Investor', color: '#2563eb', icon: '💼' },
   university: { label: 'University', color: '#10b981', icon: '🎓' },
   coworking: { label: 'Coworking', color: '#8b5cf6', icon: '🏢' },
@@ -17,7 +20,7 @@ const LOCATIONS = [
   {
     id: 'atalassian',
     name: 'Atlassian',
-    category: 'startup',
+    category: 'startupProductive',
     description: 'Global software leader with Sydney innovation teams building collaboration and AI products.',
     website: 'https://www.atlassian.com',
     contact: 'info@atlassian.com',
@@ -30,7 +33,7 @@ const LOCATIONS = [
   {
     id: 'canva',
     name: 'Canva',
-    category: 'startup',
+    category: 'startupProductive',
     description: 'Design platform with strong AI, startup growth, and Sydney headquarters presence.',
     website: 'https://www.canva.com',
     contact: 'hello@canva.com',
@@ -43,7 +46,7 @@ const LOCATIONS = [
   {
     id: 'harrison-ai',
     name: 'Harrison.ai',
-    category: 'startup',
+    category: 'startupHealthcare',
     description: 'Healthcare AI startup building machine learning solutions for medical imaging.',
     website: 'https://www.harrison.ai',
     contact: 'contact@harrison.ai',
@@ -56,7 +59,7 @@ const LOCATIONS = [
   {
     id: 'leonardo-ai',
     name: 'Leonardo AI (example)',
-    category: 'startup',
+    category: 'startupProductive',
     description: 'AI research and product startup with a focus on generative intelligence and innovation.',
     website: 'https://www.leonardo.ai',
     contact: 'hello@leonardo.ai',
@@ -69,7 +72,7 @@ const LOCATIONS = [
   {
     id: 'relevance-ai',
     name: 'Relevance AI',
-    category: 'startup',
+    category: 'startupProductive',
     description: 'Data and AI startup helping companies build better machine learning workflows.',
     website: 'https://www.relevance.ai',
     contact: 'team@relevance.ai',
@@ -82,7 +85,7 @@ const LOCATIONS = [
   {
     id: 'eucalyptus',
     name: 'Eucalyptus',
-    category: 'startup',
+    category: 'startupHealthcare',
     description: 'AI startup working on computer vision and generative intelligence solutions.',
     website: 'https://www.eucalyptus.ai',
     contact: 'contact@eucalyptus.ai',
@@ -95,7 +98,7 @@ const LOCATIONS = [
   {
     id: 'immutable',
     name: 'Immutable',
-    category: 'startup',
+    category: 'startupFintech',
     description: 'Blockchain and gaming startup with strong Australian roots and engineering talent.',
     website: 'https://www.immutable.com',
     contact: 'info@immutable.com',
@@ -108,7 +111,7 @@ const LOCATIONS = [
   {
     id: 'culture-amp',
     name: 'Culture Amp',
-    category: 'startup',
+    category: 'startupCulture',
     description: 'People analytics and AI-powered employee experience platform for modern teams.',
     website: 'https://www.cultureamp.com',
     contact: 'hello@cultureamp.com',
@@ -121,7 +124,7 @@ const LOCATIONS = [
   {
     id: 'safetyculture',
     name: 'SafetyCulture',
-    category: 'startup',
+    category: 'startupCulture',
     description: 'Operational safety platform using AI to help teams stay compliant and efficient.',
     website: 'https://www.safetyculture.com',
     contact: 'support@safetyculture.com',
@@ -134,7 +137,7 @@ const LOCATIONS = [
   {
     id: 'airwallex',
     name: 'Airwallex',
-    category: 'startup',
+    category: 'startupFintech',
     description: 'Cross-border payments startup with AI-driven global finance tools for businesses.',
     website: 'https://www.airwallex.com',
     contact: 'hello@airwallex.com',
@@ -147,7 +150,7 @@ const LOCATIONS = [
   {
     id: 'afterpay',
     name: 'Afterpay',
-    category: 'startup',
+    category: 'startupFintech',
     description: 'Australian buy-now-pay-later fintech with a large Sydney product and engineering team.',
     website: 'https://www.afterpay.com',
     contact: 'hello@afterpay.com',
@@ -344,13 +347,117 @@ const LOCATIONS = [
     name: 'NextGenius',
     category: 'community',
     description: 'Community for founders, investors and operators learning AI and startup best practices.',
-    website: 'https://nextgenius.co',
+    website: 'https://nextgenius.com.au',
     contact: 'community@nextgenius.co',
     address: '20 Hunter St, Sydney NSW 2000',
     upcomingEvents: 'AI founders workshop',
     relatedUsers: 7,
     tags: ['community', 'AI', 'founders'],
     position: [-33.8737, 151.2052]
+  },
+  {
+    id: 'startmate',
+    name: 'Startmate',
+    category: 'accelerator',
+    description: 'Australian accelerator supporting early-stage founders with mentorship and funding.',
+    website: 'https://www.startmate.com.au',
+    contact: 'hello@startmate.com.au',
+    address: 'Level 1, 55 York St, Sydney NSW 2000',
+    upcomingEvents: 'Founder mentorship night',
+    relatedUsers: 6,
+    tags: ['accelerator', 'mentorship', 'startup'],
+    position: [-33.8679, 151.2058]
+  },
+  {
+    id: 'bluechilli',
+    name: 'BlueChilli',
+    category: 'accelerator',
+    description: 'Incubator and accelerator helping startups validate and scale product-market fit.',
+    website: 'https://www.bluechilli.com',
+    contact: 'info@bluechilli.com',
+    address: '68 York St, Sydney NSW 2000',
+    upcomingEvents: 'Startup validation workshop',
+    relatedUsers: 4,
+    tags: ['accelerator', 'incubator', 'startup'],
+    position: [-33.8690, 151.2060]
+  },
+  {
+    id: 'rightclick-capital',
+    name: 'Right Click Capital',
+    category: 'investor',
+    description: 'Australian venture capital fund investing in technology startups.',
+    website: 'https://rightclickcapital.com.au',
+    contact: 'team@rightclickcapital.com.au',
+    address: 'Level 9, 60 Pitt St, Sydney NSW 2000',
+    upcomingEvents: 'VC office hours',
+    relatedUsers: 2,
+    tags: ['VC', 'investor', 'seed'],
+    position: [-33.8692, 151.2062]
+  },
+  {
+    id: 'one-ventures',
+    name: 'One Ventures',
+    category: 'investor',
+    description: 'Growth-stage investor focused on Australian tech and product-led businesses.',
+    website: 'https://one-ventures.com',
+    contact: 'contact@one-ventures.com',
+    address: '50 Clarence St, Sydney NSW 2000',
+    upcomingEvents: 'Growth-stage founders forum',
+    relatedUsers: 3,
+    tags: ['VC', 'growth', 'investor'],
+    position: [-33.8735, 151.2060]
+  },
+  {
+    id: 'muru-d',
+    name: 'muru-D',
+    category: 'accelerator',
+    description: 'Telstra-backed accelerator supporting startups across Australia.',
+    website: 'https://muru-d.com.au',
+    contact: 'info@muru-d.com.au',
+    address: '101 Sussex St, Sydney NSW 2000',
+    upcomingEvents: 'Demo day',
+    relatedUsers: 5,
+    tags: ['accelerator', 'corporate', 'startup'],
+    position: [-33.8730, 151.2048]
+  },
+  {
+    id: 'techsydney',
+    name: 'TechSydney',
+    category: 'community',
+    description: 'Sydney technology community promoting local tech events, jobs and founder connections.',
+    website: 'https://techsydney.com.au',
+    contact: 'hello@techsydney.com.au',
+    address: 'Suite 2, 45 Hunter St, Sydney NSW 2000',
+    upcomingEvents: 'Tech roundtable',
+    relatedUsers: 10,
+    tags: ['community', 'jobs', 'events'],
+    position: [-33.8739, 151.2061]
+  },
+  {
+    id: 'zip',
+    name: 'Zip Co',
+    category: 'startupFintech',
+    description: 'Australian fintech company offering buy-now-pay-later services and payments infrastructure.',
+    website: 'https://zip.co',
+    contact: 'support@zip.co',
+    address: 'Grosvenor Place, 225 George St, Sydney NSW 2000',
+    upcomingEvents: 'Payments roundtable',
+    relatedUsers: 9,
+    tags: ['fintech', 'payments', 'startup'],
+    position: [-33.8716, 151.2050]
+  },
+  {
+    id: 'prospa',
+    name: 'Prospa',
+    category: 'startupFintech',
+    description: 'Small business lender and fintech focused on helping SMBs grow.',
+    website: 'https://www.prospa.com',
+    contact: 'hello@prospa.com',
+    address: 'Level 10, 1 Market St, Sydney NSW 2000',
+    upcomingEvents: 'SMB finance workshop',
+    relatedUsers: 6,
+    tags: ['fintech', 'SMB', 'lending'],
+    position: [-33.8708, 151.2063]
   },
   {
     id: 'acs',
@@ -420,7 +527,10 @@ const LOCATIONS = [
 ];
 
 const CATEGORIES = [
-  { key: 'startup', label: 'Startups' },
+  { key: 'startupProductive', label: 'Productive AI Startups' },
+  { key: 'startupFintech', label: 'Fintech Startups' },
+  { key: 'startupHealthcare', label: 'Healthcare Startups' },
+  { key: 'startupCulture', label: 'Culture Startups' },
   { key: 'investor', label: 'Investors' },
   { key: 'university', label: 'Universities' },
   { key: 'coworking', label: 'Coworking' },
@@ -443,7 +553,7 @@ const MapRefresher = ({ locations }) => {
 
 const MapDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('startup');
+  const [selectedCategory, setSelectedCategory] = useState('startupProductive');
 
   const filteredLocations = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
