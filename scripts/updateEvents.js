@@ -23,6 +23,11 @@ const EVENTBRITE_ORGANIZATION_ID = process.env.EVENTBRITE_ORGANIZATION_ID || '';
 
 const AUSTRALIAN_CITIES = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Canberra', 'Hobart', 'Gold Coast'];
 const EVENT_SYNC_LOOKAHEAD_DAYS = Number(process.env.EVENT_SYNC_LOOKAHEAD_DAYS || 60);
+const EVENT_SYNC_COUNTRIES = String(process.env.EVENT_SYNC_COUNTRIES || '')
+  .split(',')
+  .map(country => country.trim().toLowerCase())
+  .filter(Boolean);
+const EVENT_SYNC_MAX_PAGES = Number(process.env.EVENT_SYNC_MAX_PAGES || 20);
 const EVENTS_DRY_RUN = process.env.EVENTS_DRY_RUN === 'true' || process.argv.includes('--dry-run');
 
 function getSyncWindow() {
@@ -47,10 +52,21 @@ function toNumber(value) {
   return Number.isNaN(number) ? null : number;
 }
 
-function isAustralianEvent(event) {
-  const city = String(event.city || '').trim();
+function withFallbackLocation(event) {
+  return {
+    ...event,
+    city: event.city || event.venueName || (event.country ? 'Unknown' : 'Online'),
+    country: event.country || 'Online'
+  };
+}
+
+function matchesCountryFilter(event) {
+  if (!EVENT_SYNC_COUNTRIES.length) return true;
   const country = String(event.country || '').toLowerCase();
-  return AUSTRALIAN_CITIES.includes(city) || country === 'au' || country.includes('australia');
+  return EVENT_SYNC_COUNTRIES.some(filter => {
+    if (filter === 'au') return country === 'au' || country.includes('australia');
+    return country === filter || country.includes(filter);
+  });
 }
 
 function isUpcomingInWindow(startTime, now, until) {
@@ -106,7 +122,7 @@ async function fetchLumaEvents() {
         const e = entry.event || entry;
         const location = e.geo_address_json || e.geo_address_info || e.location || {};
         const startTime = toDate(e.start_at || e.startAt || e.start_time);
-        return {
+        return withFallbackLocation({
           source: 'luma',
           sourceEventId: pick(e.api_id, e.id, entry.api_id, entry.id),
           title: e.name || '',
@@ -130,8 +146,8 @@ async function fetchLumaEvents() {
           organizer: e.calendar?.name || e.user?.name || '',
           rawPayload: e,
           contentHash: ''
-        };
-      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && isAustralianEvent(event));
+        });
+      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
 
       events.push(...mapped);
       cursor = response.data?.next_cursor || '';
@@ -178,7 +194,7 @@ async function fetchEventbriteEvents() {
         const venue = e.venue || e.primary_venue || {};
         const address = venue.address || {};
         const startTime = toDate(e.start?.utc || e.start?.local || e.event?.start_date?.utc);
-        return {
+        return withFallbackLocation({
           source: 'eventbrite',
           sourceEventId: pick(e.id, e.event?.id),
           title: e.name?.text || e.event?.name || '',
@@ -202,8 +218,8 @@ async function fetchEventbriteEvents() {
           organizer: e.organizer?.name || e.primary_organizer?.name || '',
           rawPayload: e,
           contentHash: ''
-        };
-      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && isAustralianEvent(event));
+        });
+      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
 
       events.push(...mapped);
       continuation = response.data?.pagination?.has_more_items ? response.data?.pagination?.continuation : '';
@@ -222,8 +238,7 @@ async function fetchMeetupEvents() {
   }
 
   try {
-    const now = new Date();
-    const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const { now, until } = getSyncWindow();
     const events = [];
 
     for (const city of AUSTRALIAN_CITIES) {
@@ -231,10 +246,10 @@ async function fetchMeetupEvents() {
         const response = await axios.post('https://api.meetup.com/gql', {
           query: `
             query {
-              events(first: 20, input: {
+              events(first: 100, input: {
                 byCity: "${city}, AU"
                 startsAfter: "${now.toISOString()}"
-                startsBefore: "${nextMonth.toISOString()}"
+                startsBefore: "${until.toISOString()}"
               }) {
                 edges {
                   node {
@@ -262,7 +277,7 @@ async function fetchMeetupEvents() {
         if (response.data?.data?.events?.edges) {
           const mapped = response.data.data.events.edges.map(edge => {
             const e = edge.node;
-            return {
+            return withFallbackLocation({
               source: 'meetup',
               sourceEventId: e.id,
               title: e.title || '',
@@ -286,8 +301,8 @@ async function fetchMeetupEvents() {
               organizer: e.group?.name || '',
               rawPayload: e,
               contentHash: ''
-            };
-          });
+            });
+          }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
           events.push(...mapped);
         }
       } catch (err) {
@@ -313,7 +328,7 @@ async function fetchHumanTixEvents() {
     const events = [];
     let page = 1;
 
-    while (page <= 5) {
+    while (page <= EVENT_SYNC_MAX_PAGES) {
       console.log(`Fetching Humanitix events page ${page}`);
       const response = await axios.get('https://api.humanitix.com/v1/events', {
         params: { page, pageSize: 100 },
@@ -332,7 +347,7 @@ async function fetchHumanTixEvents() {
       const mapped = batch
         .map(e => {
           const location = e.eventLocation || e.location || e.venue || {};
-          return {
+          return withFallbackLocation({
             source: 'humanitix',
             sourceEventId: pick(e._id, e.id),
             title: e.title || e.name || '',
@@ -356,9 +371,9 @@ async function fetchHumanTixEvents() {
             organizer: e.organizer?.name || '',
             rawPayload: e,
             contentHash: ''
-          };
+          });
         })
-        .filter(event => event.sourceEventId && event.title && event.url && isAustralianEvent(event));
+        .filter(event => event.sourceEventId && event.title && event.url && matchesCountryFilter(event));
 
       events.push(...mapped);
 
