@@ -23,7 +23,51 @@ const EVENTBRITE_ORGANIZATION_ID = process.env.EVENTBRITE_ORGANIZATION_ID || '';
 
 const AUSTRALIAN_CITIES = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Canberra', 'Hobart', 'Gold Coast'];
 const EVENT_SYNC_LOOKAHEAD_DAYS = Number(process.env.EVENT_SYNC_LOOKAHEAD_DAYS || 60);
+const EVENT_SYNC_COUNTRIES = String(process.env.EVENT_SYNC_COUNTRIES || '')
+  .split(',')
+  .map(country => country.trim().toLowerCase())
+  .filter(Boolean);
+const EVENT_SYNC_MAX_PAGES = Number(process.env.EVENT_SYNC_MAX_PAGES || 20);
 const EVENTS_DRY_RUN = process.env.EVENTS_DRY_RUN === 'true' || process.argv.includes('--dry-run');
+const LUMA_DISCOVERY_ENABLED = process.env.LUMA_DISCOVERY_ENABLED !== 'false';
+const LUMA_DISCOVERY_SLUGS = String(process.env.LUMA_DISCOVERY_SLUGS || 'sydney')
+  .split(',')
+  .map(slug => slug.trim().replace(/^\/+|\/+$/g, ''))
+  .filter(Boolean);
+const LUMA_DISCOVERY_TECH_KEYWORDS = String(process.env.LUMA_DISCOVERY_TECH_KEYWORDS || [
+  'ai',
+  'artificial intelligence',
+  'machine learning',
+  'ml',
+  'startup',
+  'founder',
+  'engineering',
+  'developer',
+  'software',
+  'code',
+  'coding',
+  'cloud',
+  'data',
+  'product',
+  'tech',
+  'technology',
+  'web3',
+  'blockchain',
+  'crypto',
+  'cyber',
+  'security',
+  'hackathon',
+  'notion',
+  'cursor',
+  'claude',
+  'qwen',
+  'codex',
+  'ar',
+  'robotics'
+].join(','))
+  .split(',')
+  .map(keyword => keyword.trim().toLowerCase())
+  .filter(Boolean);
 
 function getSyncWindow() {
   const now = new Date();
@@ -47,14 +91,45 @@ function toNumber(value) {
   return Number.isNaN(number) ? null : number;
 }
 
-function isAustralianEvent(event) {
-  const city = String(event.city || '').trim();
+function withFallbackLocation(event) {
+  return {
+    ...event,
+    city: event.city || event.venueName || (event.country ? 'Unknown' : 'Online'),
+    country: event.country || 'Online'
+  };
+}
+
+function matchesCountryFilter(event) {
+  if (!EVENT_SYNC_COUNTRIES.length) return true;
   const country = String(event.country || '').toLowerCase();
-  return AUSTRALIAN_CITIES.includes(city) || country === 'au' || country.includes('australia');
+  return EVENT_SYNC_COUNTRIES.some(filter => {
+    if (filter === 'au') return country === 'au' || country.includes('australia');
+    return country === filter || country.includes(filter);
+  });
 }
 
 function isUpcomingInWindow(startTime, now, until) {
   return startTime instanceof Date && !Number.isNaN(startTime.getTime()) && startTime >= now && startTime <= until;
+}
+
+function textMatchesKeyword(text, keyword) {
+  const normalized = String(text || '').toLowerCase();
+  if (!normalized || !keyword) return false;
+  if (keyword.length <= 3) {
+    return new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(normalized);
+  }
+  return normalized.includes(keyword);
+}
+
+function isTechDiscoveryEvent(...values) {
+  const text = values.filter(Boolean).join(' ');
+  return LUMA_DISCOVERY_TECH_KEYWORDS.some(keyword => textMatchesKeyword(text, keyword));
+}
+
+function parseNextData(html) {
+  const match = String(html || '').match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s);
+  if (!match) return null;
+  return JSON.parse(match[1]);
 }
 
 function buildContentHash(event) {
@@ -72,7 +147,42 @@ function calculateQualityScore(event) {
   return Math.min(10, score);
 }
 
-async function fetchLumaEvents() {
+function mapLumaEvent(entry) {
+  const e = entry.event || entry;
+  const location = e.geo_address_json || e.geo_address_info || e.location || {};
+  const localized = location.localized?.['en-AU'] || location.localized?.en || {};
+  const coordinate = e.coordinate || {};
+  const startTime = toDate(e.start_at || e.startAt || e.start_time || entry.start_at);
+  const url = pick(e.url, e.event_url, e.short_url);
+
+  return withFallbackLocation({
+    source: 'luma',
+    sourceEventId: pick(e.api_id, e.id, entry.api_id, entry.id),
+    title: e.name || '',
+    description: pick(e.description, e.description_md, entry.calendar?.description_short, entry.calendar?.personal_user?.bio_short),
+    startTime,
+    endTime: toDate(e.end_at || e.endAt || e.end_time),
+    timezone: e.timezone || 'Australia/Sydney',
+    venueName: pick(location.name, e.location_name, location.description),
+    address: pick(localized.full_address, localized.address, location.full_address, location.address, location.address_1, e.location_address),
+    city: pick(localized.city, location.city, e.city),
+    state: pick(localized.region_short, localized.region, location.region_short, location.region, location.state),
+    country: pick(location.country_code, location.country, e.country, 'Australia'),
+    latitude: toNumber(pick(e.geo_latitude, e.latitude, coordinate.latitude, location.latitude)),
+    longitude: toNumber(pick(e.geo_longitude, e.longitude, coordinate.longitude, location.longitude)),
+    categoryJson: { categories: e.tags || ['Technology', 'Luma'] },
+    audienceJson: { audience: e.topics || [], personas: [] },
+    priceMin: 0,
+    priceMax: null,
+    url: url && !String(url).startsWith('http') ? `https://luma.com/${url}` : url,
+    imageUrl: e.cover_url || e.avatar_url || e.social_image_url || '',
+    organizer: entry.calendar?.name || e.calendar?.name || e.user?.name || '',
+    rawPayload: entry,
+    contentHash: ''
+  });
+}
+
+async function fetchLumaCalendarEvents() {
   if (!LUMA_API_KEY) {
     console.warn('Luma API key missing; Luma fetch skipped.');
     return [];
@@ -102,36 +212,9 @@ async function fetchLumaEvents() {
         timeout: 10000
       });
 
-      const mapped = (response.data?.entries || []).map((entry) => {
-        const e = entry.event || entry;
-        const location = e.geo_address_json || e.geo_address_info || e.location || {};
-        const startTime = toDate(e.start_at || e.startAt || e.start_time);
-        return {
-          source: 'luma',
-          sourceEventId: pick(e.api_id, e.id, entry.api_id, entry.id),
-          title: e.name || '',
-          description: e.description || e.description_md || '',
-          startTime,
-          endTime: toDate(e.end_at || e.endAt || e.end_time),
-          timezone: e.timezone || 'Australia/Sydney',
-          venueName: pick(location.name, e.location_name),
-          address: pick(location.address, location.address_1, e.location_address),
-          city: pick(location.city, e.city),
-          state: pick(location.region, location.state),
-          country: pick(location.country, e.country, 'Australia'),
-          latitude: toNumber(pick(e.geo_latitude, e.latitude, location.latitude)),
-          longitude: toNumber(pick(e.geo_longitude, e.longitude, location.longitude)),
-          categoryJson: { categories: e.tags || [] },
-          audienceJson: { audience: e.topics || [], personas: [] },
-          priceMin: 0,
-          priceMax: null,
-          url: pick(e.url, e.event_url, e.short_url),
-          imageUrl: e.cover_url || e.avatar_url || '',
-          organizer: e.calendar?.name || e.user?.name || '',
-          rawPayload: e,
-          contentHash: ''
-        };
-      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && isAustralianEvent(event));
+      const mapped = (response.data?.entries || [])
+        .map(mapLumaEvent)
+        .filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
 
       events.push(...mapped);
       cursor = response.data?.next_cursor || '';
@@ -142,6 +225,60 @@ async function fetchLumaEvents() {
     console.error('Luma fetch error:', error.response?.data || error.message);
     return [];
   }
+}
+
+async function fetchLumaDiscoveryEvents() {
+  if (!LUMA_DISCOVERY_ENABLED || !LUMA_DISCOVERY_SLUGS.length) {
+    return [];
+  }
+
+  const { now, until } = getSyncWindow();
+  const events = [];
+
+  for (const slug of LUMA_DISCOVERY_SLUGS) {
+    try {
+      console.log(`Fetching Luma discovery events for ${slug}`);
+      const response = await axios.get(`https://luma.com/${encodeURIComponent(slug)}`, {
+        headers: { 'User-Agent': 'Lunchup event discovery (+https://lunchup.com.au)' },
+        timeout: 10000
+      });
+      const pageData = parseNextData(response.data);
+      const entries = pageData?.props?.pageProps?.initialData?.data?.events || [];
+      const mapped = entries
+        .map(mapLumaEvent)
+        .filter(event => {
+          const raw = event.rawPayload || {};
+          return event.sourceEventId
+            && event.title
+            && event.url
+            && isUpcomingInWindow(event.startTime, now, until)
+            && matchesCountryFilter(event)
+            && isTechDiscoveryEvent(
+              event.title,
+              event.description,
+              event.organizer,
+              event.city,
+              raw.calendar?.name,
+              raw.calendar?.description_short,
+              raw.calendar?.personal_user?.bio_short
+            );
+        });
+      events.push(...mapped);
+    } catch (error) {
+      console.warn(`Luma discovery fetch for ${slug} failed:`, error.response?.status || error.message);
+    }
+  }
+
+  return events;
+}
+
+async function fetchLumaEvents() {
+  const [calendarEvents, discoveryEvents] = await Promise.all([
+    fetchLumaCalendarEvents(),
+    fetchLumaDiscoveryEvents()
+  ]);
+
+  return [...calendarEvents, ...discoveryEvents];
 }
 
 async function fetchEventbriteEvents() {
@@ -178,7 +315,7 @@ async function fetchEventbriteEvents() {
         const venue = e.venue || e.primary_venue || {};
         const address = venue.address || {};
         const startTime = toDate(e.start?.utc || e.start?.local || e.event?.start_date?.utc);
-        return {
+        return withFallbackLocation({
           source: 'eventbrite',
           sourceEventId: pick(e.id, e.event?.id),
           title: e.name?.text || e.event?.name || '',
@@ -202,8 +339,8 @@ async function fetchEventbriteEvents() {
           organizer: e.organizer?.name || e.primary_organizer?.name || '',
           rawPayload: e,
           contentHash: ''
-        };
-      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && isAustralianEvent(event));
+        });
+      }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
 
       events.push(...mapped);
       continuation = response.data?.pagination?.has_more_items ? response.data?.pagination?.continuation : '';
@@ -222,8 +359,7 @@ async function fetchMeetupEvents() {
   }
 
   try {
-    const now = new Date();
-    const nextMonth = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const { now, until } = getSyncWindow();
     const events = [];
 
     for (const city of AUSTRALIAN_CITIES) {
@@ -231,10 +367,10 @@ async function fetchMeetupEvents() {
         const response = await axios.post('https://api.meetup.com/gql', {
           query: `
             query {
-              events(first: 20, input: {
+              events(first: 100, input: {
                 byCity: "${city}, AU"
                 startsAfter: "${now.toISOString()}"
-                startsBefore: "${nextMonth.toISOString()}"
+                startsBefore: "${until.toISOString()}"
               }) {
                 edges {
                   node {
@@ -262,7 +398,7 @@ async function fetchMeetupEvents() {
         if (response.data?.data?.events?.edges) {
           const mapped = response.data.data.events.edges.map(edge => {
             const e = edge.node;
-            return {
+            return withFallbackLocation({
               source: 'meetup',
               sourceEventId: e.id,
               title: e.title || '',
@@ -286,8 +422,8 @@ async function fetchMeetupEvents() {
               organizer: e.group?.name || '',
               rawPayload: e,
               contentHash: ''
-            };
-          });
+            });
+          }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
           events.push(...mapped);
         }
       } catch (err) {
@@ -313,7 +449,7 @@ async function fetchHumanTixEvents() {
     const events = [];
     let page = 1;
 
-    while (page <= 5) {
+    while (page <= EVENT_SYNC_MAX_PAGES) {
       console.log(`Fetching Humanitix events page ${page}`);
       const response = await axios.get('https://api.humanitix.com/v1/events', {
         params: { page, pageSize: 100 },
@@ -332,7 +468,7 @@ async function fetchHumanTixEvents() {
       const mapped = batch
         .map(e => {
           const location = e.eventLocation || e.location || e.venue || {};
-          return {
+          return withFallbackLocation({
             source: 'humanitix',
             sourceEventId: pick(e._id, e.id),
             title: e.title || e.name || '',
@@ -356,9 +492,9 @@ async function fetchHumanTixEvents() {
             organizer: e.organizer?.name || '',
             rawPayload: e,
             contentHash: ''
-          };
+          });
         })
-        .filter(event => event.sourceEventId && event.title && event.url && isAustralianEvent(event));
+        .filter(event => event.sourceEventId && event.title && event.url && matchesCountryFilter(event));
 
       events.push(...mapped);
 
