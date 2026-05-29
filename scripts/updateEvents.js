@@ -68,6 +68,16 @@ const LUMA_DISCOVERY_TECH_KEYWORDS = String(process.env.LUMA_DISCOVERY_TECH_KEYW
   .split(',')
   .map(keyword => keyword.trim().toLowerCase())
   .filter(Boolean);
+const MEETUP_DISCOVERY_ENABLED = process.env.MEETUP_DISCOVERY_ENABLED !== 'false';
+const MEETUP_DISCOVERY_URLS = String(process.env.MEETUP_DISCOVERY_URLS || 'https://www.meetup.com/en-AU/find/au--sydney/technology/')
+  .split(',')
+  .map(url => url.trim())
+  .filter(Boolean);
+const HUMANITIX_DISCOVERY_ENABLED = process.env.HUMANITIX_DISCOVERY_ENABLED !== 'false';
+const HUMANITIX_DISCOVERY_URLS = String(process.env.HUMANITIX_DISCOVERY_URLS || 'https://humanitix.com/au')
+  .split(',')
+  .map(url => url.trim())
+  .filter(Boolean);
 
 function getSyncWindow() {
   const now = new Date();
@@ -130,6 +140,52 @@ function parseNextData(html) {
   const match = String(html || '').match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s);
   if (!match) return null;
   return JSON.parse(match[1]);
+}
+
+function stripHtml(value) {
+  return String(value || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeTitle(value) {
+  return stripHtml(value)
+    .toLowerCase()
+    .replace(/\b(20\d{2}|jan|feb|mar|apr|may|jun|june|jul|july|aug|sep|oct|nov|dec|sydney|meetup|event)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function eventDateKey(event) {
+  const date = toDate(event.startTime);
+  return date ? date.toISOString().slice(0, 10) : '';
+}
+
+function titleSimilarity(a, b) {
+  const aTokens = new Set(normalizeTitle(a).split(' ').filter(token => token.length > 2));
+  const bTokens = new Set(normalizeTitle(b).split(' ').filter(token => token.length > 2));
+  if (!aTokens.size || !bTokens.size) return 0;
+  let overlap = 0;
+  for (const token of aTokens) {
+    if (bTokens.has(token)) overlap += 1;
+  }
+  return (2 * overlap) / (aTokens.size + bTokens.size);
+}
+
+function areSimilarEvents(a, b) {
+  if (!a || !b) return false;
+  if (a.source === b.source && a.sourceEventId && b.sourceEventId && a.sourceEventId === b.sourceEventId) return true;
+  if (a.url && b.url && String(a.url).split('?')[0] === String(b.url).split('?')[0]) return true;
+  const sameDay = eventDateKey(a) && eventDateKey(a) === eventDateKey(b);
+  const sameArea = [a.city, a.venueName, a.organizer].some(value => {
+    const normalized = normalizeTitle(value);
+    return normalized && [b.city, b.venueName, b.organizer].some(other => normalizeTitle(other) === normalized);
+  });
+  return titleSimilarity(a.title, b.title) >= 0.82 && (sameDay || sameArea);
 }
 
 function buildContentHash(event) {
@@ -354,13 +410,10 @@ async function fetchEventbriteEvents() {
 }
 
 async function fetchMeetupEvents() {
-  if (!MEETUP_API_KEY) {
-    return [];
-  }
+  const apiEvents = [];
 
-  try {
+  if (MEETUP_API_KEY) try {
     const { now, until } = getSyncWindow();
-    const events = [];
 
     for (const city of AUSTRALIAN_CITIES) {
       try {
@@ -424,29 +477,100 @@ async function fetchMeetupEvents() {
               contentHash: ''
             });
           }).filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && matchesCountryFilter(event));
-          events.push(...mapped);
+          apiEvents.push(...mapped);
         }
       } catch (err) {
         console.warn(`Meetup fetch for ${city} failed:`, err.message);
       }
     }
-
-    return events;
   } catch (error) {
     console.error('Meetup fetch error:', error.message);
+  } else {
+    console.warn('Meetup API key missing; Meetup API fetch skipped.');
+  }
+
+  const discoveryEvents = await fetchMeetupDiscoveryEvents();
+  return [...apiEvents, ...discoveryEvents];
+}
+
+function resolveApolloRef(state, ref) {
+  if (!ref) return null;
+  if (typeof ref === 'string') return state?.[ref] || null;
+  if (typeof ref.__ref === 'string') return state?.[ref.__ref] || null;
+  return ref;
+}
+
+function mapMeetupDiscoveryEvent(state, e) {
+  const group = resolveApolloRef(state, e.group) || {};
+  const photo = resolveApolloRef(state, e.displayPhoto) || resolveApolloRef(state, e.featuredEventPhoto) || resolveApolloRef(state, group.keyGroupPhoto) || {};
+  const title = stripHtml(e.title && e.title.trim() !== 'Event' ? e.title : `${group.name || 'Meetup'} event`);
+  const startTime = toDate(e.dateTime || e.startTime);
+  const description = stripHtml(e.description || '');
+
+  return withFallbackLocation({
+    source: 'meetup',
+    sourceEventId: e.id,
+    title,
+    description,
+    startTime,
+    endTime: toDate(e.endTime),
+    timezone: group.timezone || 'Australia/Sydney',
+    venueName: e.venue?.name || (e.eventType === 'ONLINE' ? 'Online' : ''),
+    address: e.venue?.address || '',
+    city: 'Sydney',
+    state: 'NSW',
+    country: 'Australia',
+    latitude: toNumber(e.venue?.lat),
+    longitude: toNumber(e.venue?.lng),
+    categoryJson: { categories: ['Technology', 'Meetup'] },
+    audienceJson: { audience: [], personas: [] },
+    priceMin: e.feeSettings?.amount || 0,
+    priceMax: e.feeSettings?.amount || null,
+    url: e.eventUrl || '',
+    imageUrl: photo.highResUrl || photo.baseUrl || '',
+    organizer: group.name || '',
+    rawPayload: e,
+    contentHash: ''
+  });
+}
+
+async function fetchMeetupDiscoveryEvents() {
+  if (!MEETUP_DISCOVERY_ENABLED || !MEETUP_DISCOVERY_URLS.length) {
     return [];
   }
+
+  const { now, until } = getSyncWindow();
+  const events = [];
+
+  for (const url of MEETUP_DISCOVERY_URLS) {
+    try {
+      console.log(`Fetching Meetup discovery events from ${url}`);
+      const response = await axios.get(url, {
+        headers: { 'User-Agent': 'Lunchup event discovery (+https://lunchup.com.au)' },
+        timeout: 15000
+      });
+      const pageData = parseNextData(response.data);
+      const state = pageData?.props?.pageProps?.__APOLLO_STATE__ || {};
+      const mapped = Object.entries(state)
+        .filter(([key, value]) => key.startsWith('Event:') && value?.eventUrl)
+        .map(([, event]) => mapMeetupDiscoveryEvent(state, event))
+        .filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && isTechDiscoveryEvent(event.title, event.description, event.organizer));
+      events.push(...mapped);
+    } catch (error) {
+      console.warn(`Meetup discovery fetch failed for ${url}:`, error.response?.status || error.message);
+    }
+  }
+
+  return events;
 }
 
 async function fetchHumanTixEvents() {
+  const apiEvents = [];
+
   if (!HUMANITIX_API_KEY) {
     console.warn('Humanitix API key missing; Humanitix fetch skipped.');
-    return [];
-  }
-
-  try {
+  } else try {
     const { now, until } = getSyncWindow();
-    const events = [];
     let page = 1;
 
     while (page <= EVENT_SYNC_MAX_PAGES) {
@@ -496,7 +620,7 @@ async function fetchHumanTixEvents() {
         })
         .filter(event => event.sourceEventId && event.title && event.url && matchesCountryFilter(event));
 
-      events.push(...mapped);
+      apiEvents.push(...mapped);
 
       if (!response.data?.total || page * (response.data?.pageSize || 100) >= response.data.total || batch.length === 0) {
         break;
@@ -504,11 +628,102 @@ async function fetchHumanTixEvents() {
       page += 1;
     }
 
-    return events;
   } catch (error) {
     console.error('HumanTix fetch error:', error.response?.data || error.message);
+  }
+
+  const discoveryEvents = await fetchHumanitixDiscoveryEvents();
+  return [...apiEvents, ...discoveryEvents];
+}
+
+function findAddressComponent(location, type, field = 'short_name') {
+  return (location?.addressComponents || []).find(component => (component.types || []).includes(type))?.[field] || '';
+}
+
+function mapHumanitixDiscoveryEvent(e) {
+  const location = e.eventLocation || {};
+  const startTime = toDate(e.date?.startDate || e.startDate || e.dates?.[0]?.startDate);
+  const endTime = toDate(e.date?.endDate || e.endDate || e.dates?.[0]?.endDate);
+  const imageHandle = e.bannerImage?.url || e.bannerImage?.handle || '';
+  const imageUrl = imageHandle && imageHandle.startsWith('http')
+    ? imageHandle
+    : (imageHandle ? `https://images.humanitix.com/i/${imageHandle}@original` : '');
+
+  return withFallbackLocation({
+    source: 'humanitix',
+    sourceEventId: pick(e._id, e.id, e.slug),
+    title: e.name || e.title || '',
+    description: stripHtml(e.sharingDescription || e.description || ''),
+    startTime,
+    endTime,
+    timezone: e.timezone || 'Australia/Sydney',
+    venueName: location.venueName || '',
+    address: location.address || '',
+    city: findAddressComponent(location, 'locality', 'long_name') || location.city || 'Sydney',
+    state: findAddressComponent(location, 'administrative_area_level_1') || location.region || 'NSW',
+    country: findAddressComponent(location, 'country') || location.country || e.location || 'Australia',
+    latitude: toNumber(location.latLng?.[0] || location.latitude),
+    longitude: toNumber(location.latLng?.[1] || location.longitude),
+    categoryJson: { categories: ['Technology', 'Humanitix'] },
+    audienceJson: { audience: [], personas: [] },
+    priceMin: toNumber(e.pricing?.minimumPrice) || 0,
+    priceMax: toNumber(e.pricing?.maximumPrice),
+    url: e.url || (e.slug ? `https://events.humanitix.com/${e.slug}` : ''),
+    imageUrl,
+    organizer: e.organiser?.name || e.organizer?.name || '',
+    rawPayload: e,
+    contentHash: ''
+  });
+}
+
+function collectHumanitixEventCards(value, results = [], seen = new Set()) {
+  if (!value || typeof value !== 'object') return results;
+  if (Array.isArray(value)) {
+    for (const item of value) collectHumanitixEventCards(item, results, seen);
+    return results;
+  }
+
+  if ((value.slug || value.url) && (value.name || value.title) && (value.date || value.startDate || value.dates)) {
+    const id = pick(value._id, value.id, value.slug);
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      results.push(value);
+    }
+  }
+
+  for (const child of Object.values(value)) {
+    collectHumanitixEventCards(child, results, seen);
+  }
+  return results;
+}
+
+async function fetchHumanitixDiscoveryEvents() {
+  if (!HUMANITIX_DISCOVERY_ENABLED || !HUMANITIX_DISCOVERY_URLS.length) {
     return [];
   }
+
+  const { now, until } = getSyncWindow();
+  const events = [];
+
+  for (const url of HUMANITIX_DISCOVERY_URLS) {
+    try {
+      console.log(`Fetching Humanitix discovery events from ${url}`);
+      const response = await axios.get(url, {
+        headers: { 'User-Agent': 'Lunchup event discovery (+https://lunchup.com.au)' },
+        timeout: 15000
+      });
+      const pageData = parseNextData(response.data);
+      const cards = collectHumanitixEventCards(pageData?.props?.pageProps || {});
+      const mapped = cards
+        .map(mapHumanitixDiscoveryEvent)
+        .filter(event => event.sourceEventId && event.title && event.url && isUpcomingInWindow(event.startTime, now, until) && isTechDiscoveryEvent(event.title, event.description, event.organizer, event.categoryJson?.categories?.join(' ')));
+      events.push(...mapped);
+    } catch (error) {
+      console.warn(`Humanitix discovery fetch failed for ${url}:`, error.response?.status || error.message);
+    }
+  }
+
+  return events;
 }
 
 async function mergeAndSaveEvents({ dryRun = false } = {}) {
@@ -530,16 +745,32 @@ async function mergeAndSaveEvents({ dryRun = false } = {}) {
     }
 
     const deduped = new Map();
+    const uniqueEvents = [];
     for (const event of allEvents) {
       event.contentHash = buildContentHash(event);
       event.qualityScore = calculateQualityScore(event);
 
-      if (!deduped.has(event.contentHash) || deduped.get(event.contentHash).qualityScore < event.qualityScore) {
+      const duplicateIndex = uniqueEvents.findIndex(existing => areSimilarEvents(existing, event));
+      if (duplicateIndex >= 0) {
+        const existing = uniqueEvents[duplicateIndex];
+        if (event.qualityScore > existing.qualityScore) {
+          uniqueEvents[duplicateIndex] = event;
+        }
+        continue;
+      }
+
+      if (!deduped.has(event.contentHash)) {
         deduped.set(event.contentHash, event);
+        uniqueEvents.push(event);
+      } else if (deduped.get(event.contentHash).qualityScore < event.qualityScore) {
+        const previous = deduped.get(event.contentHash);
+        const previousIndex = uniqueEvents.findIndex(existing => existing.contentHash === previous.contentHash);
+        deduped.set(event.contentHash, event);
+        if (previousIndex >= 0) uniqueEvents[previousIndex] = event;
       }
     }
 
-    const eventsToSave = Array.from(deduped.values());
+    const eventsToSave = uniqueEvents;
     if (dryRun) {
       console.log(`📅 Dry run complete: total=${allEvents.length}, deduped=${eventsToSave.length}`);
       process.exit(0);
