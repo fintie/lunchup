@@ -257,7 +257,7 @@ router.post('/forgot-password', async (req, res) => {
       const publicResetLink = `${publicHost}/#/reset-password/${resetToken}`;
 
       return res.json({
-        message: 'Reset instructions are ready for this demo account.',
+        message: 'Reset instructions are ready. Use the link below to reset your password.',
         resetLink: publicResetLink
       });
     }
