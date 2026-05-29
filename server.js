@@ -20,6 +20,8 @@ const allowedOrigins = [
   'https://lunchup.com.au',
   'https://www.lunchup.com.au',
   'https://lunchup-web.onrender.com'
+  , 'http://localhost:3000'
+  , 'http://127.0.0.1:3000'
 ];
 
 if (process.env.CORS_ORIGIN) {
