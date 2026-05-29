@@ -20,6 +20,7 @@ jobs:
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           EVENTBRITE_API_KEY: ${{ secrets.EVENTBRITE_API_KEY }}
+          EVENTBRITE_ORGANIZATION_ID: ${{ secrets.EVENTBRITE_ORGANIZATION_ID }}
           MEETUP_API_KEY: ${{ secrets.MEETUP_API_KEY }}
           LUMA_API_KEY: ${{ secrets.LUMA_API_KEY }}
           HUMANITIX_API_KEY: ${{ secrets.HUMANITIX_API_KEY }}
