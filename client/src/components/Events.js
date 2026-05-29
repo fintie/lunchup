@@ -220,16 +220,18 @@ const Events = ({ user }) => {
               <div className="events-grid full-width">
                 {filteredEvents.map((event) => (
                   <article className="event-card" key={event._id || event.id}>
-                    <div className="event-meta">
-                      <span className="event-badge">{event.source}</span>
-                      <span>{formatDate(event.startTime)}</span>
-                    </div>
-                    <h3>{event.title}</h3>
-                    <p>{event.description}</p>
-                    <div className="event-tags">
-                      {(event.categoryJson?.categories || []).map((category) => (
-                        <span className="event-tag" key={category}>{category}</span>
-                      ))}
+                    <div className="event-card-main">
+                      <div className="event-meta">
+                        <span className="event-badge">{event.source}</span>
+                        <span>{formatDate(event.startTime)}</span>
+                      </div>
+                      <h3>{event.title}</h3>
+                      <p className="event-description">{event.description}</p>
+                      <div className="event-tags">
+                        {(event.categoryJson?.categories || []).map((category) => (
+                          <span className="event-tag" key={category}>{category}</span>
+                        ))}
+                      </div>
                     </div>
                     <div className="event-footer">
                       <div>
