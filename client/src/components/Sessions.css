@@ -292,3 +292,33 @@
   .session-title-row { flex-direction: column; }
   .sessions-header { flex-direction: column; gap: 12px; }
 }
+
+/* Active challenge banner */
+.sessions-challenge-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.sessions-challenge-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.sessions-challenge-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sessions-challenge-desc {
+  font-size: 0.85rem;
+  opacity: 0.88;
+}

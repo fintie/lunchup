@@ -217,6 +217,31 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// Leaderboard — must be before /:id to avoid route conflict
+router.get('/leaderboard', async (req, res) => {
+  try {
+    let users = [];
+    try {
+      users = await User.find({})
+        .select('name role reputationScore profilePicture')
+        .sort({ reputationScore: -1 })
+        .limit(20);
+    } catch (mongoError) {
+      console.log('MongoDB unavailable, using demo users for leaderboard');
+    }
+    if (users.length === 0) {
+      const demoArr = Array.from(demoUsers.values())
+        .map(u => ({ _id: u._id, name: u.name, role: u.role, reputationScore: u.reputationScore || 0, profilePicture: u.profilePicture }))
+        .sort((a, b) => b.reputationScore - a.reputationScore)
+        .slice(0, 20);
+      return res.json(demoArr);
+    }
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Get user profile by ID
 router.get('/:id', async (req, res) => {
   try {

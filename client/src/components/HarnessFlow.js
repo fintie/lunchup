@@ -2,9 +2,19 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './HarnessFlow.css';
 
-function HarnessFlow({ meeting, user, onClose, onCreated }) {
+const PROJECT_TEMPLATES = [
+  { id: 'ai-side-project', title: 'AI Side Project', emoji: '🤖', description: 'Build an AI-powered tool together' },
+  { id: 'saas-mvp', title: 'SaaS MVP', emoji: '🚀', description: 'Launch a software product with paying customers in mind' },
+  { id: 'data-dashboard', title: 'Data Dashboard', emoji: '📊', description: 'Visualise data to surface insights and decisions' },
+  { id: 'browser-extension', title: 'Browser Extension', emoji: '🧩', description: 'Ship a Chrome or Firefox extension that solves a daily problem' },
+  { id: 'open-source-lib', title: 'Open Source Lib', emoji: '📦', description: 'Build a reusable library the developer community can use' },
+  { id: 'community-tool', title: 'Community Tool', emoji: '🌏', description: 'Build something useful for a specific community or group' },
+];
+
+function HarnessFlow({ meeting, user, onClose, onCreated, chatHistory, partnerName }) {
   const [step, setStep] = useState(1);
   const [idea, setIdea] = useState('');
+  const [selectedTemplateId, setSelectedTemplateId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState(null);
   const [error, setError] = useState('');
@@ -21,7 +31,7 @@ function HarnessFlow({ meeting, user, onClose, onCreated }) {
       const token = localStorage.getItem('token');
       const res = await axios.post(
         '/harness/generate',
-        { title: idea, description: idea, participants },
+        { title: idea, description: idea, participants, templateId: selectedTemplateId, chatHistory: chatHistory || null },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPlan(res.data.plan);
@@ -87,7 +97,9 @@ function HarnessFlow({ meeting, user, onClose, onCreated }) {
           <div className="harness-panel">
             <h2>What do you want to build together?</h2>
             <p className="harness-subtitle">
-              {meeting
+              {chatHistory
+                ? `AI will use your conversation with ${partnerName} to generate a tailored project plan.`
+                : meeting
                 ? `You met ${meeting.with?.name} — now turn that lunch into a project.`
                 : 'Describe your idea and AI will generate a full MVP plan.'}
             </p>
@@ -96,6 +108,21 @@ function HarnessFlow({ meeting, user, onClose, onCreated }) {
                 <span>👥 {participants.map(p => p.name).join(' + ')}</span>
               </div>
             )}
+            <div className="template-grid">
+              {PROJECT_TEMPLATES.map(t => (
+                <button
+                  key={t.id}
+                  className={`template-card ${selectedTemplateId === t.id ? 'selected' : ''}`}
+                  onClick={() => {
+                    setSelectedTemplateId(selectedTemplateId === t.id ? null : t.id);
+                    if (selectedTemplateId !== t.id) setIdea(t.description);
+                  }}
+                >
+                  <span className="template-emoji">{t.emoji}</span>
+                  <span className="template-title">{t.title}</span>
+                </button>
+              ))}
+            </div>
             <textarea
               className="harness-input"
               placeholder="e.g. An AI tool that matches freelancers with startup founders in Sydney..."

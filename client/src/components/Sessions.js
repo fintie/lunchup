@@ -10,6 +10,7 @@ function Sessions({ user }) {
   const [regenerating, setRegenerating] = useState(null);
   const [githubConnected, setGithubConnected] = useState(false);
   const [githubError, setGithubError] = useState('');
+  const [activeChallenge, setActiveChallenge] = useState(null);
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -29,6 +30,7 @@ function Sessions({ user }) {
 
   useEffect(() => {
     fetchProjects();
+    axios.get('/challenges/current').then(res => setActiveChallenge(res.data)).catch(() => {});
     const fetchGithubStatus = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -113,6 +115,14 @@ function Sessions({ user }) {
             + New Project
           </button>
         </div>
+
+        {activeChallenge && (
+          <div className="sessions-challenge-banner">
+            <span className="sessions-challenge-badge">{activeChallenge.badge} Active Challenge</span>
+            <span className="sessions-challenge-title">{activeChallenge.title}</span>
+            <span className="sessions-challenge-desc">{activeChallenge.description}</span>
+          </div>
+        )}
 
         {loading ? (
           <div className="loading-state">

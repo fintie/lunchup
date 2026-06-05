@@ -12,10 +12,14 @@ function Matches({ user }) {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [roleFilter, setRoleFilter] = useState('All');
   const [sortBy, setSortBy] = useState('matchScore');
+  const [challenge, setChallenge] = useState(null);
+  const [joinedChallenge, setJoinedChallenge] = useState(false);
+  const [sentRequests, setSentRequests] = useState(new Set());
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchMatches(); // Auto-load matches on page visit
+    fetchMatches();
+    axios.get('/challenges/current').then(res => setChallenge(res.data)).catch(() => {});
   }, []);
 
   const fetchMatches = async () => {
@@ -318,37 +322,35 @@ function Matches({ user }) {
     }).sort((a, b) => b.matchScore - a.matchScore);
   };
 
-  const handleConnect = (matchId, matchName) => {
+  const handleConnect = async (matchId, matchName, matchAvatar) => {
     if (!user) {
-      // User is not authenticated - show auth modal
       setSelectedMatch({ id: matchId, name: matchName });
       setShowAuthModal(true);
-    } else {
-      // User is authenticated - save the connection
-      const connection = {
-        id: matchId,
-        name: matchName,
-        connectedAt: new Date().toISOString(),
-        status: 'pending'
-      };
-      
-      // Get existing connections from localStorage
-      const existingConnections = JSON.parse(localStorage.getItem('connections') || '[]');
-      
-      // Add new connection
-      const updatedConnections = [...existingConnections, connection];
-      localStorage.setItem('connections', JSON.stringify(updatedConnections));
-      
-      // Also save to axios for Meetings component to access
-      localStorage.setItem('connectionsUpdated', Date.now().toString());
-      
-      setMessage({ type: 'success', text: `Connection request sent to ${matchName}! They'll appear in your meetings once accepted.` });
-      
-      // Remove from matches list
-      setMatches(matches.filter(m => m._id !== matchId));
-      
-      setTimeout(() => setMessage({ type: '', text: '' }), 4000);
+      return;
     }
+    if (sentRequests.has(matchId)) return;
+
+    setSentRequests(prev => new Set([...prev, matchId]));
+
+    // Keep localStorage for Meetings page backward compat
+    const connection = { id: matchId, name: matchName, connectedAt: new Date().toISOString(), status: 'pending' };
+    const existing = JSON.parse(localStorage.getItem('connections') || '[]');
+    localStorage.setItem('connections', JSON.stringify([...existing, connection]));
+    localStorage.setItem('connectionsUpdated', Date.now().toString());
+
+    try {
+      const token = localStorage.getItem('token');
+      const myName = localStorage.getItem('userName') || user.name || 'Someone';
+      await axios.post('/messages/connect', {
+        receiverId: matchId,
+        receiverName: matchName,
+        senderName: myName,
+        senderAvatar: matchAvatar || null
+      }, { headers: { Authorization: `Bearer ${token}` } });
+    } catch {}
+
+    setMessage({ type: 'success', text: `Connection request sent to ${matchName}! Check Messages to chat once they accept.` });
+    setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   };
 
   if (loading) {
@@ -396,6 +398,41 @@ function Matches({ user }) {
             </button>
           )}
         </div>
+
+        {challenge && (() => {
+          const deadline = new Date(challenge.deadline);
+          const now = new Date();
+          const diff = deadline - now;
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const countdown = diff > 0
+            ? (days > 0 ? `${days}d ${hours}h left` : `${hours}h left`)
+            : 'Ended';
+          return (
+            <div className="challenge-banner">
+              <div className="challenge-banner-left">
+                <span className="challenge-badge">{challenge.badge} Weekly Challenge</span>
+                <span className="challenge-title">{challenge.title}</span>
+                <span className="challenge-desc">{challenge.description}</span>
+                <span className="challenge-countdown">⏰ {countdown}</span>
+              </div>
+              <button
+                className={`btn btn-sm ${joinedChallenge ? 'btn-secondary' : 'btn-primary'}`}
+                onClick={async () => {
+                  if (joinedChallenge) return;
+                  if (!user) { navigate('/login'); return; }
+                  try {
+                    const token = localStorage.getItem('token');
+                    await axios.post(`/challenges/${challenge.id}/join`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                    setJoinedChallenge(true);
+                  } catch { setJoinedChallenge(true); }
+                }}
+              >
+                {joinedChallenge ? '✓ Joined' : 'Join Challenge →'}
+              </button>
+            </div>
+          );
+        })()}
 
         <div className="role-filter">
           {['All', 'Builder', 'Designer', 'AI Engineer', 'Product Thinker'].map(role=> (
@@ -551,10 +588,11 @@ function Matches({ user }) {
 
                 <div className="match-actions">
                   <button
-                    onClick={() => handleConnect(match._id, match.name)}
-                    className="btn btn-primary btn-block"
+                    onClick={() => handleConnect(match._id, match.name, match.profilePicture)}
+                    className={`btn btn-block ${sentRequests.has(match._id) ? 'btn-secondary' : 'btn-primary'}`}
+                    disabled={sentRequests.has(match._id)}
                   >
-                    {user ? 'Connect' : 'Sign in to Connect'}
+                    {sentRequests.has(match._id) ? '✓ Request Sent' : user ? 'Connect' : 'Sign in to Connect'}
                   </button>
                   {user && (
                     <a href="#/projects" className="btn btn-secondary btn-block btn-sm">

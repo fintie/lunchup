@@ -408,13 +408,14 @@ function Meetings({ user }) {
                       <button className="btn btn-outline btn-sm">Reschedule</button>
                     </div>
                     {meeting.status === 'confirmed' && (
-                      <div className="harness-prompt">
-                        <span>Ready to build something together?</span>
+                      <div className="harness-prompt build-after-lunch">
+                        <div className="bal-badge">🍽️ Build After Lunch</div>
+                        <p className="bal-text">Great meeting! Turn this lunch into a real project — AI will generate your MVP plan in 30 seconds.</p>
                         <button
-                          className="btn btn-link"
+                          className="btn btn-primary btn-sm bal-btn"
                           onClick={() => setHarnessTarget(meeting)}
                         >
-                          Start a guided project →
+                          Start a Guided Project →
                         </button>
                       </div>
                     )}

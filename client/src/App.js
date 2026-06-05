@@ -18,6 +18,8 @@ import News from './components/News';
 import Opportunities from './components/Opportunities';
 import Sessions from './components/Sessions';
 import UserProfile from './components/UserProfile';
+import Leaderboard from './components/Leaderboard';
+import Messages from './components/Messages';
 
 // Determine API URL based on environment
 const getApiUrl = () => {
@@ -143,6 +145,14 @@ function AppContent() {
           <Route
             path="/profile/:userId"
             element={<UserProfile user={user} />}
+          />
+          <Route
+            path="/leaderboard"
+            element={<Leaderboard user={user} />}
+          />
+          <Route
+            path="/messages"
+            element={user ? <Messages user={user} /> : <Navigate to="/login" />}
           />
         </Routes>
       </div>
