@@ -1,18 +1,19 @@
 const express = require('express');
 const router = express.Router();
+const Meeting = require('../models/Meeting');
 const User = require('../models/User');
 
 // Create a new meeting
 router.post('/', async (req, res) => {
   try {
-    const { 
-      hostId, 
-      attendees, 
-      meetingPoint, 
-      date, 
-      time, 
-      topic, 
-      description 
+    const {
+      hostId,
+      attendees,
+      meetingPoint,
+      date,
+      time,
+      topic,
+      description
     } = req.body;
 
     // Validate host exists
@@ -28,8 +29,7 @@ router.post('/', async (req, res) => {
     }
 
     // Create meeting object (in a real app, you'd have a Meeting model)
-    const meeting = {
-      id: Date.now().toString(), // Simple ID generation for demo
+    const meeting = new Meeting({
       hostId,
       attendees,
       meetingPoint,
@@ -37,14 +37,10 @@ router.post('/', async (req, res) => {
       time,
       topic,
       description,
-      createdAt: new Date(),
-      status: 'scheduled'
-    };
+    });
 
-    // In a real implementation, you would save this to a database
-    // For now, we'll just return the meeting object
-    
-    res.status(201).json(meeting);
+    const savedMeeting = await meeting.save();
+    res.status(201).json(savedMeeting);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -54,22 +50,22 @@ router.post('/', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     // In a real implementation, you would fetch meetings from a database
     // For now, we'll return an empty array as an example
-    
+
     // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
-    // This is a placeholder - in a real app, you'd have a Meeting model
-    // and query for meetings where the user is either host or attendee
-    const userMeetings = [];
-    
+
+    const userMeetings = await Meeting.find({
+      $or: [{ hostId: userId }, { attendees: userId }]
+    });
     res.json(userMeetings);
- } catch (error) {
+
+  } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -79,21 +75,23 @@ router.put('/:meetingId/status', async (req, res) => {
   try {
     const { meetingId } = req.params;
     const { status } = req.body;
-    
-    // In a real implementation, you would update the meeting in the database
-    // For now, we'll just return a success message
-    
     const validStatuses = ['scheduled', 'confirmed', 'completed', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
-    
-    // Placeholder response
-    res.json({ 
-      message: 'Meeting status updated successfully',
+
+    const meeting = await Meeting.findByIdAndUpdate(
       meetingId,
-      status
-    });
+      { status },
+      { new: true }
+    );
+
+    if (!meeting) {
+      return res.status(404).json({ message: 'Meeting not found' });
+    }
+
+    res.json(meeting);
+
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -16,6 +16,10 @@ import Navbar from './components/Navbar';
 import Live from './components/Live';
 import News from './components/News';
 import Opportunities from './components/Opportunities';
+import Sessions from './components/Sessions';
+import UserProfile from './components/UserProfile';
+import Leaderboard from './components/Leaderboard';
+import Messages from './components/Messages';
 import Events from './components/Events';
 
 // Determine API URL based on environment
@@ -138,6 +142,22 @@ function AppContent() {
           <Route
             path="/meetings"
             element={user ? <Meetings user={user} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/projects"
+            element={user ? <Sessions user={user} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/profile/:userId"
+            element={<UserProfile user={user} />}
+          />
+          <Route
+            path="/leaderboard"
+            element={<Leaderboard user={user} />}
+          />
+          <Route
+            path="/messages"
+            element={user ? <Messages user={user} /> : <Navigate to="/login" />}
           />
         </Routes>
       </div>

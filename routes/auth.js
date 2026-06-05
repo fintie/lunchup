@@ -8,7 +8,8 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 
 // In-memory demo users (fallback when MongoDB is unavailable)
-const demoUsers = new Map();
+const { demoUsers } = require('../utils/demoStore');
+const { assignRole } = require('../utils/roleAssigner');
 
 // Australian first names
 const firstNames = [
@@ -134,21 +135,26 @@ const generateDemoUsers = () => {
     const password = 'password123'; // Same password for all demo users
     
     const locationData = locations[Math.floor(Math.random() * locations.length)];
-    
+    const userSkills = getRandomItems(allSkills, Math.floor(Math.random() * 3) + 3);
+
     demoUsers.set(email, {
       _id: `demo_${i + 1}`,
       name,
       email,
       password: '$2a$10$demoHashedPasswordForAllDemoUsers123456789', // Pre-hashed for demo
       professionalBackground: backgrounds[Math.floor(Math.random() * backgrounds.length)],
-      skills: getRandomItems(allSkills, Math.floor(Math.random() * 3) + 3),
+      skills: userSkills,
+      role: assignRole(userSkills),
       preferredTopics: getRandomItems(allTopics, Math.floor(Math.random() * 2) + 2),
       preferredLocation: locationData.location,
       preferredMeetingPoint: locationData.meetingPoint,
       profilePicture: `https://i.pravatar.cc/300?img=${(i % 70) + 1}`,
       bio: bios[Math.floor(Math.random() * bios.length)],
       isOnline: Math.random() > 0.5,
-      lastActive: new Date(Date.now() - Math.floor(Math.random() * 86400000 * 7))
+      lastActive: new Date(Date.now() - Math.floor(Math.random() * 86400000 * 7)),
+      reputationScore: Math.floor(Math.random() * 120),
+      collaborators: [],
+      buildPreferences: getRandomItems(['SaaS', 'Mobile App', 'AI Tools', 'Web App', 'API', 'Data Platform'], 2)
     });
   }
   
@@ -158,13 +164,17 @@ const generateDemoUsers = () => {
     name: 'Demo User',
     email: 'demo@lunchup.com',
     password: '$2a$10$demoHashedPasswordForAllDemoUsers123456789',
-    professionalBackground: 'Developer',
+    professionalBackground: 'Full Stack Developer',
     skills: ['JavaScript', 'React', 'Node.js'],
+    role: 'Builder',
     preferredTopics: ['Tech Trends', 'Startups'],
     preferredLocation: 'Sydney - CBD',
     preferredMeetingPoint: 'Circular Quay',
     profilePicture: 'https://i.pravatar.cc/300?img=1',
     bio: 'Demo user for testing',
+    buildPreferences: ['SaaS', 'AI Tools'],
+    reputationScore: 75,
+    collaborators: [],
     isOnline: true,
     lastActive: new Date()
   });

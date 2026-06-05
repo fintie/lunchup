@@ -46,6 +46,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  role: {
+    type: String,
+    enum: ['Builder', 'Designer', 'AI Engineer', 'Product Thinker'],
+    default: 'Builder'
+  },
+  buildPreferences: [{
+    type: String
+  }],
   rawInterestText: {
     type: String,
     default: ''
@@ -76,7 +84,23 @@ const userSchema = new mongoose.Schema({
   isOnline: {
     type: Boolean,
     default: false
-  }
+  },
+  githubToken: {
+    type: String,
+    default: null
+  },
+  githubUserName: {
+    type: String,
+    default: null
+  },
+  reputationScore: {
+    type: Number,
+    default: 0
+  },
+  collaborators: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProjectSession' }
+  }]
 });
 
 module.exports = mongoose.model('User', userSchema);

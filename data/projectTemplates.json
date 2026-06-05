@@ -1,0 +1,44 @@
+[
+    {
+        "id": "ai-side-project",
+        "title": "AI Side Project",
+        "description": "Build an AI-powered tool together",
+        "defaultTasks": ["Define use case", "Choose model/API", "Build MVP", "Deploy"],
+        "suggestedRoles": ["Builder", "AI Engineer"]
+    },
+    {
+        "id": "saas-mvp",
+        "title": "Saas MVP",
+        "description": "Launch a software product with paying customers in mind",
+        "defaultTasks": ["Define problem and target user", "Build landing page", "Develop core feature", "Set up payments and launch"],
+        "suggestedRoles": ["Builder", "Product Thinker"]
+    },
+    {
+        "id": "data-dashboard",
+        "title": "Data Dashboard",
+        "description": "Visualise data to surface insights and decisions",
+        "defaultTasks": ["Identify data sources", "Design schema", "Build charts and UI", "Deploy and share"],
+        "suggestedRoles": ["AI Engineer", "Designer"]
+    },
+    {
+        "id": "browser-extension",
+        "title": "Browser Extension",
+        "description": "Ship a Chrome or Firefox extension that solves a daily problem",
+        "defaultTasks": ["Define use case", "Set up extension scaffold", "Build core feature", "Publish to store"],
+        "suggestedRoles": ["Builder", "Designer"]
+    },
+    {
+        "id": "open-source-lib",
+        "title": "Open Source Lib",
+        "description": "Build a reusable library or tool the developer community can use",
+        "defaultTasks": ["Define API design", "Write core logic", "Add tests and docs", "Publish to npm/PyPI"],
+        "suggestedRoles": ["Builder", "AI Engineer"]
+    },
+    {
+        "id": "community-tool",
+        "title": "Community Tool",
+        "description": "Build something useful for a specific community or group",
+        "defaultTasks": ["Talk to community members", "Define core feature", "Build and test with users", "Launch and gather feedback"],
+        "suggestedRoles": ["Product Thinker", "Builder"]
+    }
+]

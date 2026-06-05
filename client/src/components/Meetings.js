@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Meetings.css';
+import HarnessFlow from './HarnessFlow';
 
 function Meetings({ user }) {
   const [meetings, setMeetings] = useState([]);
@@ -8,6 +9,7 @@ function Meetings({ user }) {
   const [showSchedule, setShowSchedule] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [harnessTarget, setHarnessTarget] = useState(null);
   const [newMeeting, setNewMeeting] = useState({
     date: '',
     time: '',
@@ -394,9 +396,29 @@ function Meetings({ user }) {
                     </div>
                     
                     <div className="meeting-actions">
+                      {meeting.status === 'confirmed' && (
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => setHarnessTarget(meeting)}
+                        >
+                          Start a Project Together →
+                        </button>
+                      )}
                       <button className="btn btn-secondary btn-sm">Message</button>
                       <button className="btn btn-outline btn-sm">Reschedule</button>
                     </div>
+                    {meeting.status === 'confirmed' && (
+                      <div className="harness-prompt build-after-lunch">
+                        <div className="bal-badge">🍽️ Build After Lunch</div>
+                        <p className="bal-text">Great meeting! Turn this lunch into a real project — AI will generate your MVP plan in 30 seconds.</p>
+                        <button
+                          className="btn btn-primary btn-sm bal-btn"
+                          onClick={() => setHarnessTarget(meeting)}
+                        >
+                          Start a Guided Project →
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -404,6 +426,14 @@ function Meetings({ user }) {
           )
         )}
       </div>
+      {harnessTarget && (
+        <HarnessFlow
+          meeting={harnessTarget}
+          user={user}
+          onClose={() => setHarnessTarget(null)}
+          onCreated={() => {}}
+        />
+      )}
     </div>
   );
 }
