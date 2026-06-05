@@ -65,11 +65,71 @@ PORT=3001
 MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/lunchup
 JWT_SECRET=your-secret-key-min-32-characters-long-for-security
 CORS_ORIGIN=https://lunchup-web.onrender.com
+WHATSAPP_EVENT_NUMBER=61412345678
 ```
 
 6. Click **Create Web Service**
 
-## Step 4: Deploy Frontend
+## Step 4: Schedule Event Imports on Render
+
+Render does not support MongoDB natively, but you can still schedule a backend job by using a Render cron job that runs against your deployed API or directly against your repo.
+
+### Option A: Use an OpenClaw Cron Job (recommended)
+
+OpenClaw can replace the Render cron job by running the existing `scripts/updateEvents.js` on a fixed schedule from this workspace.
+
+Recommended OpenClaw cron configuration:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `lunchup-events-update` |
+| **Schedule** | `0 2 * * *` (daily at 02:00 UTC) |
+| **Session target** | `isolated` |
+| **Payload kind** | `agentTurn` |
+| **Prompt** | `In /Users/nic/.openclaw/workspace/lunchup, run npm run events:update. Report success/failure briefly and include created/updated totals if available. Do not message the user unless the run fails repeatedly or needs a decision.` |
+
+Required environment/secrets still need to exist wherever the script runs:
+
+```
+MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/lunchup
+EVENTBRITE_API_KEY=your-eventbrite-api-key
+MEETUP_API_KEY=your-meetup-api-key
+LUMA_API_KEY=your-luma-api-key
+HUMANITIX_API_KEY=your-humanitix-api-key
+```
+
+### Option B: Keep Render cron
+
+If you want the scheduler to live with the deployed app instead, keep the existing Render cron approach.
+
+1. Go to [Render Dashboard](https://dashboard.render.com/).
+2. Click **New** → **Cron Job**.
+3. Connect your Git repository and choose the `main` branch.
+4. Configure the cron job:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `lunchup-events-update` |
+| **Environment** | `Node 18` |
+| **Schedule** | `0 2 * * *` (daily at 02:00 UTC) |
+| **Command** | `npm run events:update` |
+| **Root Directory** | (leave blank or the repo root) |
+
+5. Add the same environment variables.
+
+### Option C: Trigger the Backend Endpoint from a Cron Job
+
+If you prefer to keep the API deployment separate, create a cron job that calls a secure endpoint on the deployed backend.
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `lunchup-events-trigger` |
+| **Schedule** | `0 2 * * *` |
+| **Command** | `curl -s -X POST https://lunchup-api.onrender.com/api/events/update` |
+
+Secure the endpoint with a secret token or restrict access by IP if needed.
+
+## Step 5: Deploy Frontend
 
 ### Option A: Deploy as Static Site on Render
 
@@ -172,6 +232,7 @@ PORT=3001
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=your-secret-key
 CORS_ORIGIN=https://your-frontend-url.com
+WHATSAPP_EVENT_NUMBER=61412345678
 ```
 
 ### Frontend (lunchup-web)

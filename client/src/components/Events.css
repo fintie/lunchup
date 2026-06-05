@@ -1,0 +1,269 @@
+.events-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.events-hero {
+  padding: 48px 24px 24px;
+}
+
+.events-hero-content,
+.events-content {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.events-eyebrow {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4f46e5;
+  margin-bottom: 12px;
+}
+
+.events-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  margin-bottom: 16px;
+}
+
+.events-hero p {
+  max-width: 760px;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.events-actions {
+  margin-top: 20px;
+}
+
+.events-note,
+.events-error {
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.events-error {
+  color: #b91c1c;
+}
+
+.events-content {
+  padding: 12px 24px 56px;
+}
+
+.events-grid-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.event-card,
+.recommendation-card,
+.category-card,
+.digest-card,
+.events-state-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+}
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  max-height: 550pt;
+  min-height: 420px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.event-card-main {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px 22px 0;
+}
+
+.event-meta,
+.recommendation-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.event-card h3 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.event-description {
+  flex: 1;
+  min-height: 110px;
+  margin: 0;
+  overflow: auto;
+  padding-right: 6px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.event-badge,
+.event-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.event-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0 18px;
+}
+
+.event-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-end;
+  margin-top: auto;
+  padding: 18px 22px 22px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.event-footer strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #0f172a;
+}
+
+.event-footer div {
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.event-footer a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.recommendation-list {
+  display: grid;
+  gap: 14px;
+}
+
+.recommendation-card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 14px;
+}
+
+.recommendation-score {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.digest-card pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.events-state-card.small {
+  padding: 18px;
+}
+
+@media (max-width: 960px) {
+  .events-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.events-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.events-toolbar {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.toolbar-group {
+  min-width: 180px;
+}
+
+.toolbar-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.event-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  .events-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .event-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .event-actions {
+    align-items: stretch;
+  }
+}

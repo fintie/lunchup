@@ -263,9 +263,12 @@ router.post('/forgot-password', async (req, res) => {
       demoUser.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
       demoUsers.set(normalizedEmail, demoUser);
 
+      const publicHost = process.env.APP_URL ? process.env.APP_URL.replace(/\/$/, '') : 'https://lunchup.com.au';
+      const publicResetLink = `${publicHost}/#/reset-password/${resetToken}`;
+
       return res.json({
-        message: 'Reset instructions are ready for this demo account.',
-        resetLink: `${getBaseUrl(req)}/#/reset-password/${resetToken}`
+        message: 'Reset instructions are ready. Use the link below to reset your password.',
+        resetLink: publicResetLink
       });
     }
 
@@ -286,6 +289,9 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
 
     const resetLink = `${getBaseUrl(req)}/#/reset-password/${resetToken}`;
+    const publicHost = process.env.APP_URL ? process.env.APP_URL.replace(/\/$/, '') : 'https://lunchup.com.au';
+    const publicResetLink = `${publicHost}/#/reset-password/${resetToken}`;
+
     const emailSent = await sendResetEmail({ to: user.email, resetLink }).catch((error) => {
       console.error('Reset email send error:', error);
       return false;
@@ -294,8 +300,8 @@ router.post('/forgot-password', async (req, res) => {
     return res.json({
       message: emailSent
         ? 'If that email exists, we have sent reset instructions.'
-        : 'Reset link generated. Email is not configured on the server yet, so use the link below.',
-      ...(emailSent ? {} : { resetLink })
+        : 'Reset link generated.',
+      ...(emailSent ? {} : { resetLink: publicResetLink })
     });
   } catch (error) {
     console.error('Forgot password error:', error);

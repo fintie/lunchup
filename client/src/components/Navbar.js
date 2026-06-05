@@ -53,6 +53,9 @@ const Navbar = ({ user, logout }) => {
                 <Link to="/projects" className={`nav-link ${isActive('/projects') ? 'active' : ''}`} onClick={close}>
                   Projects
                 </Link>
+                <Link to="/events" className={`nav-link ${isActive('/events') ? 'active' : ''}`} onClick={close}>
+                  Events
+                </Link>
               </>
             )}
 

@@ -4,7 +4,7 @@
 
 Go to Render Dashboard → `lunchup` (Web Service) → **Environment**
 
-Add these **5 environment variables**:
+Add these **6 environment variables**:
 
 | Key | Value | Example |
 |-----|-------|---------|
@@ -13,6 +13,7 @@ Add these **5 environment variables**:
 | `MONGODB_URI` | Your MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster0.xxx.mongodb.net/lunchup?retryWrites=true&w=majority` |
 | `JWT_SECRET` | Random string (min 32 chars) | `my_super_secret_jwt_key_2024_lunchup_app` |
 | `CORS_ORIGIN` | Your frontend URL | `https://lunchup-web.onrender.com` |
+| `WHATSAPP_EVENT_NUMBER` | Destination for event registration chats | `61412345678` |
 
 ### How to get MongoDB URI:
 1. Go to https://cloud.mongodb.com/
@@ -101,13 +102,14 @@ Expected: `{"message":"🍽️ LunchUp API is running!",...}`
 
 ## 📝 Summary
 
-**Backend (5 variables):**
+**Backend (6 variables):**
 ```
 NODE_ENV=production
 PORT=3001
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=your-secret-key
 CORS_ORIGIN=https://lunchup-web.onrender.com
+WHATSAPP_EVENT_NUMBER=61412345678
 ```
 
 **Frontend (1 variable):**
@@ -115,4 +117,4 @@ CORS_ORIGIN=https://lunchup-web.onrender.com
 REACT_APP_API_URL=https://lunchup.onrender.com
 ```
 
-**Total: 6 environment variables**
+**Total: 7 environment variables**

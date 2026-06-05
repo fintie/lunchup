@@ -202,29 +202,31 @@
 .steps {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-wrap: nowrap;
   gap: var(--space-4);
-  max-width: 1000px;
+  max-width: none;
   margin: 0 auto;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 .step {
-  flex: 1;
-  min-width: 200px;
+  flex: 1 1 180px;
+  min-width: 180px;
   max-width: 220px;
   text-align: center;
 }
 
 .step-number {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
   color: white;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   border-radius: var(--radius-full);
   margin: 0 auto var(--space-4);
@@ -232,17 +234,17 @@
 }
 
 .step-content h3 {
-  font-size: 1.125rem;
+  font-size: 1.05rem;
   margin-bottom: var(--space-2);
 }
 
 .step-content p {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--gray-600);
 }
 
 .step-connector {
-  width: 60px;
+  width: 40px;
   height: 2px;
   background: linear-gradient(90deg, var(--primary-300) 0%, var(--primary-200) 100%);
   margin-top: 28px;
@@ -253,6 +255,8 @@
   .steps {
     flex-direction: column;
     align-items: center;
+    overflow-x: visible;
+    padding-bottom: 0;
   }
   
   .step-connector {

@@ -20,6 +20,7 @@ import Sessions from './components/Sessions';
 import UserProfile from './components/UserProfile';
 import Leaderboard from './components/Leaderboard';
 import Messages from './components/Messages';
+import Events from './components/Events';
 
 // Determine API URL based on environment
 const getApiUrl = () => {
@@ -133,6 +134,10 @@ function AppContent() {
           <Route
             path="/opportunities"
             element={<Opportunities />}
+          />
+          <Route
+            path="/events"
+            element={<Events user={user} />}
           />
           <Route
             path="/meetings"

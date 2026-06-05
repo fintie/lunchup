@@ -31,7 +31,7 @@ const authMiddleware = async (req, res, next) => {
 // Register a new user
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, professionalBackground, skills, preferredTopics, preferredLocation, preferredMeetingPoint, bio } = req.body;
+    const { name, email, password, professionalBackground, skills, preferredTopics, preferredLocation, preferredMeetingPoint, bio, rawInterestText, eventInterests, eventNotificationFrequency } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -63,7 +63,10 @@ router.post('/register', async (req, res) => {
         preferredTopics,
         preferredLocation,
         preferredMeetingPoint,
-        bio
+        bio,
+        rawInterestText,
+        eventInterests,
+        eventNotificationFrequency
       });
 
       await newUser.save();
@@ -92,7 +95,10 @@ router.post('/register', async (req, res) => {
         preferredTopics,
         preferredLocation,
         preferredMeetingPoint,
-        bio
+        bio,
+        rawInterestText,
+        eventInterests,
+        eventNotificationFrequency
       };
 
       demoUsers.set(email, user);

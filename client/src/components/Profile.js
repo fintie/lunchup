@@ -13,7 +13,10 @@ function Profile({ user }) {
     preferredLocation: '',
     preferredMeetingPoint: '',
     role: '',
-    buildPreferences: ''
+    buildPreferences: '',
+    rawInterestText: '',
+    eventInterests: '',
+    eventNotificationFrequency: 'DAILY'
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -40,7 +43,10 @@ function Profile({ user }) {
             preferredLocation: data.preferredLocation || '',
             preferredMeetingPoint: data.preferredMeetingPoint || '',
             role: data.role || '',
-            buildPreferences: Array.isArray(data.buildPreferences) ? data.buildPreferences.join(', ') : ''
+            buildPreferences: Array.isArray(data.buildPreferences) ? data.buildPreferences.join(', ') : '',
+            rawInterestText: data.rawInterestText || '',
+            eventInterests: Array.isArray(data.eventInterests) ? data.eventInterests.join(', ') : '',
+            eventNotificationFrequency: data.eventNotificationFrequency || 'DAILY'
           });
           // For demo users, use the score embedded in user data directly
           if (user?.id?.startsWith('demo_') && data.reputationScore != null) {
@@ -136,7 +142,8 @@ function Profile({ user }) {
         ...profile,
         skills: profile.skills.split(',').map(s => s.trim()).filter(s => s),
         preferredTopics: profile.preferredTopics.split(',').map(t => t.trim()).filter(t => t),
-        buildPreferences: profile.buildPreferences.split(',').map(b => b.trim()).filter(b => b)
+        buildPreferences: profile.buildPreferences.split(',').map(b => b.trim()).filter(b => b),
+        eventInterests: profile.eventInterests.split(',').map(i => i.trim()).filter(i => i)
       };
 
       const res = await axios.put(`/users/${user.id}`, updateData, {
@@ -283,6 +290,44 @@ function Profile({ user }) {
                 className="form-input"
                 placeholder="e.g., career coaching, startups, AI"
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Event Interest Summary</label>
+              <textarea
+                name="rawInterestText"
+                value={profile.rawInterestText}
+                onChange={handleChange}
+                className="form-input form-textarea"
+                rows="3"
+                placeholder="e.g., Sydney AI startup events, founder networking, product meetups"
+              />
+              <span className="form-hint">This is the free-text input used by the Nixie-style event recommender.</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Event Categories</label>
+              <input
+                type="text"
+                name="eventInterests"
+                value={profile.eventInterests}
+                onChange={handleChange}
+                className="form-input"
+                placeholder="e.g., AI, Startups, Web3, Food, Music"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Event Digest Frequency</label>
+              <select
+                name="eventNotificationFrequency"
+                value={profile.eventNotificationFrequency}
+                onChange={handleChange}
+                className="form-input"
+              >
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+              </select>
             </div>
 
             <div className="form-row">

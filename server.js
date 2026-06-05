@@ -20,6 +20,8 @@ const allowedOrigins = [
   'https://lunchup.com.au',
   'https://www.lunchup.com.au',
   'https://lunchup-web.onrender.com'
+  , 'http://localhost:3000'
+  , 'http://127.0.0.1:3000'
 ];
 
 if (process.env.CORS_ORIGIN) {
@@ -90,7 +92,8 @@ app.get('/', (req, res) => {
       auth: '/api/auth/login',
       users: '/api/users',
       match: '/api/match',
-      meetings: '/api/meetings'
+      meetings: '/api/meetings',
+      events: '/api/events'
     },
     environment: process.env.NODE_ENV || 'development'
   });
@@ -108,12 +111,14 @@ app.use('/api/match', require('./routes/match'));
 app.use('/api/meetings', require('./routes/meetings'));
 app.use('/api/news', require('./routes/news'));
 app.use('/api/opportunities', require('./routes/opportunities'));
+app.use('/api/events', require('./routes/events'));
 app.use('/api/seed', require('./routes/seed'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/harness', require('./routes/harness'));
 app.use('/api/github', require('./routes/github'));
 app.use('/api/challenges', require('./routes/challenges'));
 app.use('/api/messages', require('./routes/messages'));
+app.use('/api/whatsapp', require('./routes/whatsapp'));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
@@ -127,6 +132,7 @@ if (process.env.NODE_ENV === 'production') {
 const { execFile } = require('child_process');
 const newsUpdateScript = path.join(__dirname, 'scripts', 'updateNews.js');
 const opportunitiesUpdateScript = path.join(__dirname, 'scripts', 'updateOpportunities.js');
+const eventsUpdateScript = path.join(__dirname, 'scripts', 'updateEvents.js');
 
 function scheduleRefresh(scriptPath, label, intervalMs) {
   const runUpdate = () => {
@@ -144,7 +150,8 @@ function scheduleRefresh(scriptPath, label, intervalMs) {
 }
 
 scheduleRefresh(newsUpdateScript, '📰', 12 * 60 * 60 * 1000);
-scheduleRefresh(opportunitiesUpdateScript, '💼', 6 * 60 * 60 * 1000);
+scheduleRefresh(opportunitiesUpdateScript, '💼', 24 * 60 * 60 * 1000);
+scheduleRefresh(eventsUpdateScript, '📅', 24 * 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
