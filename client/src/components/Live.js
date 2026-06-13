@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import './Live.css';
 
 function Live({ user }) {
@@ -7,6 +8,7 @@ function Live({ user }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [wechatHighlights, setWechatHighlights] = useState([]);
 
   // Sample Australian users for live visualization (names hidden from display)
   const users = [
@@ -45,6 +47,29 @@ function Live({ user }) {
     return () => {
       clearInterval(timer);
       clearInterval(statusRefresh);
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadWechatHighlights = async () => {
+      try {
+        const { data } = await axios.get('/wechat-highlights?limit=20');
+        if (active) {
+          setWechatHighlights(Array.isArray(data.items) ? data.items : []);
+        }
+      } catch (error) {
+        console.error('Failed to load WeChat highlights:', error.message);
+      }
+    };
+
+    loadWechatHighlights();
+    const refreshTimer = setInterval(loadWechatHighlights, 30000);
+
+    return () => {
+      active = false;
+      clearInterval(refreshTimer);
     };
   }, []);
 
@@ -113,6 +138,16 @@ function Live({ user }) {
       hour: '2-digit', 
       minute: '2-digit',
       hour12: true 
+    });
+  };
+
+  const formatHighlightTime = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+
+    return date.toLocaleString('en-AU', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
     });
   };
 
@@ -357,44 +392,64 @@ function Live({ user }) {
 
       {/* Activity Feed */}
       <div className="activity-feed">
-        <h3 className="feed-title">Recent Activity</h3>
+        <h3 className="feed-title">
+          {wechatHighlights.length > 0 ? 'WeChat Group Highlights' : 'Recent Activity'}
+        </h3>
         <div className="feed-list">
-          <div className="feed-item">
-            <span className="feed-icon meeting">💬</span>
-            <div className="feed-content">
-              <span className="feed-text">
-                <strong>Product Designer</strong> and <strong>Software Engineer</strong> started a meeting
-              </span>
-              <span className="feed-time">2 min ago</span>
-            </div>
-          </div>
-          <div className="feed-item">
-            <span className="feed-icon waiting">⏳</span>
-            <div className="feed-content">
-              <span className="feed-text">
-                <strong>UX Designer</strong> is waiting for a connection
-              </span>
-              <span className="feed-time">5 min ago</span>
-            </div>
-          </div>
-          <div className="feed-item">
-            <span className="feed-icon available">👋</span>
-            <div className="feed-content">
-              <span className="feed-text">
-                <strong>DevOps Engineer</strong> is available to connect
-              </span>
-              <span className="feed-time">8 min ago</span>
-            </div>
-          </div>
-          <div className="feed-item">
-            <span className="feed-icon success">✅</span>
-            <div className="feed-content">
-              <span className="feed-text">
-                <strong>Marketing Manager</strong> connected with <strong>Data Scientist</strong>
-              </span>
-              <span className="feed-time">12 min ago</span>
-            </div>
-          </div>
+          {wechatHighlights.length > 0 ? (
+            wechatHighlights.map((highlight) => (
+              <div className="feed-item" key={highlight._id || highlight.sourceMessageId}>
+                <span className="feed-icon meeting">💬</span>
+                <div className="feed-content">
+                  <span className="feed-text">
+                    <strong>{highlight.authorName || 'Anonymous'}</strong>: {highlight.content}
+                  </span>
+                  <span className="feed-time">
+                    {highlight.roomName} · {formatHighlightTime(highlight.messageTimestamp)}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="feed-item">
+                <span className="feed-icon meeting">💬</span>
+                <div className="feed-content">
+                  <span className="feed-text">
+                    <strong>Product Designer</strong> and <strong>Software Engineer</strong> started a meeting
+                  </span>
+                  <span className="feed-time">2 min ago</span>
+                </div>
+              </div>
+              <div className="feed-item">
+                <span className="feed-icon waiting">⏳</span>
+                <div className="feed-content">
+                  <span className="feed-text">
+                    <strong>UX Designer</strong> is waiting for a connection
+                  </span>
+                  <span className="feed-time">5 min ago</span>
+                </div>
+              </div>
+              <div className="feed-item">
+                <span className="feed-icon available">👋</span>
+                <div className="feed-content">
+                  <span className="feed-text">
+                    <strong>DevOps Engineer</strong> is available to connect
+                  </span>
+                  <span className="feed-time">8 min ago</span>
+                </div>
+              </div>
+              <div className="feed-item">
+                <span className="feed-icon success">✅</span>
+                <div className="feed-content">
+                  <span className="feed-text">
+                    <strong>Marketing Manager</strong> connected with <strong>Data Scientist</strong>
+                  </span>
+                  <span className="feed-time">12 min ago</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
