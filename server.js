@@ -114,6 +114,7 @@ app.use('/api/opportunities', require('./routes/opportunities'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/seed', require('./routes/seed'));
 app.use('/api/whatsapp', require('./routes/whatsapp'));
+app.use('/api/wechat-highlights', require('./routes/wechatHighlights'));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

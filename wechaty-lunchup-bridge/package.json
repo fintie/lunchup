@@ -1,0 +1,20 @@
+{
+  "name": "wechaty-lunchup-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Publish marked WeChat group highlights to LunchUp Live",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "qrcode-terminal": "^0.12.0",
+    "wechaty": "^1.20.2",
+    "wechaty-puppet-wechat4u": "^1.14.14"
+  }
+}
