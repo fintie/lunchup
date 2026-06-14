@@ -1,0 +1,24 @@
+<view class="page">
+  <view class="hero event-hero">
+    <view class="hero-title">去现场，遇见同频的人</view>
+    <view class="hero-copy">发现悉尼及澳大利亚的 AI、创业、科技与文化活动。</view>
+  </view>
+
+  <view class="search-box">
+    <input class="search-input" value="{{city}}" bindinput="updateCity" placeholder="按城市筛选，例如 Sydney" />
+    <button class="search-button" bindtap="loadEvents">筛选</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="state">正在读取活动...</view>
+  <view wx:elif="{{error}}" class="state">{{error}}</view>
+  <view wx:elif="{{!events.length}}" class="state">暂时没有找到活动。</view>
+
+  <view wx:for="{{events}}" wx:key="_id" class="card">
+    <view class="event-date">{{item.dateLabel}}</view>
+    <view class="card-title event-title">{{item.title}}</view>
+    <view class="muted">{{item.description}}</view>
+    <view class="meta">{{item.venueName || item.address}} · {{item.city}}</view>
+    <view class="tag" wx:for="{{item.categories}}" wx:for-item="category" wx:key="*this">{{category}}</view>
+    <button class="button-secondary" data-url="{{item.url}}" bindtap="copyLink">复制活动链接</button>
+  </view>
+</view>

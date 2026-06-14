@@ -1,0 +1,57 @@
+.jobs-hero {
+  background: linear-gradient(135deg, #245b4a, #16352c);
+}
+
+.filters {
+  margin: 26rpx 0;
+  white-space: nowrap;
+}
+
+.filter-row {
+  display: flex;
+  gap: 14rpx;
+}
+
+.filter {
+  padding: 14rpx 26rpx;
+  border-radius: 999rpx;
+  color: #756e68;
+  background: #fff;
+}
+
+.filter.active {
+  color: #fff;
+  background: #e86f2d;
+}
+
+.job-category,
+.remote {
+  padding: 7rpx 14rpx;
+  border-radius: 999rpx;
+  color: #a84720;
+  background: #fff0e6;
+  font-size: 21rpx;
+}
+
+.remote {
+  color: #247653;
+  background: #dff5e9;
+}
+
+.job-title {
+  margin-top: 18rpx;
+}
+
+.company {
+  margin-top: 8rpx;
+  color: #4e4843;
+  font-weight: 650;
+}
+
+.summary {
+  display: -webkit-box;
+  margin-top: 18rpx;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}

@@ -1,0 +1,16 @@
+.register-title {
+  margin-top: 20rpx;
+  font-size: 42rpx;
+}
+
+.register-copy {
+  margin-bottom: 28rpx;
+}
+
+.form-card {
+  padding: 32rpx;
+}
+
+.error {
+  color: #c23e2b;
+}

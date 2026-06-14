@@ -1,0 +1,46 @@
+.auth-page {
+  padding-top: 90rpx;
+}
+
+.auth-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100rpx;
+  height: 100rpx;
+  margin: 0 auto 30rpx;
+  border-radius: 30rpx;
+  color: #fff;
+  background: #e86f2d;
+  font-size: 36rpx;
+  font-weight: 800;
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 46rpx;
+  font-weight: 800;
+}
+
+.auth-copy {
+  margin: 14rpx auto 40rpx;
+  text-align: center;
+}
+
+.form-card {
+  padding: 34rpx;
+  border-radius: 30rpx;
+  background: #fff;
+}
+
+.error {
+  margin: 12rpx 0;
+  color: #c23e2b;
+}
+
+.demo {
+  margin-top: 28rpx;
+  color: #9a918a;
+  font-size: 23rpx;
+  text-align: center;
+}

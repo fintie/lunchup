@@ -1,19 +1,51 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
+const Meeting = require('../models/Meeting');
+
+const populateMeeting = (query) => query
+  .populate('host', 'name professionalBackground profilePicture')
+  .populate('attendees', 'name professionalBackground profilePicture');
+
+function requireUser(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
+    req.userId = decoded.userId;
+    return next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+}
 
 // Create a new meeting
-router.post('/', async (req, res) => {
+router.post('/', requireUser, async (req, res) => {
   try {
     const { 
       hostId, 
       attendees, 
+      location,
       meetingPoint, 
       date, 
       time, 
       topic, 
       description 
     } = req.body;
+
+    if (!hostId || !Array.isArray(attendees) || attendees.length === 0 || !meetingPoint || !date || !time || !topic) {
+      return res.status(400).json({
+        message: 'hostId, attendees, meetingPoint, date, time, and topic are required'
+      });
+    }
+
+    if (String(hostId) !== String(req.userId)) {
+      return res.status(403).json({ message: 'You can only create meetings as yourself' });
+    }
 
     // Validate host exists
     const host = await User.findById(hostId);
@@ -27,46 +59,46 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ message: 'One or more attendees not found' });
     }
 
-    // Create meeting object (in a real app, you'd have a Meeting model)
-    const meeting = {
-      id: Date.now().toString(), // Simple ID generation for demo
-      hostId,
+    const meeting = await Meeting.create({
+      host: hostId,
       attendees,
+      location,
       meetingPoint,
       date,
       time,
       topic,
-      description,
-      createdAt: new Date(),
-      status: 'scheduled'
-    };
+      description
+    });
 
-    // In a real implementation, you would save this to a database
-    // For now, we'll just return the meeting object
-    
-    res.status(201).json(meeting);
+    const populatedMeeting = await populateMeeting(Meeting.findById(meeting._id));
+    res.status(201).json(populatedMeeting);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
 // Get meetings for a user
-router.get('/user/:userId', async (req, res) => {
+router.get('/user/:userId', requireUser, async (req, res) => {
   try {
     const { userId } = req.params;
+
+    if (String(userId) !== String(req.userId)) {
+      return res.status(403).json({ message: 'You can only view your own meetings' });
+    }
     
-    // In a real implementation, you would fetch meetings from a database
-    // For now, we'll return an empty array as an example
-    
-    // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // This is a placeholder - in a real app, you'd have a Meeting model
-    // and query for meetings where the user is either host or attendee
-    const userMeetings = [];
+    const userMeetings = await populateMeeting(
+      Meeting.find({
+        $or: [
+          { host: userId },
+          { attendees: userId }
+        ]
+      }).sort({ date: 1, time: 1 })
+    );
     
     res.json(userMeetings);
  } catch (error) {
@@ -75,25 +107,34 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Update meeting status
-router.put('/:meetingId/status', async (req, res) => {
+router.put('/:meetingId/status', requireUser, async (req, res) => {
   try {
     const { meetingId } = req.params;
     const { status } = req.body;
-    
-    // In a real implementation, you would update the meeting in the database
-    // For now, we'll just return a success message
     
     const validStatuses = ['scheduled', 'confirmed', 'completed', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
     
-    // Placeholder response
-    res.json({ 
-      message: 'Meeting status updated successfully',
-      meetingId,
-      status
-    });
+    const existingMeeting = await Meeting.findById(meetingId);
+    if (!existingMeeting) {
+      return res.status(404).json({ message: 'Meeting not found' });
+    }
+
+    const canManage = String(existingMeeting.host) === String(req.userId)
+      || existingMeeting.attendees.some((attendeeId) => String(attendeeId) === String(req.userId));
+
+    if (!canManage) {
+      return res.status(403).json({ message: 'Not authorized to update this meeting' });
+    }
+
+    existingMeeting.status = status;
+    await existingMeeting.save();
+
+    const meeting = await populateMeeting(Meeting.findById(existingMeeting._id));
+
+    res.json(meeting);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -1,0 +1,73 @@
+<view class="page">
+  <view wx:if="{{!user}}" class="state">
+    <view class="empty-icon">🍜</view>
+    <view class="section-title">登录后管理午餐邀约</view>
+    <button class="button-primary" bindtap="login">登录 LunchUp</button>
+  </view>
+
+  <block wx:else>
+    <view class="row heading">
+      <view>
+        <view class="section-title">我的午餐邀约</view>
+        <view class="muted">所有端共享同一份会议记录</view>
+      </view>
+      <button class="small-button" bindtap="toggleForm">{{showForm ? '收起' : '+ 新邀约'}}</button>
+    </view>
+
+    <view wx:if="{{showForm}}" class="card">
+      <view class="card-title">邀请 {{attendeeName || '一位匹配对象'}}</view>
+      <view wx:if="{{!attendeeId}}" class="notice" bindtap="goMatches">先去匹配页选择想约的人 →</view>
+      <view class="field">
+        <view class="field-label">日期</view>
+        <picker mode="date" value="{{form.date}}" bindchange="changeDate">
+          <view class="picker">{{form.date || '选择日期'}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <view class="field-label">时间</view>
+        <picker mode="time" value="{{form.time}}" bindchange="changeTime">
+          <view class="picker">{{form.time}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <view class="field-label">餐厅 / 场地</view>
+        <input class="input" value="{{form.location}}" data-field="location" bindinput="updateField" placeholder="例如：The Grounds" />
+      </view>
+      <view class="field">
+        <view class="field-label">碰面地点</view>
+        <input class="input" value="{{form.meetingPoint}}" data-field="meetingPoint" bindinput="updateField" placeholder="例如：Circular Quay" />
+      </view>
+      <view class="field">
+        <view class="field-label">聊天话题</view>
+        <input class="input" value="{{form.topic}}" data-field="topic" bindinput="updateField" />
+      </view>
+      <view class="field">
+        <view class="field-label">补充说明</view>
+        <textarea class="textarea" value="{{form.description}}" data-field="description" bindinput="updateField" placeholder="选填" />
+      </view>
+      <button class="button-primary" loading="{{loading}}" bindtap="submit">发送邀约</button>
+    </view>
+
+    <view wx:if="{{loading &amp;&amp; !meetings.length}}" class="state">正在读取邀约...</view>
+    <view wx:elif="{{!meetings.length}}" class="state">
+      <view class="empty-icon">🥢</view>
+      <view>还没有邀约，去认识一位新朋友吧。</view>
+      <button class="button-secondary" bindtap="goMatches">去匹配</button>
+    </view>
+
+    <view wx:for="{{meetings}}" wx:key="_id" class="card">
+      <view class="row">
+        <view class="card-title">{{item.topic}}</view>
+        <view class="status status-{{item.status}}">{{item.status}}</view>
+      </view>
+      <view class="meeting-time">{{item.date}} · {{item.time}}</view>
+      <view class="muted">{{item.location || item.meetingPoint}} · {{item.meetingPoint}}</view>
+      <view class="meta">参与者：{{item.attendees[0].name || 'LunchUp 好友'}}</view>
+      <view class="status-actions">
+        <button class="mini-action" data-id="{{item._id}}" data-status="confirmed" bindtap="updateStatus">确认</button>
+        <button class="mini-action" data-id="{{item._id}}" data-status="completed" bindtap="updateStatus">完成</button>
+        <button class="mini-action danger" data-id="{{item._id}}" data-status="cancelled" bindtap="updateStatus">取消</button>
+      </view>
+    </view>
+  </block>
+</view>

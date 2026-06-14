@@ -1,0 +1,37 @@
+<view class="page">
+  <view wx:if="{{!user}}" class="guest">
+    <view class="guest-icon">👋</view>
+    <view class="section-title">登录后开始连接</view>
+    <view class="muted">你的网页版 LunchUp 账号可以直接使用。</view>
+    <button class="button-primary" bindtap="login">登录 / 注册</button>
+  </view>
+
+  <view wx:else>
+    <view class="profile-card">
+      <image wx:if="{{profile.profilePicture}}" class="profile-avatar" src="{{profile.profilePicture}}" mode="aspectFill" />
+      <view wx:else class="profile-avatar placeholder">{{avatarLetter}}</view>
+      <view class="profile-name">{{user.name}}</view>
+      <view class="muted">{{profile.professionalBackground || user.email}}</view>
+      <view class="meta">{{profile.preferredLocation || '尚未填写常驻区域'}}</view>
+    </view>
+
+    <view class="section">
+      <view class="card action-row" bindtap="openMeetings">
+        <view>
+          <view class="card-title">我的约饭</view>
+          <view class="muted">查看和管理午餐邀约</view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+      <view class="card">
+        <view class="card-title">技能</view>
+        <view wx:for="{{profile.skills}}" wx:key="*this" class="tag">{{item}}</view>
+      </view>
+      <view class="card">
+        <view class="card-title">想聊的话题</view>
+        <view wx:for="{{profile.preferredTopics}}" wx:key="*this" class="tag">{{item}}</view>
+      </view>
+      <button class="button-secondary" bindtap="logout">退出登录</button>
+    </view>
+  </view>
+</view>

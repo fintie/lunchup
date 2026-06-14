@@ -1,0 +1,24 @@
+<view class="page">
+  <view class="hero news-hero">
+    <view class="hero-title">今天值得知道的事</view>
+    <view class="hero-copy">科技、创业、AI 与 Web3 新闻，保留 LunchUp 的“为什么重要”。</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="state">正在整理今天的新闻...</view>
+  <view wx:elif="{{error}}" class="state">{{error}}</view>
+
+  <view wx:for="{{news}}" wx:key="id" class="card">
+    <view class="row">
+      <view class="news-category">{{item.category}}</view>
+      <view class="meta">{{item.dateLabel}}</view>
+    </view>
+    <view class="card-title news-title">{{item.title}}</view>
+    <view class="meta">{{item.source}} · {{item.region}}</view>
+    <view class="muted summary">{{item.summary}}</view>
+    <view class="why">
+      <view class="why-title">为什么值得关注</view>
+      <view>{{item.whyItMatters}}</view>
+    </view>
+    <button class="button-secondary" data-url="{{item.url}}" bindtap="copyLink">复制原文链接</button>
+  </view>
+</view>

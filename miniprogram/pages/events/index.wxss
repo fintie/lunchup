@@ -1,0 +1,34 @@
+.event-hero {
+  background: linear-gradient(135deg, #6b3c72, #35203b);
+}
+
+.search-box {
+  display: flex;
+  gap: 14rpx;
+  margin: 26rpx 0;
+}
+
+.search-input {
+  flex: 1;
+  padding: 20rpx 24rpx;
+  border-radius: 20rpx;
+  background: #fff;
+}
+
+.search-button {
+  width: 140rpx;
+  color: #fff;
+  background: #e86f2d;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+}
+
+.event-date {
+  color: #a84720;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.event-title {
+  margin: 12rpx 0;
+}
