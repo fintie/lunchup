@@ -1,0 +1,141 @@
+.live-page {
+  background: #191715;
+  color: #fff;
+}
+
+.live-header {
+  padding: 38rpx 28rpx;
+  border: 1rpx solid #3a342f;
+  border-radius: 30rpx;
+  background: linear-gradient(135deg, #302821, #191715);
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 18rpx;
+  color: #ff6d5a;
+  font-size: 23rpx;
+  font-weight: 800;
+}
+
+.live-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff4f42;
+}
+
+.scene-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.scene {
+  padding: 24rpx;
+  border: 1rpx solid #3a342f;
+  border-radius: 24rpx;
+  background: #24201d;
+}
+
+.scene-status {
+  color: #f09a61;
+  font-size: 22rpx;
+}
+
+.scene-people {
+  margin: 22rpx 0;
+  font-size: 52rpx;
+}
+
+.scene-topic {
+  font-weight: 700;
+}
+
+.light-title {
+  color: #fff;
+}
+
+.publish-button {
+  width: 180rpx;
+  margin: 0 0 20rpx;
+  color: #fff;
+  background: #e86f2d;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+}
+
+.composer {
+  margin-bottom: 20rpx;
+  padding: 24rpx;
+  border: 1rpx solid #493d35;
+  border-radius: 24rpx;
+  background: #2b2521;
+}
+
+.composer-note {
+  color: #d2c3b8;
+  font-size: 23rpx;
+}
+
+.composer-input {
+  width: 100%;
+  min-height: 180rpx;
+  margin-top: 18rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  color: #242220;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.composer-actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+
+.composer-primary,
+.composer-secondary {
+  flex: 1;
+  margin: 0;
+  border-radius: 14rpx;
+  font-size: 23rpx;
+}
+
+.composer-primary {
+  color: #fff;
+  background: #e86f2d;
+}
+
+.composer-secondary {
+  color: #d8c8bc;
+  background: #40362f;
+}
+
+.highlight {
+  margin-bottom: 18rpx;
+  padding: 28rpx;
+  border: 1rpx solid #3a342f;
+  border-radius: 24rpx;
+  background: #24201d;
+}
+
+.quote {
+  color: #f4eee9;
+  font-size: 29rpx;
+  line-height: 1.65;
+}
+
+.highlight-meta {
+  margin-top: 18rpx;
+  color: #a89e96;
+  font-size: 23rpx;
+}
+
+.live-state {
+  color: #a89e96;
+}

@@ -1,0 +1,64 @@
+<view class="page">
+  <view class="hero">
+    <view class="hero-kicker">LunchUp 澳大利亚</view>
+    <view class="hero-title">{{user ? '你好，' + user.name : '一顿午餐，认识对的人'}}</view>
+    <view class="hero-copy">匹配同行、约午餐、找工作、看行业新闻，也看看此刻大家正在聊什么。</view>
+    <button wx:if="{{!user}}" class="hero-button" data-url="/pages/login/index" bindtap="openPage">登录 / 注册</button>
+  </view>
+
+  <view class="stats">
+    <view class="stat">
+      <view class="stat-number">{{stats.jobs}}</view>
+      <view class="stat-label">工作机会</view>
+    </view>
+    <view class="stat">
+      <view class="stat-number">{{stats.news}}</view>
+      <view class="stat-label">行业新闻</view>
+    </view>
+    <view class="stat">
+      <view class="stat-number">{{stats.highlights}}</view>
+      <view class="stat-label">群聊亮点</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">现在想做什么？</view>
+    <view class="action-grid">
+      <view class="action-card" data-url="/pages/matches/index" bindtap="switchTab">
+        <view class="action-icon">🤝</view>
+        <view class="card-title">智能匹配</view>
+        <view class="muted">发现值得认识的同行</view>
+      </view>
+      <view class="action-card" data-url="/pages/meeting/index" bindtap="openPage">
+        <view class="action-icon">🍜</view>
+        <view class="card-title">约 Lunch</view>
+        <view class="muted">安排下一次线下交流</view>
+      </view>
+      <view class="action-card" data-url="/pages/news/index" bindtap="openPage">
+        <view class="action-icon">📰</view>
+        <view class="card-title">看新闻</view>
+        <view class="muted">快速掌握科技与创业动态</view>
+      </view>
+      <view class="action-card" data-url="/pages/events/index" bindtap="openPage">
+        <view class="action-icon">📍</view>
+        <view class="card-title">找活动</view>
+        <view class="muted">发现澳洲本地行业活动</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="row">
+      <view class="section-title">最新新闻</view>
+      <view class="more" data-url="/pages/news/index" bindtap="openPage">查看全部</view>
+    </view>
+    <view wx:if="{{loading}}" class="state">正在连接 LunchUp...</view>
+    <view wx:elif="{{error}}" class="state">{{error}}</view>
+    <view wx:else>
+      <view class="card" wx:for="{{latestNews}}" wx:key="id">
+        <view class="card-title">{{item.title}}</view>
+        <view class="meta">{{item.source}} · {{item.region}}</view>
+      </view>
+    </view>
+  </view>
+</view>

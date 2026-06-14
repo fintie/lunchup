@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="hero jobs-hero">
+    <view class="hero-title">澳洲科技与创业工作机会</view>
+    <view class="hero-copy">聚焦 AI、数据、IT、市场，以及适合澳洲求职者的远程岗位。</view>
+  </view>
+
+  <scroll-view class="filters" scroll-x>
+    <view class="filter-row">
+      <view wx:for="{{categories}}" wx:key="*this" class="filter {{category === item ? 'active' : ''}}" data-category="{{item}}" bindtap="filter">{{item}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{loading}}" class="state">正在寻找新机会...</view>
+  <view wx:elif="{{error}}" class="state">{{error}}</view>
+  <view wx:elif="{{!jobs.length}}" class="state">这个分类暂时没有职位。</view>
+
+  <view wx:for="{{jobs}}" wx:key="id" class="card">
+    <view class="row">
+      <view class="job-category">{{item.category}}</view>
+      <view wx:if="{{item.isRemote}}" class="remote">远程</view>
+    </view>
+    <view class="card-title job-title">{{item.title}}</view>
+    <view class="company">{{item.company}}</view>
+    <view class="meta">{{item.location}} · {{item.dateLabel}}</view>
+    <view class="muted summary">{{item.summary}}</view>
+    <view>
+      <view class="tag" wx:for="{{item.displayTags}}" wx:for-item="tag" wx:key="*this">{{tag}}</view>
+    </view>
+    <button class="button-primary" data-url="{{item.applyUrl || item.url}}" bindtap="copyLink">复制申请链接</button>
+  </view>
+</view>

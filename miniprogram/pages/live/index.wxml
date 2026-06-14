@@ -1,0 +1,38 @@
+<view class="page live-page">
+  <view class="live-header">
+    <view class="live-badge"><view class="live-dot"></view> LIVE</view>
+    <view class="hero-title">此刻的 LunchUp</view>
+    <view class="hero-copy">看看谁在见面，也看看 AI Cafe 群里沉淀出的讨论亮点。</view>
+  </view>
+
+  <view class="scene-grid">
+    <view wx:for="{{scenes}}" wx:key="id" class="scene">
+      <view class="scene-status">{{item.status}}</view>
+      <view class="scene-people">{{item.people === 2 ? '👥' : '👤'}}</view>
+      <view class="scene-topic">{{item.topic}}</view>
+      <view class="meta">{{item.place}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="row">
+      <view class="section-title light-title">AI Cafe 群聊亮点</view>
+      <button class="publish-button" bindtap="toggleComposer">发布亮点</button>
+    </view>
+    <view wx:if="{{showComposer}}" class="composer">
+      <view class="composer-note">请只发布已获同意、适合公开展示的内容。</view>
+      <textarea class="composer-input" value="{{highlightContent}}" bindinput="updateHighlight" placeholder="粘贴群消息，或输入你提炼后的亮点" />
+      <view class="composer-actions">
+        <button class="composer-secondary" bindtap="pasteClipboard">粘贴剪贴板</button>
+        <button class="composer-primary" bindtap="submitHighlight">确认发布</button>
+      </view>
+    </view>
+    <view wx:if="{{loading}}" class="state live-state">正在刷新亮点...</view>
+    <view wx:elif="{{error}}" class="state live-state">{{error}}</view>
+    <view wx:elif="{{!highlights.length}}" class="state live-state">还没有发布亮点。在群里标记内容后，它会出现在这里。</view>
+    <view wx:for="{{highlights}}" wx:key="_id" class="highlight">
+      <view class="quote">“{{item.content}}”</view>
+      <view class="highlight-meta">{{item.authorName || '匿名成员'}} · {{item.roomName}} · {{item.dateLabel}}</view>
+    </view>
+  </view>
+</view>

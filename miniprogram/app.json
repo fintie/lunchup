@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/matches/index",
+    "pages/live/index",
+    "pages/opportunities/index",
+    "pages/profile/index",
+    "pages/meeting/index",
+    "pages/news/index",
+    "pages/events/index",
+    "pages/login/index",
+    "pages/register/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "LunchUp",
+    "navigationBarBackgroundColor": "#fff8f1",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f7f5",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#77736f",
+    "selectedColor": "#e86f2d",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/matches/index",
+        "text": "匹配"
+      },
+      {
+        "pagePath": "pages/live/index",
+        "text": "现场"
+      },
+      {
+        "pagePath": "pages/opportunities/index",
+        "text": "工作"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

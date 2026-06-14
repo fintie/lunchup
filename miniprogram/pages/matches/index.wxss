@@ -1,0 +1,43 @@
+.match-hero {
+  background: linear-gradient(135deg, #4d4038, #241f1b);
+}
+
+.search-box {
+  display: flex;
+  gap: 14rpx;
+  margin: 26rpx 0;
+}
+
+.search-input {
+  flex: 1;
+  padding: 20rpx 24rpx;
+  border-radius: 20rpx;
+  background: #fff;
+}
+
+.search-button {
+  width: 140rpx;
+  color: #fff;
+  background: #e86f2d;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+}
+
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #e86f2d;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.score {
+  color: #d85b29;
+  font-weight: 800;
+}
+
+.tags {
+  margin-top: 12rpx;
+}

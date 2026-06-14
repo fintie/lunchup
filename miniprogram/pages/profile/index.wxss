@@ -1,0 +1,49 @@
+.guest {
+  padding-top: 180rpx;
+  text-align: center;
+}
+
+.guest-icon {
+  margin-bottom: 24rpx;
+  font-size: 80rpx;
+}
+
+.profile-card {
+  padding: 46rpx 30rpx;
+  border-radius: 32rpx;
+  background: #fff;
+  text-align: center;
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150rpx;
+  height: 150rpx;
+  margin: 0 auto 22rpx;
+  border-radius: 50%;
+}
+
+.placeholder {
+  color: #fff;
+  background: #e86f2d;
+  font-size: 54rpx;
+  font-weight: 800;
+}
+
+.profile-name {
+  font-size: 40rpx;
+  font-weight: 800;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.arrow {
+  color: #d85b29;
+  font-size: 52rpx;
+}

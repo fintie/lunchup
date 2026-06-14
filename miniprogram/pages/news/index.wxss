@@ -1,0 +1,34 @@
+.news-hero {
+  background: linear-gradient(135deg, #394a76, #202942);
+}
+
+.news-category {
+  padding: 7rpx 14rpx;
+  border-radius: 999rpx;
+  color: #324d88;
+  background: #e8eefc;
+  font-size: 21rpx;
+}
+
+.news-title {
+  margin-top: 18rpx;
+}
+
+.summary {
+  margin-top: 18rpx;
+}
+
+.why {
+  margin-top: 22rpx;
+  padding: 20rpx;
+  border-radius: 18rpx;
+  color: #5a4c43;
+  background: #faf4ef;
+  line-height: 1.6;
+}
+
+.why-title {
+  margin-bottom: 6rpx;
+  color: #a84720;
+  font-weight: 700;
+}

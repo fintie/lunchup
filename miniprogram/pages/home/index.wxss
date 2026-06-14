@@ -1,0 +1,65 @@
+.hero-kicker {
+  margin-bottom: 12rpx;
+  color: #ffe2d0;
+  font-size: 24rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.hero-button {
+  width: 240rpx;
+  margin: 28rpx 0 0;
+  color: #bd4c20;
+  background: #fff;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.stats {
+  display: flex;
+  margin-top: 24rpx;
+  padding: 26rpx 12rpx;
+  border-radius: 26rpx;
+  background: #fff;
+}
+
+.stat {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-number {
+  color: #d85b29;
+  font-size: 38rpx;
+  font-weight: 800;
+}
+
+.stat-label {
+  color: #8c847d;
+  font-size: 23rpx;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+}
+
+.action-card {
+  min-height: 190rpx;
+  padding: 26rpx;
+  border-radius: 25rpx;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.action-icon {
+  margin-bottom: 16rpx;
+  font-size: 44rpx;
+}
+
+.more {
+  color: #d85b29;
+  font-size: 25rpx;
+}
