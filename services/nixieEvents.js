@@ -7,6 +7,24 @@ const User = require('../models/User');
 const organizersWithBoost = new Set(['Fishburners', 'Stone & Chalk', 'UTS']);
 // Always link WhatsApp event registrations to the Lunchup business account.
 const WHATSAPP_EVENT_NUMBER = '15559826782';
+const UPCOMING_EVENT_WINDOW_DAYS = 14;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const upcomingEventsWindow = () => {
+  const now = new Date();
+  const windowEnd = new Date(now.getTime() + UPCOMING_EVENT_WINDOW_DAYS * DAY_MS);
+
+  return {
+    startTime: {
+      $gte: now,
+      $lte: windowEnd
+    }
+  };
+};
+
+async function purgePastEvents() {
+  return Event.deleteMany({ startTime: { $lt: new Date() } });
+}
 
 const sampleEvents = () => {
   const now = Date.now();
@@ -181,6 +199,8 @@ const buildWhatsAppText = ({ event, userName }) => {
 };
 
 async function seedSampleEvents() {
+  await purgePastEvents();
+
   const events = sampleEvents();
   let created = 0;
   let updated = 0;
@@ -210,7 +230,12 @@ async function seedSampleEvents() {
 }
 
 async function listEvents(city) {
-  const query = city ? { city: new RegExp(`^${city}$`, 'i') } : {};
+  await purgePastEvents();
+
+  const query = {
+    ...upcomingEventsWindow(),
+    ...(city ? { city: new RegExp(`^${city}$`, 'i') } : {})
+  };
   return Event.find(query).sort({ startTime: 1 }).lean();
 }
 
@@ -256,6 +281,8 @@ async function buildWhatsAppRegistration({ eventId, userId, userName, phoneNumbe
 
 async function runRecommendations({ userId } = {}) {
   await seedSampleEvents();
+  await purgePastEvents();
+
   const users = userId
     ? await User.find({ _id: userId }).lean()
     : await User.find({}).lean();
@@ -265,7 +292,10 @@ async function runRecommendations({ userId } = {}) {
 
   for (const user of users) {
     const preferredCity = (user.preferredLocation?.split('-')[0] || user.preferredLocation || 'Sydney').trim();
-    const events = await Event.find({ city: new RegExp(`^${preferredCity}$`, 'i') }).lean();
+    const events = await Event.find({
+      ...upcomingEventsWindow(),
+      city: new RegExp(`^${preferredCity}$`, 'i')
+    }).lean();
     const scored = events.map((event) => ({ event, ...scoreEventForUser(user, event) }));
     const topMatches = scored.sort((a, b) => b.score - a.score).slice(0, 5);
 
@@ -307,9 +337,15 @@ async function getRecommendationsForUser(userId) {
     .sort({ score: -1, createdAt: -1 })
     .populate('eventId')
     .lean();
+  const now = Date.now();
+  const windowEnd = now + UPCOMING_EVENT_WINDOW_DAYS * DAY_MS;
 
   return rows
-    .filter((row) => row.eventId)
+    .filter((row) => {
+      if (!row.eventId) return false;
+      const startTime = new Date(row.eventId.startTime).getTime();
+      return startTime >= now && startTime <= windowEnd;
+    })
     .map((row) => ({
       id: row._id,
       eventId: row.eventId._id,
