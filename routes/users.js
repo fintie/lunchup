@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
 
 // In-memory demo users storage (same as auth.js)
@@ -22,6 +24,56 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
+const featuredMembersPath = path.join(__dirname, '..', 'data', 'featuredUsers.json');
+
+const publicUserFields = [
+  '_id',
+  'name',
+  'professionalBackground',
+  'skills',
+  'preferredTopics',
+  'preferredLocation',
+  'preferredMeetingPoint',
+  'profilePicture',
+  'linkedinUrl',
+  'bio'
+];
+
+const sanitizePublicUser = (user, index = 0) => {
+  const source = typeof user.toObject === 'function' ? user.toObject() : user;
+
+  return {
+    _id: source._id || source.id || `featured_${index + 1}`,
+    name: source.name,
+    professionalBackground: source.professionalBackground,
+    skills: Array.isArray(source.skills) ? source.skills.slice(0, 5) : [],
+    preferredTopics: Array.isArray(source.preferredTopics) ? source.preferredTopics.slice(0, 4) : [],
+    preferredLocation: source.preferredLocation || '',
+    preferredMeetingPoint: source.preferredMeetingPoint || '',
+    profilePicture: source.profilePicture || '',
+    linkedinUrl: source.linkedinUrl || '',
+    bio: source.bio || '',
+    matchScore: source.matchScore || Math.max(58, 96 - index * 3)
+  };
+};
+
+const readCuratedFeaturedMembers = () => {
+  if (!fs.existsSync(featuredMembersPath)) return [];
+
+  try {
+    const raw = fs.readFileSync(featuredMembersPath, 'utf8');
+    const members = JSON.parse(raw);
+    if (!Array.isArray(members)) return [];
+
+    return members
+      .filter((member) => member && member.name && member.professionalBackground)
+      .map(sanitizePublicUser);
+  } catch (error) {
+    console.warn('Unable to read featured users:', error.message);
+    return [];
   }
 };
 
@@ -132,6 +184,26 @@ router.post('/register', async (req, res) => {
       return res.status(503).json({ message: 'Database unavailable. Please try again later.' });
     }
     
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Public featured users for unregistered matches page.
+// Use curated entries first so only consented profiles are shown publicly.
+router.get('/featured', async (req, res) => {
+  try {
+    const curatedMembers = readCuratedFeaturedMembers();
+    if (curatedMembers.length > 0) {
+      return res.json(curatedMembers.slice(0, 24));
+    }
+
+    const featuredUsers = await User.find({ featuredOnPublicMatches: true })
+      .select(publicUserFields.join(' '))
+      .limit(24);
+
+    res.json(featuredUsers.map(sanitizePublicUser));
+  } catch (error) {
+    console.error('Get featured users error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

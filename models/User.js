@@ -42,6 +42,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  linkedinUrl: {
+    type: String,
+    default: ''
+  },
+  featuredOnPublicMatches: {
+    type: Boolean,
+    default: false
+  },
   bio: {
     type: String,
     default: ''

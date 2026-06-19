@@ -20,10 +20,16 @@ function Matches({ user }) {
     try {
       const token = localStorage.getItem('token');
       
+      if (!token) {
+        const featuredUsers = await fetchFeaturedMatches();
+        setMatches(featuredUsers.length > 0 ? featuredUsers : getSampleMatches());
+        return;
+      }
+
       // Try to fetch all users from API
       try {
         const allUsersRes = await axios.get('/users', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
+          headers: { Authorization: `Bearer ${token}` }
         });
         
         let allUsers = allUsersRes.data || [];
@@ -44,6 +50,15 @@ function Matches({ user }) {
       setMatches(getSampleMatches());
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFeaturedMatches = async () => {
+    try {
+      const featuredUsersRes = await axios.get('/users/featured');
+      return featuredUsersRes.data || [];
+    } catch (error) {
+      return [];
     }
   };
 
@@ -213,8 +228,12 @@ function Matches({ user }) {
         setMatches(scoredMatches.slice(0, 12));
       } else {
         // Guest user - just show matches without personalization
-        const allUsersRes = await axios.get('/users', {}).catch(() => null);
-        let allUsers = allUsersRes?.data || getSampleMatches();
+        const allUsers = await fetchFeaturedMatches();
+        if (allUsers.length === 0) {
+          setMatches(getSampleMatches());
+          setFindingMatches(false);
+          return;
+        }
         setMatches(allUsers.slice(0, 12));
       }
       
@@ -415,6 +434,16 @@ function Matches({ user }) {
                 <div className="match-body">
                   <h3>{match.name}</h3>
                   <p className="match-background">{match.professionalBackground}</p>
+                  {match.linkedinUrl && (
+                    <a
+                      className="linkedin-link"
+                      href={match.linkedinUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      LinkedIn profile
+                    </a>
+                  )}
 
                   <div className="match-section">
                     <span className="match-label">Skills</span>
