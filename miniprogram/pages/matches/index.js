@@ -55,7 +55,20 @@ Page({
   async loadMatches() {
     const user = getUser()
     if (!user) {
-      this.setData({ matches: samples, loading: false })
+      this.setData({ loading: true, error: '' })
+      try {
+        const users = await api.get('/users/featured')
+        const matches = (users || []).map((item, index) => ({
+          ...item,
+          avatarLetter: item.name ? item.name.charAt(0) : 'L',
+          matchScore: item.matchScore || Math.max(58, 96 - index * 3)
+        }))
+        this.setData({ matches: matches.length ? matches : samples })
+      } catch (error) {
+        this.setData({ matches: samples })
+      } finally {
+        this.setData({ loading: false })
+      }
       return
     }
 
