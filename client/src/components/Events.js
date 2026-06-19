@@ -131,9 +131,9 @@ const Events = ({ user }) => {
       <section className="events-hero">
         <div className="events-hero-content">
           <span className="events-eyebrow">Lunchup x Nixie</span>
-          <h1>All events in one place</h1>
+          <h1>Events in the next 2 weeks</h1>
           <p>
-            Browse the full Lunchup events feed on one page, then optionally generate tailored picks based on your profile and event interests.
+            Browse upcoming Lunchup events from the next 14 days, then optionally generate tailored picks based on your profile and event interests.
           </p>
           <div className="events-actions">
             <button className="btn btn-primary" onClick={runRecommendations} disabled={!userId || running}>
@@ -160,7 +160,7 @@ const Events = ({ user }) => {
             <div className="events-summary-row">
               <div className="events-state-card small">
                 <strong>{events.length}</strong>
-                <span>Total events</span>
+                <span>Next 14 days</span>
               </div>
               <div className="events-state-card small">
                 <strong>{filteredEvents.length}</strong>
@@ -215,7 +215,7 @@ const Events = ({ user }) => {
             <section>
               <div className="section-header-row">
                 <h2>Upcoming events</h2>
-                <span>{filteredEvents.length} loaded</span>
+                <span>{filteredEvents.length} in next 14 days</span>
               </div>
               <div className="events-grid full-width">
                 {filteredEvents.map((event) => (

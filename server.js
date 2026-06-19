@@ -110,6 +110,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/match', require('./routes/match'));
 app.use('/api/meetings', require('./routes/meetings'));
 app.use('/api/news', require('./routes/news'));
+app.use('/api/community-feed', require('./routes/communityFeed'));
 app.use('/api/opportunities', require('./routes/opportunities'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/seed', require('./routes/seed'));
@@ -129,6 +130,7 @@ const { execFile } = require('child_process');
 const newsUpdateScript = path.join(__dirname, 'scripts', 'updateNews.js');
 const opportunitiesUpdateScript = path.join(__dirname, 'scripts', 'updateOpportunities.js');
 const eventsUpdateScript = path.join(__dirname, 'scripts', 'updateEvents.js');
+const communityFeedUpdateScript = path.join(__dirname, 'scripts', 'updateCommunityFeed.js');
 
 function scheduleRefresh(scriptPath, label, intervalMs) {
   const runUpdate = () => {
@@ -148,6 +150,7 @@ function scheduleRefresh(scriptPath, label, intervalMs) {
 scheduleRefresh(newsUpdateScript, '📰', 12 * 60 * 60 * 1000);
 scheduleRefresh(opportunitiesUpdateScript, '💼', 24 * 60 * 60 * 1000);
 scheduleRefresh(eventsUpdateScript, '📅', 24 * 60 * 60 * 1000);
+scheduleRefresh(communityFeedUpdateScript, '🌐', 24 * 60 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
