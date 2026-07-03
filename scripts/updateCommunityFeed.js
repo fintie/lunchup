@@ -6,7 +6,7 @@ const DATA_PATH = path.join(__dirname, '..', 'data', 'communityFeed.json');
 const META_PATH = path.join(__dirname, '..', 'data', 'communityFeed-meta.json');
 const MAX_ITEMS = 80;
 const FRESH_ITEMS_PER_RUN = 24;
-const MIN_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const MIN_REFRESH_INTERVAL_MS = Number(process.env.COMMUNITY_MIN_REFRESH_INTERVAL_MS || 60 * 60 * 1000);
 const FETCH_TIMEOUT = 12000;
 
 const RSS_SOURCES = [

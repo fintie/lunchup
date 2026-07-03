@@ -203,6 +203,18 @@ function calculateQualityScore(event) {
   return Math.min(10, score);
 }
 
+function normalizeEventForSave(event) {
+  return {
+    ...event,
+    description: stripHtml(event.description || event.title || 'Event details coming soon.'),
+    city: event.city || 'Sydney',
+    country: event.country || 'Australia',
+    timezone: event.timezone || 'Australia/Sydney',
+    categoryJson: event.categoryJson || { categories: ['Event'] },
+    audienceJson: event.audienceJson || { audience: [], personas: [] }
+  };
+}
+
 function mapLumaEvent(entry) {
   const e = entry.event || entry;
   const location = e.geo_address_json || e.geo_address_info || e.location || {};
@@ -746,7 +758,8 @@ async function mergeAndSaveEvents({ dryRun = false } = {}) {
 
     const deduped = new Map();
     const uniqueEvents = [];
-    for (const event of allEvents) {
+    for (const rawEvent of allEvents) {
+      const event = normalizeEventForSave(rawEvent);
       event.contentHash = buildContentHash(event);
       event.qualityScore = calculateQualityScore(event);
 

@@ -132,25 +132,61 @@ const opportunitiesUpdateScript = path.join(__dirname, 'scripts', 'updateOpportu
 const eventsUpdateScript = path.join(__dirname, 'scripts', 'updateEvents.js');
 const communityFeedUpdateScript = path.join(__dirname, 'scripts', 'updateCommunityFeed.js');
 
-function scheduleRefresh(scriptPath, label, intervalMs) {
+function envMs(name, fallbackMs) {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value > 0 ? value : fallbackMs;
+}
+
+function scheduleRefresh(scriptPath, label, intervalMs, options = {}) {
+  let running = false;
+  let failureCount = 0;
+  const timeoutMs = options.timeoutMs || 10 * 60 * 1000;
+  const retryBaseMs = options.retryBaseMs || 5 * 60 * 1000;
+  const initialDelayMs = options.initialDelayMs || 30 * 1000;
+
   const runUpdate = () => {
-    execFile('node', [scriptPath], (error, stdout, stderr) => {
+    if (running) {
+      console.log(`${label} refresh skipped because previous run is still active`);
+      return;
+    }
+
+    running = true;
+    const startedAt = Date.now();
+
+    execFile('node', [scriptPath], { timeout: timeoutMs }, (error, stdout, stderr) => {
+      running = false;
+
       if (error) {
+        failureCount += 1;
+        const retryMs = Math.min(retryBaseMs * failureCount, intervalMs);
         console.error(`❌ ${label} refresh failed:`, stderr || error.message);
+        console.log(`${label} retry scheduled in ${Math.round(retryMs / 1000)}s`);
+        setTimeout(runUpdate, retryMs);
         return;
       }
-      console.log(`${label} ${stdout.trim()}`);
+
+      failureCount = 0;
+      console.log(`${label} ${stdout.trim()} (${Date.now() - startedAt}ms)`);
     });
   };
 
-  runUpdate();
+  setTimeout(runUpdate, initialDelayMs);
   setInterval(runUpdate, intervalMs);
 }
 
-scheduleRefresh(newsUpdateScript, '📰', 12 * 60 * 60 * 1000);
-scheduleRefresh(opportunitiesUpdateScript, '💼', 24 * 60 * 60 * 1000);
-scheduleRefresh(eventsUpdateScript, '📅', 24 * 60 * 60 * 1000);
-scheduleRefresh(communityFeedUpdateScript, '🌐', 24 * 60 * 60 * 1000);
+scheduleRefresh(newsUpdateScript, '📰', envMs('NEWS_REFRESH_INTERVAL_MS', 60 * 60 * 1000), {
+  initialDelayMs: envMs('NEWS_REFRESH_INITIAL_DELAY_MS', 45 * 1000)
+});
+scheduleRefresh(opportunitiesUpdateScript, '💼', envMs('OPPORTUNITIES_REFRESH_INTERVAL_MS', 2 * 60 * 60 * 1000), {
+  initialDelayMs: envMs('OPPORTUNITIES_REFRESH_INITIAL_DELAY_MS', 60 * 1000)
+});
+scheduleRefresh(eventsUpdateScript, '📅', envMs('EVENTS_REFRESH_INTERVAL_MS', 3 * 60 * 60 * 1000), {
+  initialDelayMs: envMs('EVENTS_REFRESH_INITIAL_DELAY_MS', 90 * 1000),
+  timeoutMs: envMs('EVENTS_REFRESH_TIMEOUT_MS', 10 * 60 * 1000)
+});
+scheduleRefresh(communityFeedUpdateScript, '🌐', envMs('COMMUNITY_REFRESH_INTERVAL_MS', 60 * 60 * 1000), {
+  initialDelayMs: envMs('COMMUNITY_REFRESH_INITIAL_DELAY_MS', 75 * 1000)
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

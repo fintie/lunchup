@@ -5,7 +5,7 @@ const axios = require('axios');
 const DATA_PATH = path.join(__dirname, '..', 'data', 'news.json');
 const MAX_ITEMS = 100;
 const FRESH_ITEMS_PER_RUN = 12;
-const MIN_REFRESH_INTERVAL_MS = 12 * 60 * 60 * 1000;
+const MIN_REFRESH_INTERVAL_MS = Number(process.env.NEWS_MIN_REFRESH_INTERVAL_MS || 60 * 60 * 1000);
 const META_PATH = path.join(__dirname, '..', 'data', 'news-meta.json');
 const FETCH_TIMEOUT = 12000;
 
